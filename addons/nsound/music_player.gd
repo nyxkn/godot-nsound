@@ -7,6 +7,7 @@ signal bar(n)
 signal barbeat(n)
 signal odd_bar(n)
 signal loop(n)
+signal end(n)
 signal level(n)
 
 
@@ -25,10 +26,10 @@ const reference_method: int = ReferenceMethod.SILENCE
 var process_diffs := []
 
 # progress counters
-var bar: int
-var beat: int # current beat in the bar
+#var bar: int
+#var beat: int # current beat in the bar
 var loop_beat: int # current beat in the loop
-var barbeat: float # current beat in float format
+var bbt: BBT = BBT.new() # current beat in float format
 var loop: int
 
 var last_beat: int
@@ -64,6 +65,10 @@ var level: int = 0 setget set_level
 var levels_tracks := []
 
 var tracks_queue := []
+
+var last_seek_time := 0
+
+var looping_regions := {}
 
 #var stingers := {}
 #var transitions := {}
@@ -131,8 +136,8 @@ func _process(delta: float) -> void:
 		# anytime you do modulus calculations, you need to bring beats back to start on 0 instead of 1
 		# these calculations could also just go in _beat and _bar respectively
 		# but if you add them here they'll be updated with seeking
-		beat = (loop_beat - 1) % beats_per_bar + 1
-		bar = (loop_beat - 1) / beats_per_bar + 1
+		bbt.beat = (loop_beat - 1) % beats_per_bar + 1
+		bbt.bar = (loop_beat - 1) / beats_per_bar + 1
 
 		if loop_beat != last_beat:
 			_beat()
@@ -155,7 +160,7 @@ func load_song_section(song_node: Node, section_node: Section):
 	# -------
 
 #	section = sections[section_name]
-	self.section = section_node
+	section = section_node
 
 #	_copy_props_from(section, true)
 	bars = section.bars
@@ -167,6 +172,11 @@ func load_song_section(song_node: Node, section_node: Section):
 			loop_length = beat_length * section_beats
 
 	Log.d(["loop length calculated as:", loop_length])
+
+	for r in section.regions:
+		section.regions[r]._section = section
+		if section.regions[r].loop == true:
+			looping_regions[r] = section.regions[r]
 
 	_setup_buses(section_node)
 
@@ -188,8 +198,8 @@ func start():
 
 func start_loop() -> void:
 	loop += 1
-	bar = 1
-	beat = 1
+	bbt.bar = 1
+	bbt.beat = 1
 	loop_beat = 1
 
 	loop_time = 0.0
@@ -252,11 +262,11 @@ func play_track(track: Bus):
 
 	elif track is SegmentsTrack:
 		for segment in track.timeline:
-			var target_beat = _barbeat_to_loop_beat(track.timeline[segment])
+			var target_beat = _bbt_to_loop_beat(track.timeline[segment])
 			queue_track_on_beat(target_beat, track.get_node(segment))
 		# version for array timeline
 #		for i in track.timeline.size():
-#			var target_beat = _barbeat_to_loop_beat(track.timeline[i])
+#			var target_beat = _bbt_to_loop_beat(track.timeline[i])
 #			queue_track_on_beat(target_beat, track.get_child(i))
 
 	elif track is MultiTrack:
@@ -271,17 +281,29 @@ func play_audiotrack(track: AudioTrack):
 
 
 func seek(to_position: float) -> void:
-	Log.d(["seeking to", to_position])
+	Log.d(["seeking to time:", to_position, "s"], name)
 	loop_time = to_position
+
+	if OS.get_ticks_msec() < last_seek_time + 10:
+		Log.w(["seeking too quickly. ignoring seek."], name)
+		return
+
 	if reference_method == ReferenceMethod.SILENCE:
 		reference_stream_silence.seek(to_position)
 	for stream in active_streams:
 		stream.seek(to_position)
 
+	last_seek_time = OS.get_ticks_msec()
+
+
+func seek_to_bbt(bbt: BBT) -> void:
+	var to_position = _bbt_to_loop_beat(bbt) * beat_length
+	seek(to_position)
+
 
 func seek_to_barbeat(barbeat: float) -> void:
-	var to_position = _barbeat_to_loop_beat(barbeat) * beat_length
-	seek(to_position)
+	var bbt = BBT.new().from_float(barbeat)
+	seek_to_bbt(bbt)
 
 
 func stop_all_streams() -> void:
@@ -462,22 +484,11 @@ func _setup_buses(node: Bus) -> void:
 #	return streams
 
 
-func _barbeat_to_loop_beat(beat_float: float):
-	var integer = int(beat_float) # bar
-	var bar_portion = integer
 
-	var fractional = beat_float - integer # beat
-	var s = str(fractional).trim_prefix("0.")
-	var beat_portion = int(s)
+func _bbt_to_loop_beat(bbt: BBT):
+#	var bbt = BBT.new().from_float(bbt_float)
 
-	return (bar_portion-1) * beats_per_bar + (beat_portion-1)
-
-
-func _get_barbeat(bar: int, beat: int) -> float:
-	# this is actually surprisingly (very slightly) faster than doing bar + beat * 0.1
-	var bb = float(str(bar, ".", beat))
-	return bb
-
+	return (bbt.bar-1) * beats_per_bar + (bbt.beat-1)
 
 
 func _is_stream_stinger(node: Node) -> bool:
@@ -507,7 +518,7 @@ func _beat() -> void:
 #	beat = (loop_beat - 1) % beats_per_bar + 1
 #	bar = (loop_beat - 1) / beats_per_bar + 1
 
-	if beat == 1:
+	if bbt.beat == 1:
 		_bar()
 
 	for t in tracks_queue:
@@ -515,21 +526,23 @@ func _beat() -> void:
 #			Log.d(["playing queued track", t[1]], name)
 			play_track(t[1])
 
-	barbeat = _get_barbeat(bar, beat)
-
 	emit_signal("loop_beat", loop_beat)
-	emit_signal("beat", beat)
-	emit_signal("barbeat", barbeat)
+	emit_signal("beat", bbt.beat)
+	emit_signal("barbeat", bbt.to_float())
 
 
 func _bar() -> void:
 #	bar = (loop_beat - 1) / beats_per_bar + 1
-	emit_signal("bar", bar)
-	if bar % 2 == 1:
-		emit_signal("odd_bar", bar)
+	emit_signal("bar", bbt.bar)
+	if bbt.bar % 2 == 1:
+		emit_signal("odd_bar", bbt.bar)
 
 
 func _loop_end() -> void:
-	start_loop()
-	emit_signal("loop", loop)
+	if section.play_mode == Section.PlayMode.LOOP:
+		start_loop()
+		emit_signal("loop", loop)
+	else:
+		stop()
+		emit_signal("end", section)
 

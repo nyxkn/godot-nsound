@@ -11,6 +11,7 @@ var sections := {}
 var stingers := {}
 var transitions := {}
 
+
 var current_section: String
 var current_song: String
 
@@ -105,8 +106,25 @@ func run_transition(transition_name: String) -> void:
 	var transition = transitions[transition_name]
 	Log.d(["running transition", transition_name])
 
-	var from_music_player = music_players[current_song][transition.from]
-	var to_music_player = music_players[current_song][transition.to]
+	var from_section = transition.from
+	if from_section is Section:
+		from_section = from_section.name
+	elif not from_section:
+		from_section = current_section
+
+	var to_section
+	var to_barbeat
+	# region
+	if transition.to is Region:
+		to_section = transition.to.section().name
+		to_barbeat = transition.to.start
+	# section
+	elif transition.to is String:
+		to_section = transition.to
+		to_barbeat = transition.barbeat
+
+	var from_music_player = music_players[current_song][from_section]
+	var to_music_player = music_players[current_song][to_section]
 
 	yield(from_music_player.wait_until(transition.when), "completed")
 
@@ -117,14 +135,16 @@ func run_transition(transition_name: String) -> void:
 		yield(from_music_player, "bar")
 
 	to_music_player.set_level(transition.level, Music.When.NOW)
-	play_and_switch(current_song, transition.to, false)
-	if transition.barbeat != 1.0:
-		to_music_player.seek_to_barbeat(transition.barbeat)
+	play_and_switch(current_song, to_section, false)
+
+#	if transition.barbeat != 1.1:
+	if to_barbeat and to_barbeat != 1.1:
+		to_music_player.seek_to_bbt(BBT.new().from_float(to_barbeat))
 
 	# crossfade can only happen after the new section has started
 	# i.e. you cannot start the new section at full volume (cannot fade_in before the track even exists)
 	if transition.fade == A_SongTransition.FadeType.CROSS:
-		sections[transition.to].volume_db = Config.MIN_DB
+		sections[to_section].volume_db = Config.MIN_DB
 		from_music_player.fade_out(from_music_player.section, Music.When.NOW, from_music_player.beat_length * 4)
 		to_music_player.fade_in(to_music_player.section, Music.When.NOW, from_music_player.beat_length * 4)
 

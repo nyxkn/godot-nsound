@@ -1,6 +1,7 @@
 extends AudioServerBus
 class_name Song
 
+# required parameters
 export(int) var bpm
 export(int) var beats_per_bar
 # bars is defined per section
@@ -19,12 +20,8 @@ export(int) var beats_per_bar
 #export(Array, Resource) var transitions
 export(Dictionary) var transitions
 
-
 var music_system
 
-
-#func _ready() -> void:
-#	transitions = []
 
 # simply define the transition functions in your Song-derived script
 # and we can then find them automatically with this
@@ -41,13 +38,8 @@ func t_Theme1_to_Theme2() -> void:
 	pass
 
 
-func new_transition(from, to, level = 0, stinger = '', bars = 0, fade = -1):
-#	for t in transitions:
-#		if t.name == name:
-#			return
-
+func new_transition(to, from = "", level = 0, stinger = '', bars = 0, fade = -1):
 	var t = A_SongTransition.new()
-#	t.name = name
 	t.from = from
 	t.to = to
 	t.level = level
@@ -57,5 +49,6 @@ func new_transition(from, to, level = 0, stinger = '', bars = 0, fade = -1):
 	return t
 
 
+# override for scripting
 func _setup():
 	pass
