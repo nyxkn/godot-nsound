@@ -34,6 +34,9 @@ var fade_final: float # [0,1]
 var fade_duration: float
 enum FadeType { IN, OUT }
 var fade_type: int
+var fade_blend: float
+
+var fading: bool setget set_fading
 
 # last volume before fade
 # useful for restoring the previous volume level we had before fading out
@@ -51,53 +54,61 @@ func init(send_bus_name: String = "Master") -> Bus:
 
 
 func _ready() -> void:
-	set_process(false)
+	pass
+	self.fading = false
+
+
+func set_fading(value):
+	fading = value
+	set_process(value)
 
 
 func _process(delta: float) -> void:
-	var t = inverse_lerp(fade_start_time, fade_start_time + fade_duration, F.time())
+	print('processing enabled')
+	if fading:
+		var t = inverse_lerp(fade_start_time, fade_start_time + fade_duration, F.time())
 
-	if t >= 1.0:
-		self.volume_db = linear2db(fade_final)
-#		Log.d(["final", stream.volume_db])
-		set_process(false)
-	else:
-		if fade_type == FadeType.IN:
-			# if the signals are correlated (the same?), the fade should be linear
-			# this means that when both signals meet at the middle (x=0.5)
-			# then y=0.5 (0.5 translates to -6db)
-			# so one signal follows f(x)=x, the other follows g(x)=1-x
-			# the sum function is always 1: f(x) + g(x) = 1
-			# if the signals are uncorrelated (not the same), the fade should be an equal power fade
-			# this means that at x=0.5, y=0.5 * sqrt(2) ~= 0.707 (0.707 is -3db)
-			# you can use any two functions where the sum of the square of the functions = 1
-			# that is f(x)^2 + g(x)^2 = 1
-			# you can then use a square function: f(x)=sqrt(x), g(x)=sqrt(1.0-x)
-			# or a cos crossfade: f(x)=cos(x*pi/2), g(x)=cos((1-x)*pi/2)
-			# https://dsp.stackexchange.com/questions/37477/understanding-equal-power-crossfades
-			# this is because you want the power of the signals to stay constant
-			# rather than the voltage
-			var linear_t = t
-			var square_t = sqrt(t)
-			# we can choose the blend between linear and square
-			# often signals aren't perfectly correlated or uncorrelated
-			var t_final = lerp(linear_t, square_t, 1)
-			self.volume_db = linear2db( lerp(fade_initial, fade_final, t_final) )
-		elif fade_type == FadeType.OUT:
-			var linear_t = 1.0 - t
-			var square_t = sqrt(1.0 - t)
-			var t_final = lerp(linear_t, square_t, 1)
-			# note that we need to swap initial and final
-			self.volume_db = linear2db( lerp(fade_final, fade_initial, t_final) )
+		if t >= 1.0:
+			self.volume_db = linear2db(fade_final)
+			Log.d(["final", volume_db])
+			self.fading = false
+		else:
+			if fade_type == FadeType.IN:
+				# if the signals are correlated (the same?), the fade should be linear
+				# this means that when both signals meet at the middle (x=0.5)
+				# then y=0.5 (0.5 translates to -6db)
+				# so one signal follows f(x)=x, the other follows g(x)=1-x
+				# the sum function is always 1: f(x) + g(x) = 1
+				# if the signals are uncorrelated (not the same), the fade should be an equal power fade
+				# this means that at x=0.5, y=0.5 * sqrt(2) ~= 0.707 (0.707 is -3db)
+				# you can use any two functions where the sum of the square of the functions = 1
+				# that is f(x)^2 + g(x)^2 = 1
+				# you can then use a square function: f(x)=sqrt(x), g(x)=sqrt(1.0-x)
+				# or a cos crossfade: f(x)=cos(x*pi/2), g(x)=cos((1-x)*pi/2)
+				# https://dsp.stackexchange.com/questions/37477/understanding-equal-power-crossfades
+				# this is because you want the power of the signals to stay constant
+				# rather than the voltage
+				var linear_t = t
+				var square_t = sqrt(t)
+				# we can choose the blend between linear and square
+				# often signals aren't perfectly correlated or uncorrelated
+				var t_final = lerp(linear_t, square_t, fade_blend)
+				self.volume_db = linear2db( lerp(fade_initial, fade_final, t_final) )
+			elif fade_type == FadeType.OUT:
+				var linear_t = 1.0 - t
+				var square_t = sqrt(1.0 - t)
+				var t_final = lerp(linear_t, square_t, fade_blend)
+				# note that we need to swap initial and final
+				self.volume_db = linear2db( lerp(fade_final, fade_initial, t_final) )
 
-		debug.print(self.volume_db, "db_" + name)
+			debug.print(self.volume_db, "db_" + name)
 
-#	if is_equal_approx(t, 0.5):
-#		Log.d([name, stream.volume_db, fade_type])
+	#	if is_equal_approx(t, 0.5):
+	#		Log.d([name, stream.volume_db, fade_type])
 
 
 # we take the values in decibels but then convert to linear for calculations
-func fade(initial, final, duration = 2.0):
+func fade(initial, final, duration = 2.0, blend = 1.0):
 	if duration <= 0:
 		Log.e(["cannot use negative duration:", duration], name)
 
@@ -114,6 +125,7 @@ func fade(initial, final, duration = 2.0):
 	fade_initial = db2linear(initial)
 	fade_final = db2linear(final)
 	fade_duration = duration
+	fade_blend = blend
 
 	if fade_final > fade_initial:
 		fade_type = FadeType.IN
@@ -122,7 +134,7 @@ func fade(initial, final, duration = 2.0):
 		if initial != Config.MIN_DB:
 			prefade_volume = volume_db
 
-	set_process(true)
+	self.fading = true
 
 
 func set_volume_db(value: float) -> void:
