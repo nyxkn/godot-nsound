@@ -149,8 +149,12 @@ func run_transition(transition_name: String) -> void:
 		sections[to_section].volume_db = Config.MIN_DB
 		from_music_player.fade_out(from_music_player.section, Music.When.NOW, from_music_player.beat_length * 4)
 		to_music_player.fade_in(to_music_player.section, Music.When.NOW, from_music_player.beat_length * 4)
-	else:
+		yield(from_music_player, "faded_out")
 		from_music_player.stop()
+	else:
+		# always duplicate?
+		if from_music_player != to_music_player:
+			from_music_player.stop()
 
 func queue_stinger(stinger: String, when: int = Music.When.BAR) -> void:
 	yield(current_music_player.wait_until(when), "completed")

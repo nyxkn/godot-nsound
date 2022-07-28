@@ -10,6 +10,9 @@ signal loop(n)
 signal end(n)
 signal level(n)
 
+signal faded_in(track)
+signal faded_out(track)
+
 
 const silence_ogg = preload("res://addons/nframework/assets/audio/silence-10m.ogg")
 
@@ -426,6 +429,9 @@ func fade_in(track: Bus, when: int = Music.When.ODD_BAR, duration: float = -1) -
 		track.fade(null, null, dur)
 		Log.d(["fading in track", track, "duration", dur])
 
+	yield(get_tree().create_timer(dur), "timeout")
+	emit_signal("faded_in", track)
+
 
 func fade_out(track: Bus, when: int = Music.When.ODD_BAR, duration: float = -1) -> void:
 	var dur = duration
@@ -440,6 +446,8 @@ func fade_out(track: Bus, when: int = Music.When.ODD_BAR, duration: float = -1) 
 		track.fade(null, Config.MIN_DB, dur)
 		Log.d(["fading out track", track])
 
+	yield(get_tree().create_timer(dur), "timeout")
+	emit_signal("faded_out", track)
 
 
 
@@ -530,9 +538,17 @@ func _beat() -> void:
 #			Log.d(["playing queued track", t[1]], name)
 			play_track(t[1])
 
+	var barbeat = bbt.to_float()
+
+	for k in looping_regions:
+		var region: Region = looping_regions[k]
+		var end_bbt = BBT.new().from_float(region.end)
+		if barbeat == end_bbt.to_float():
+			seek_to_barbeat(region.start)
+
 	emit_signal("loop_beat", loop_beat)
 	emit_signal("beat", bbt.beat)
-	emit_signal("barbeat", bbt.to_float())
+	emit_signal("barbeat", barbeat)
 
 
 func _bar() -> void:
