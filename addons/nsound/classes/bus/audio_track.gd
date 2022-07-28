@@ -1,5 +1,5 @@
 extends Bus
-class_name AudioTrack, "res://addons/nframework/assets/icons/godot/AudioStreamPlayer.svg"
+class_name AudioTrack, "res://addons/nsound/assets/icons/godot/AudioStreamPlayer.svg"
 
 
 export(bool) var loop := false

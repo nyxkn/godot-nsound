@@ -23,6 +23,12 @@ export(Dictionary) var transitions
 var music_system
 
 
+func _ready() -> void:
+	pass
+#	assert(bpm, "bpm value must be set in song: " + name)
+#	assert(beats_per_bar, "beats_per_bar value must be set in song: " + name)
+
+
 # simply define the transition functions in your Song-derived script
 # and we can then find them automatically with this
 func list_functions():

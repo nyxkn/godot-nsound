@@ -15,4 +15,5 @@ export(PlayMode) var play_mode = PlayMode.LOOP
 
 
 func _ready() -> void:
-	assert(bars, "bars number must be set in section")
+	pass
+#	assert(bars, "bars value must be set in section: " + name)

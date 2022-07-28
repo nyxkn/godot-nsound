@@ -18,7 +18,10 @@ const silence_ogg = preload("res://addons/nframework/assets/audio/silence-10m.og
 # the other two are equally accurate. silence uses a custom silence track
 # whereas song uses a stream from the loop
 enum ReferenceMethod { SONG_STREAM, PROCESS, SILENCE }
-const reference_method: int = ReferenceMethod.SILENCE
+# set the default. although we can force override this in code later
+# that is if bars value is not provided,
+# we can still attempt to loop the audio by using the song stream
+var reference_method: int = ReferenceMethod.SILENCE
 
 
 
@@ -82,21 +85,6 @@ func _ready() -> void:
 	add_child(reference_stream_silence)
 
 
-#func _input(event: InputEvent) -> void:
-#	if event.is_action_pressed("ui_down"):
-#		var layout = AudioServer.generate_bus_layout()
-#		ResourceSaver.save("res://test/adaptive_music/saves/bus_layout.res", layout)
-#		Log.d('saved bus layout', name)
-#	if event.is_action_pressed("ui_right"):
-#		var all_children = Utils.get_all_children(song)
-#		for c in all_children:
-#			# this is because if we own stream we'll end up with duplicated streams
-#			if not c is AudioStreamPlayer:
-#				c.owner = song
-#		FileUtils.save_scene("res://test/adaptive_music/saves/", song, true)
-#		Log.d('saved song', name)
-
-
 #var test_diff
 #var last_test_diff = 0
 #var test_all_diffs = []
@@ -150,28 +138,44 @@ func ________LOAD_START_SONG(): pass
 
 
 func load_song_section(song_node: Node, section_node: Section):
-#	self.song = song_node
-	# copy all exported song properties to here. for consistency
+	section = section_node
+
+	# from song
 #	_copy_props_from(song)
 	bpm = song_node.bpm
 	beats_per_bar = song_node.beats_per_bar
-	beat_length = 60.0 / bpm
 
-	# -------
-
-#	section = sections[section_name]
-	section = section_node
-
+	# from section
 #	_copy_props_from(section, true)
 	bars = section.bars
+	if section.bpm: bpm = section.bpm
 	if section.beats_per_bar: beats_per_bar = section.beats_per_bar
+
+	if bpm == 0:
+		Log.e(["missing bpm value for song/section", section])
+		assert(1 == 2)
+	if beats_per_bar == 0:
+		Log.e(["missing beats_per_bar value for song/section", section])
+		assert(1 == 2)
+	if bars == 0:
+		Log.w(["missing bars value for song/section, attempting to autocalculate", section])
+		# attempting to autocalculate bars
+		var first_audiotrack = section.get_child(0)
+		if not first_audiotrack is AudioTrack:
+			Log.e(["failed to calculate bars value. input manually"])
+			assert(1 == 2)
+		var beats_in_track = (bpm / 60.0) * first_audiotrack.stream.stream.get_length()
+		bars = round(beats_in_track / beats_per_bar)
+		Log.i(["autocalculated bars for section", section.name, "to", bars])
+
+	beat_length = 60.0 / bpm
 
 	section_beats = bars * beats_per_bar
 	match reference_method:
 		ReferenceMethod.PROCESS, ReferenceMethod.SILENCE:
 			loop_length = beat_length * section_beats
 
-	Log.d(["loop length calculated as:", loop_length])
+	Log.d(["loop length for section", section.name, "calculated as:", loop_length, "s"])
 
 	for r in section.regions:
 		section.regions[r]._section = section

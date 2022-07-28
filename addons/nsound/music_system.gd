@@ -119,8 +119,10 @@ func run_transition(transition_name: String) -> void:
 		to_section = transition.to.section().name
 		to_barbeat = transition.to.start
 	# section
-	elif transition.to is String:
+	else:
 		to_section = transition.to
+		if to_section is Section:
+			to_section = to_section.name
 		to_barbeat = transition.barbeat
 
 	var from_music_player = music_players[current_song][from_section]
@@ -147,7 +149,8 @@ func run_transition(transition_name: String) -> void:
 		sections[to_section].volume_db = Config.MIN_DB
 		from_music_player.fade_out(from_music_player.section, Music.When.NOW, from_music_player.beat_length * 4)
 		to_music_player.fade_in(to_music_player.section, Music.When.NOW, from_music_player.beat_length * 4)
-
+	else:
+		from_music_player.stop()
 
 func queue_stinger(stinger: String, when: int = Music.When.BAR) -> void:
 	yield(current_music_player.wait_until(when), "completed")

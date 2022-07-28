@@ -7,6 +7,7 @@ class_name A_SongTransition
 # or maybe as strings with a prefix (s.Section1, r.Region1, m.Marker)
 # to needs to be specified as a section and optionally a barbeat
 # if from is not specified, it means we can transition from any section
+# only exported as string, but you can actually pass Sections and Regions
 export(String) var to
 export(String) var from
 
