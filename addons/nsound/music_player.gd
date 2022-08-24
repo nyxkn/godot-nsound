@@ -269,7 +269,8 @@ func play_track(track: Bus):
 
 	elif track is SegmentsTrack:
 		for segment in track.timeline:
-			var target_beat = _bbt_to_loop_beat(track.timeline[segment])
+			var bbt = BBT.new().from_float(track.timeline[segment])
+			var target_beat = _bbt_to_loop_beat(bbt)
 			queue_track_on_beat(target_beat, track.get_node(segment))
 		# version for array timeline
 #		for i in track.timeline.size():
@@ -485,9 +486,7 @@ func _copy_props_from(node: Node, if_not_zero = false) -> void:
 
 
 func _bbt_to_loop_beat(bbt: BBT):
-#	var bbt = BBT.new().from_float(bbt_float)
-
-	return (bbt.bar-1) * beats_per_bar + (bbt.beat-1)
+	return (bbt.bar-1) * beats_per_bar + (bbt.beat)
 
 
 func _is_stream_stinger(node: Node) -> bool:

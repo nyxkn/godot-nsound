@@ -69,7 +69,7 @@ func _process(delta: float) -> void:
 
 		if t >= 1.0:
 			self.volume_db = linear2db(fade_final)
-			Log.d(["final", volume_db])
+#			Log.d(["final", volume_db])
 			self.fading = false
 		else:
 			if fade_type == FadeType.IN:
