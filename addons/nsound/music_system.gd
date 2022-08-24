@@ -110,11 +110,18 @@ func run_transition(transition_name: String) -> void:
 	var transition = transitions[transition_name]
 	Log.d(["running transition", transition_name])
 
-	var from_section = transition.from
-	if from_section is Section:
-		from_section = from_section.name
-	elif not from_section:
+	var from_section = ""
+
+	if not transition.from:
 		from_section = current_section
+	elif transition.from is Section:
+		from_section = transition.from.name
+	elif from_section is String:
+		from_section = transition.from
+
+	if from_section != current_section:
+		Log.i("running transition from the wrong section", name)
+		return
 
 	var to_section
 	var to_barbeat
