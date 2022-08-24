@@ -139,6 +139,8 @@ func run_transition(transition_name: String) -> void:
 	var from_music_player = music_players[current_song][from_section]
 	var to_music_player = music_players[current_song][to_section]
 
+	from_music_player.determine_transition_beat(transition.when)
+
 	yield(from_music_player.wait_until(transition.when), "completed")
 
 	if transition.stinger:
@@ -165,9 +167,6 @@ func run_transition(transition_name: String) -> void:
 	else:
 		# always duplicate?
 		if from_music_player != to_music_player:
-			print('stopping yo')
-			from_music_player.stop()
-			yield(F.wait(0.5), "completed")
 			from_music_player.stop()
 
 

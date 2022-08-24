@@ -76,6 +76,10 @@ var last_seek_time := 0
 
 var looping_regions := {}
 
+# the loop-beat at which we'll be transitioning away from this track
+# useful to plan things ahead. specifically avoid playing tracks that were queued for this beat
+var transition_beat := -1
+
 #var stingers := {}
 #var transitions := {}
 
@@ -200,6 +204,7 @@ func load_song_section(song_node: Node, section_node: Section):
 func start():
 	loop = 0
 	last_beat = -1
+	transition_beat = -1
 	start_loop()
 
 
@@ -319,16 +324,25 @@ func seek_to_barbeat(barbeat: float) -> void:
 func stop_all_streams() -> void:
 	for stream in active_streams:
 #		print(stream.name)
-
 		if _is_stream_stinger(stream):
 			Log.d(["not stopping stinger", stream])
 		else:
-			# muting because in some instances calling stop() immediately after play()
-			# doesn't actually stop the track
-			# e.g. in transitions when queued segment starts playing and then we stop everything
-#			stream.volume_db = Music.MIN_DB
 			stream.stop()
+
+	# WARN: it is possible for streams not to have stopped properly
+	# e.g. if you call stop() on the same frame as play(), stop will fail
+	# nonetheless, it's somewhat hard to check whether the stream has truly stopped
 	active_streams.clear()
+
+#	yield(get_tree(), "idle_frame")
+
+#	var streams_still_playing = []
+#	for stream in active_streams:
+#		if stream.playing:
+#			Log.e(["failed to stop stream", stream])
+#			streams_still_playing.append(stream)
+#
+#	active_streams = streams_still_playing
 
 
 func stop() -> void:
@@ -420,6 +434,23 @@ func wait_until(when: int) -> void:
 			yield(self, "loop")
 
 	return
+
+
+func determine_transition_beat(when: int):
+	match when:
+		Music.When.NOW:
+			transition_beat = loop_beat
+		Music.When.BEAT:
+			transition_beat = loop_beat + 1
+		Music.When.BAR:
+			transition_beat = bbt.bar * beats_per_bar + 1
+		Music.When.ODD_BAR:
+			transition_beat = (bbt.bar + (bbt.bar % 2)) * beats_per_bar + 1
+		Music.When.LOOP:
+			transition_beat = 0
+
+	var loop_beats = beats_per_bar * bars
+	transition_beat = transition_beat % loop_beats
 
 
 func fade_in(track: Bus, when: int = Music.When.ODD_BAR, duration: float = -1) -> void:
@@ -530,8 +561,11 @@ func _beat() -> void:
 	# just to be sure it runs on time (code run on signals could take a long time)
 	for t in tracks_queue:
 		if loop_beat == t[0]:
-			Log.d(["playing queued track", t[1]], name)
-			play_audiotrack(t[1])
+			if loop_beat == transition_beat:
+				Log.d(["skipping playing of track", t[1], "because it falls on transition beat"], name)
+			else:
+				Log.d(["playing queued track", t[1]], name)
+				play_audiotrack(t[1])
 
 	for k in looping_regions:
 		var region: Region = looping_regions[k]
