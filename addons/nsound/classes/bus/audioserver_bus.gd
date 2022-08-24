@@ -75,6 +75,16 @@ func set_send(value: String) -> void:
 #	return bus_send
 
 
+func set_mute(value: bool) -> void:
+	AudioServer.set_bus_mute(bus_idx, value)
+	.set_mute(value)
+
+
+#func set_solo(value: bool) -> void:
+#	AudioServer.set_bus_solo(bus_idx, value)
+#	solo = value
+
+
 # --------------------------------
 # audioserver specific
 

@@ -66,7 +66,7 @@ var loop_length: float
 var beat_length: float
 var section_beats: int
 
-var level: int = 0 setget set_level
+var level: int = 1 setget set_level
 #var active_levels_tracks := []
 var levels_tracks := []
 
@@ -194,7 +194,7 @@ func load_song_section(song_node: Node, section_node: Section):
 			levels_tracks.append(node)
 			for child in node.get_children():
 				if child is Bus:
-					child.volume_db = Config.MIN_DB
+					child.volume_db = Music.MIN_DB
 
 
 func start():
@@ -226,6 +226,8 @@ func start_loop() -> void:
 	# restart the silence stream
 	if reference_method == ReferenceMethod.SILENCE:
 		reference_stream_silence.play()
+
+	set_level(level)
 
 #	for node in section.get_children():
 #		play_track(node)
@@ -316,9 +318,15 @@ func seek_to_barbeat(barbeat: float) -> void:
 
 func stop_all_streams() -> void:
 	for stream in active_streams:
+#		print(stream.name)
+
 		if _is_stream_stinger(stream):
 			Log.d(["not stopping stinger", stream])
 		else:
+			# muting because in some instances calling stop() immediately after play()
+			# doesn't actually stop the track
+			# e.g. in transitions when queued segment starts playing and then we stop everything
+#			stream.volume_db = Music.MIN_DB
 			stream.stop()
 	active_streams.clear()
 
@@ -428,7 +436,7 @@ func fade_in(track: Bus, when: int = Music.When.ODD_BAR, duration: float = -1) -
 	else:
 		yield(wait_until(when), "completed")
 		track.fade(null, null, dur)
-		Log.d(["fading in track", track, "duration", dur])
+#		Log.d(["fading in track", track, "duration", dur])
 
 	yield(get_tree().create_timer(dur), "timeout")
 	emit_signal("faded_in", track)
@@ -440,12 +448,12 @@ func fade_out(track: Bus, when: int = Music.When.ODD_BAR, duration: float = -1) 
 		dur = determine_fade_duration(when)
 
 	if dur == 0:
-		track.volume_db = Config.MIN_DB
+		track.volume_db = Music.MIN_DB
 		return
 	else:
 		yield(wait_until(when), "completed")
-		track.fade(null, Config.MIN_DB, dur)
-		Log.d(["fading out track", track])
+		track.fade(null, Music.MIN_DB, dur)
+#		Log.d(["fading out track", track])
 
 	yield(get_tree().create_timer(dur), "timeout")
 	emit_signal("faded_out", track)
@@ -516,15 +524,14 @@ func _beat() -> void:
 #	beat = (loop_beat - 1) % beats_per_bar + 1
 #	bar = (loop_beat - 1) / beats_per_bar + 1
 
-	if bbt.beat == 1:
-		_bar()
+	var barbeat = bbt.to_float()
 
+	# this code should run before emitting signals
+	# just to be sure it runs on time (code run on signals could take a long time)
 	for t in tracks_queue:
 		if loop_beat == t[0]:
-#			Log.d(["playing queued track", t[1]], name)
-			play_track(t[1])
-
-	var barbeat = bbt.to_float()
+			Log.d(["playing queued track", t[1]], name)
+			play_audiotrack(t[1])
 
 	for k in looping_regions:
 		var region: Region = looping_regions[k]
@@ -532,9 +539,15 @@ func _beat() -> void:
 		if barbeat == end_bbt.to_float():
 			seek_to_barbeat(region.start)
 
+
+
+	if bbt.beat == 1:
+		_bar()
+
 	emit_signal("loop_beat", loop_beat)
 	emit_signal("beat", bbt.beat)
 	emit_signal("barbeat", barbeat)
+
 
 
 func _bar() -> void:

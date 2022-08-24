@@ -34,6 +34,7 @@ func _ready() -> void:
 
 
 func init(send_bus_name: String = "Master") -> Bus:
+	stream.name = name
 	self.send = send_bus_name
 	Audio.register_track(self)
 	return self
@@ -64,6 +65,21 @@ func set_send(value: String) -> void:
 
 	stream.bus = value
 	.set_send(value)
+
+
+func set_mute(value: bool) -> void:
+	if not stream: return
+
+	if value:
+		stream.volume_db = Music.MIN_DB
+	else:
+		stream.volume_db = volume_db
+	.set_mute(value)
+
+
+#func set_solo(value: bool) -> void:
+#	AudioServer.set_bus_solo(bus_idx, value)
+#	solo = value
 
 
 func _stream_finished() -> void:

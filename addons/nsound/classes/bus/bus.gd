@@ -15,9 +15,14 @@ class_name Bus
 signal volume_changed(value)
 
 
-export(bool) var solo := false
-export(bool) var mute := false
-export(bool) var disabled := false
+export(bool) var mute := false setget set_mute
+# solo is not very useful on chained buses
+# all buses of the chain need to be soloed for them to play
+# it's only useful for top-level buses really
+#export(bool) var solo := false setget set_solo
+# a disabled track won't be played by play_track() and _process won't run
+# it's a simple true/false value
+export(bool) var disabled := false setget set_disabled
 
 
 # we'd use MIN_DB but export doesn't seem to accept that
@@ -59,6 +64,8 @@ func _ready() -> void:
 
 
 func set_fading(value):
+	if disabled: return
+
 	fading = value
 	set_process(value)
 
@@ -130,7 +137,7 @@ func fade(initial, final, duration = 2.0, blend = 1.0):
 		fade_type = FadeType.IN
 	else:
 		fade_type = FadeType.OUT
-		if initial != Config.MIN_DB:
+		if initial != Music.MIN_DB:
 			prefade_volume = volume_db
 
 	self.fading = true
@@ -152,3 +159,16 @@ func set_send(value: String) -> void:
 
 func get_send() -> String:
 	return send
+
+
+func set_mute(value: bool) -> void:
+	mute = value
+
+
+#func set_solo(value: bool) -> void:
+#	solo = value
+
+
+func set_disabled(value: bool) -> void:
+	set_process(!disabled)
+	disabled = value
