@@ -13,7 +13,7 @@ Custom logic can also be provided through scripting.
 
 > *** Project is still work in progress, but it's nearing a stable api ***
 >
-> Documentation will be improved soon.
+> Documentation will be improved soon and examples will be added.
 
 ## Installation
 
@@ -60,7 +60,7 @@ You should be able to combine containers in whatever way you like.
 
 In each container you'll add your audio files (wrapped in `AudioTrack` nodes).
 
-From code you will then call MusicSystem.load_song() and play() to start the track.
+From code you will then call `MusicSystem.load_song()` and `play()` to start the track.
 
 ## Nodes and components explained
 
