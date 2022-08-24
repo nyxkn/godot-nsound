@@ -64,7 +64,6 @@ func set_fading(value):
 
 
 func _process(delta: float) -> void:
-	print('processing enabled')
 	if fading:
 		var t = inverse_lerp(fade_start_time, fade_start_time + fade_duration, F.time())
 

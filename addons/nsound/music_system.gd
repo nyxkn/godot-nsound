@@ -49,6 +49,7 @@ func load_song(song_name: String):
 		elif node is StingersContainer:
 			for track in node.get_children():
 				stingers[track.name] = track
+			NSoundUtils.setup_buses(node)
 
 	transitions = song_node.transitions
 
@@ -63,10 +64,13 @@ func load_song(song_name: String):
 
 		music_player.load_song_section(song_node, section_node)
 
-		get_node("%Mixer").init_song(section_node)
+#		get_node("%Mixer").init_song(section_node)
 
 	song_node.music_system = self
 	song_node._setup()
+
+	get_node("%Mixer").init_song(song_node)
+
 
 
 func play_only(song_name: String, section_name: String = ""):
@@ -156,8 +160,12 @@ func run_transition(transition_name: String) -> void:
 		if from_music_player != to_music_player:
 			from_music_player.stop()
 
+
 func queue_stinger(stinger: String, when: int = Music.When.BAR) -> void:
 	yield(current_music_player.wait_until(when), "completed")
 
 	Log.d(["playing stinger", stinger], name)
 	current_music_player.play_track(stingers[stinger])
+
+
+

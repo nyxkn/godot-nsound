@@ -185,7 +185,7 @@ func load_song_section(song_node: Node, section_node: Section):
 		if section.regions[r].loop == true:
 			looping_regions[r] = section.regions[r]
 
-	_setup_buses(section_node)
+	NSoundUtils.setup_buses(section_node)
 
 	# initialize nodes
 	levels_tracks.clear()
@@ -468,20 +468,7 @@ func _copy_props_from(node: Node, if_not_zero = false) -> void:
 				set(prop.name, node.get(prop.name))
 
 
-func _setup_buses(node: Bus) -> void:
-	var children = Utils.get_all_children(node)
-	children.push_front(node)
-	for child in children:
-		if child is Bus:
-			var parent_node = child.get_parent()
-			var send_bus
-			if parent_node is Song and not parent_node is Section:
-				send_bus = "Music"
-			elif parent_node is AudioServerBus:
-				send_bus = parent_node.bus_name
-			else:
-				send_bus = "Music"
-			child.init(send_bus)
+
 
 
 #func _get_all_tracks(node: Node) -> Array:
