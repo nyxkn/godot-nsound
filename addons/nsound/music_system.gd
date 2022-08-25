@@ -1,8 +1,8 @@
 extends Node
 class_name MusicSystem
 
-signal section(name)
-signal song(name)
+signal section_started(node)
+signal song_started(node)
 signal song_loaded(song_name)
 
 var music_players := {}
@@ -40,7 +40,7 @@ func _input(event: InputEvent) -> void:
 #				Log.d('saved song', name)
 
 
-func load_song(song_name: String):
+func load_song(song_name: String) -> Song:
 	var song_node = songs[song_name]
 
 	sections.clear()
@@ -66,12 +66,12 @@ func load_song(song_name: String):
 
 		music_player.load_song_section(song_node, section_node)
 
-#		get_node("%Mixer").init_song(section_node)
-
 	song_node.music_system = self
 	song_node._setup()
 
-	get_node("%Mixer").init_song(song_node)
+	emit_signal("song_loaded", song_node)
+
+	return song_node
 
 
 
@@ -81,14 +81,13 @@ func play_only(song_name: String, section_name: String = ""):
 
 func play_and_switch(song_name: String, section_name: String = "", stop: bool = true):
 	if song_name != current_song:
-		emit_signal("song", song_name)
+		emit_signal("song_started", songs[song_name])
 
 	current_song = song_name
 
 	if not section_name:
-		current_section = music_players[current_song].keys()[0]
-	else:
-		current_section = section_name
+		section_name = music_players[current_song].keys()[0]
+	current_section = section_name
 
 	if stop and current_music_player:
 		current_music_player.stop()
@@ -96,7 +95,7 @@ func play_and_switch(song_name: String, section_name: String = "", stop: bool = 
 	current_music_player = music_players[current_song][current_section]
 	current_music_player.start()
 
-	emit_signal("section", section_name)
+	emit_signal("section_started", sections[section_name])
 
 
 func goto_section(section_name: String, when: int = Music.When.ODD_BAR) -> void:

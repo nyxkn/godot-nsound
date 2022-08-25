@@ -1,0 +1,344 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://addons/nui/combo/slider_value.gd" type="Script" id=1]
+[ext_resource path="res://addons/nsound/assets/icons/godot/Play.svg" type="Texture" id=2]
+[ext_resource path="res://addons/nui/quick_button.gd" type="Script" id=3]
+[ext_resource path="res://addons/nsound/studio/studio.gd" type="Script" id=4]
+[ext_resource path="res://addons/nui/combo/slider_value.tscn" type="PackedScene" id=5]
+[ext_resource path="res://addons/nui/combo/label_value.tscn" type="PackedScene" id=6]
+[ext_resource path="res://addons/nsound/mixer/mixer.tscn" type="PackedScene" id=7]
+
+[node name="Studio" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 4 )
+
+[node name="Controls" type="Control" parent="."]
+anchor_right = 1.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="Sliders" type="GridContainer" parent="Controls"]
+margin_left = 292.732
+margin_top = 161.252
+margin_right = 971.732
+margin_bottom = 266.252
+custom_constants/vseparation = 32
+custom_constants/hseparation = 64
+columns = 2
+
+[node name="Level" parent="Controls/Sliders" instance=ExtResource( 5 )]
+unique_name_in_owner = true
+margin_right = 308.0
+rect_min_size = Vector2( 300, 0 )
+max_value = 20.0
+
+[node name="HookValue" parent="Controls/Sliders" instance=ExtResource( 5 )]
+unique_name_in_owner = true
+margin_left = 372.0
+margin_right = 679.0
+rect_min_size = Vector2( 300, 0 )
+max_value = 80.0
+
+[node name="Timeline" type="HBoxContainer" parent="Controls/Sliders"]
+unique_name_in_owner = true
+margin_top = 56.0
+margin_right = 308.0
+margin_bottom = 80.0
+size_flags_horizontal = 3
+script = ExtResource( 1 )
+
+[node name="Label" type="Label" parent="Controls/Sliders/Timeline"]
+margin_top = 5.0
+margin_right = 56.0
+margin_bottom = 19.0
+text = "Timeline"
+
+[node name="HSlider" type="HSlider" parent="Controls/Sliders/Timeline"]
+margin_left = 60.0
+margin_top = 4.0
+margin_right = 237.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 10.0
+
+[node name="SpinBox" type="SpinBox" parent="Controls/Sliders/Timeline"]
+visible = false
+margin_left = 224.0
+margin_right = 298.0
+margin_bottom = 24.0
+max_value = 10.0
+
+[node name="Time" type="Label" parent="Controls/Sliders/Timeline"]
+unique_name_in_owner = true
+margin_left = 241.0
+margin_top = 5.0
+margin_right = 268.0
+margin_bottom = 19.0
+text = "0.0s"
+
+[node name="Separator" type="Label" parent="Controls/Sliders/Timeline"]
+margin_left = 272.0
+margin_top = 5.0
+margin_right = 277.0
+margin_bottom = 19.0
+text = "/"
+
+[node name="TotalTime" type="Label" parent="Controls/Sliders/Timeline"]
+margin_left = 281.0
+margin_top = 5.0
+margin_right = 308.0
+margin_bottom = 19.0
+text = "0.0s"
+
+[node name="BBT" parent="Controls/Sliders" instance=ExtResource( 6 )]
+unique_name_in_owner = true
+margin_left = 372.0
+margin_top = 56.0
+margin_right = 679.0
+margin_bottom = 80.0
+value = "1.1"
+total = "8.4"
+editable = true
+
+[node name="Run" type="GridContainer" parent="Controls"]
+margin_left = 1022.94
+margin_top = 40.3354
+margin_right = 1243.94
+margin_bottom = 224.335
+custom_constants/vseparation = 32
+custom_constants/hseparation = 32
+
+[node name="Transitions" type="HBoxContainer" parent="Controls/Run"]
+margin_right = 245.0
+margin_bottom = 22.0
+custom_constants/separation = 16
+
+[node name="Label" type="Label" parent="Controls/Run/Transitions"]
+margin_top = 4.0
+margin_right = 93.0
+margin_bottom = 18.0
+text = "Run transition:"
+
+[node name="RunTransition" type="Button" parent="Controls/Run/Transitions"]
+margin_left = 109.0
+margin_right = 137.0
+margin_bottom = 22.0
+icon = ExtResource( 2 )
+
+[node name="Transitions" type="OptionButton" parent="Controls/Run/Transitions"]
+unique_name_in_owner = true
+margin_left = 153.0
+margin_right = 245.0
+margin_bottom = 22.0
+text = "Transition"
+
+[node name="Section" type="HBoxContainer" parent="Controls/Run"]
+margin_top = 54.0
+margin_right = 245.0
+margin_bottom = 76.0
+custom_constants/separation = 16
+
+[node name="Label" type="Label" parent="Controls/Run/Section"]
+margin_top = 4.0
+margin_right = 86.0
+margin_bottom = 18.0
+text = "Goto section:"
+
+[node name="GotoSection" type="Button" parent="Controls/Run/Section"]
+margin_left = 102.0
+margin_right = 130.0
+margin_bottom = 22.0
+icon = ExtResource( 2 )
+
+[node name="Sections" type="OptionButton" parent="Controls/Run/Section"]
+unique_name_in_owner = true
+margin_left = 146.0
+margin_right = 222.0
+margin_bottom = 22.0
+text = "Section"
+
+[node name="Song" type="HBoxContainer" parent="Controls/Run"]
+margin_top = 108.0
+margin_right = 245.0
+margin_bottom = 130.0
+custom_constants/separation = 16
+
+[node name="Label" type="Label" parent="Controls/Run/Song"]
+margin_top = 4.0
+margin_right = 69.0
+margin_bottom = 18.0
+text = "Goto song:"
+
+[node name="GotoSong" type="Button" parent="Controls/Run/Song"]
+margin_left = 85.0
+margin_right = 113.0
+margin_bottom = 22.0
+icon = ExtResource( 2 )
+
+[node name="Songs" type="OptionButton" parent="Controls/Run/Song"]
+unique_name_in_owner = true
+margin_left = 129.0
+margin_right = 188.0
+margin_bottom = 22.0
+text = "Song"
+
+[node name="Stingers" type="HBoxContainer" parent="Controls/Run"]
+margin_top = 162.0
+margin_right = 245.0
+margin_bottom = 184.0
+custom_constants/separation = 16
+
+[node name="Label" type="Label" parent="Controls/Run/Stingers"]
+margin_top = 4.0
+margin_right = 78.0
+margin_bottom = 18.0
+text = "Play stinger:"
+
+[node name="RunStinger" type="Button" parent="Controls/Run/Stingers"]
+margin_left = 94.0
+margin_right = 122.0
+margin_bottom = 22.0
+icon = ExtResource( 2 )
+
+[node name="Stingers" type="OptionButton" parent="Controls/Run/Stingers"]
+unique_name_in_owner = true
+margin_left = 138.0
+margin_right = 211.0
+margin_bottom = 22.0
+text = "Stinger"
+
+[node name="Transport" type="HBoxContainer" parent="Controls"]
+margin_left = 161.915
+margin_top = 90.4819
+margin_right = 344.915
+margin_bottom = 110.482
+custom_constants/separation = 16
+
+[node name="Play" type="Button" parent="Controls/Transport"]
+margin_right = 38.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 0, 32 )
+text = "Play"
+script = ExtResource( 3 )
+
+[node name="Stop" type="Button" parent="Controls/Transport"]
+margin_left = 54.0
+margin_right = 94.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 0, 32 )
+text = "Stop"
+script = ExtResource( 3 )
+
+[node name="NextLoop" type="Button" parent="Controls/Transport"]
+margin_left = 110.0
+margin_right = 183.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 0, 32 )
+text = "NextLoop"
+script = ExtResource( 3 )
+
+[node name="Point" type="VBoxContainer" parent="Controls"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -574.639
+margin_top = 166.677
+margin_right = -510.639
+margin_bottom = 234.677
+
+[node name="Bar" parent="Controls/Point" instance=ExtResource( 6 )]
+unique_name_in_owner = true
+margin_right = 64.0
+separator = ":"
+
+[node name="Beat" parent="Controls/Point" instance=ExtResource( 6 )]
+unique_name_in_owner = true
+margin_top = 18.0
+margin_right = 64.0
+margin_bottom = 32.0
+separator = ":"
+
+[node name="LoopBeat" parent="Controls/Point" instance=ExtResource( 6 )]
+unique_name_in_owner = true
+margin_top = 36.0
+margin_right = 64.0
+margin_bottom = 50.0
+separator = ":"
+
+[node name="Loop" parent="Controls/Point" instance=ExtResource( 6 )]
+unique_name_in_owner = true
+margin_top = 54.0
+margin_right = 64.0
+margin_bottom = 68.0
+separator = ":"
+
+[node name="Song" type="VBoxContainer" parent="Controls"]
+margin_left = 407.126
+margin_top = 29.3665
+margin_right = 465.126
+margin_bottom = 125.366
+custom_constants/separation = 16
+
+[node name="SongTitle" type="Label" parent="Controls/Song"]
+unique_name_in_owner = true
+margin_right = 58.0
+margin_bottom = 14.0
+text = "SongTitle"
+
+[node name="SongParams" type="VBoxContainer" parent="Controls/Song"]
+margin_top = 30.0
+margin_right = 58.0
+margin_bottom = 80.0
+
+[node name="BPM" parent="Controls/Song/SongParams" instance=ExtResource( 6 )]
+unique_name_in_owner = true
+margin_right = 58.0
+
+[node name="BPB" parent="Controls/Song/SongParams" instance=ExtResource( 6 )]
+unique_name_in_owner = true
+margin_top = 18.0
+margin_right = 58.0
+margin_bottom = 32.0
+
+[node name="Bars" parent="Controls/Song/SongParams" instance=ExtResource( 6 )]
+unique_name_in_owner = true
+margin_top = 36.0
+margin_right = 58.0
+margin_bottom = 50.0
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -15.0
+custom_constants/margin_right = 32
+custom_constants/margin_top = 32
+custom_constants/margin_left = 32
+custom_constants/margin_bottom = 32
+
+[node name="Mixer" parent="MarginContainer" instance=ExtResource( 7 )]
+unique_name_in_owner = true
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 32.0
+margin_top = 32.0
+margin_right = 1334.0
+margin_bottom = 367.0
+
+[connection signal="value_changed" from="Controls/Sliders/Level" to="." method="_on_Level_value_changed"]
+[connection signal="value_changed" from="Controls/Sliders/HookValue" to="." method="_on_HookValue_value_changed"]
+[connection signal="value_changed" from="Controls/Sliders/Timeline" to="." method="_on_Timeline_value_changed"]
+[connection signal="drag_ended" from="Controls/Sliders/Timeline/HSlider" to="Controls/Sliders/Timeline" method="_on_HSlider_drag_ended"]
+[connection signal="drag_started" from="Controls/Sliders/Timeline/HSlider" to="Controls/Sliders/Timeline" method="_on_HSlider_drag_started"]
+[connection signal="value_changed" from="Controls/Sliders/Timeline/HSlider" to="Controls/Sliders/Timeline" method="_on_HSlider_value_changed"]
+[connection signal="value_changed" from="Controls/Sliders/BBT" to="." method="_on_BBT_value_changed"]
+[connection signal="pressed" from="Controls/Run/Transitions/RunTransition" to="." method="_on_RunTransition_pressed"]
+[connection signal="pressed" from="Controls/Run/Section/GotoSection" to="." method="_on_GotoSection_pressed"]
+[connection signal="pressed" from="Controls/Run/Song/GotoSong" to="." method="_on_GotoSong_pressed"]
+[connection signal="pressed" from="Controls/Run/Stingers/RunStinger" to="." method="_on_RunStinger_pressed"]
+[connection signal="pressed" from="Controls/Transport/Play" to="." method="_on_Play_pressed"]
+[connection signal="pressed" from="Controls/Transport/Stop" to="." method="_on_Stop_pressed"]
+[connection signal="pressed" from="Controls/Transport/NextLoop" to="." method="_on_NextLoop_pressed"]
