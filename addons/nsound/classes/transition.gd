@@ -1,5 +1,5 @@
 extends Resource
-class_name A_SongTransition
+class_name Transition
 
 #export(String) var name
 

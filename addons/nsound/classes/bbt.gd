@@ -23,7 +23,7 @@ func from_float(bbt: float) -> BBT:
 
 
 func from_string(bbt: String) -> BBT:
-	var re := StringUtils.compile_regex("\\d+(\\.\\d+)?(\\.\\d+)?")
+	var re := NUtils.compile_regex("\\d+(\\.\\d+)?(\\.\\d+)?")
 	var result = re.search_all(bbt)
 	if not result.size() == 1:
 		Log.e(["float bbt", bbt, "is incorrectly formatted"])

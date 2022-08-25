@@ -38,7 +38,7 @@ func init_song(root_node: Node) -> void:
 	var all_strips = []
 	var audioserver_bus_strips = {}
 
-	var all_nodes = Utils.get_all_children(root_node)
+	var all_nodes = NUtils.get_all_children(root_node)
 	all_nodes.push_front(root_node)
 	for node in all_nodes:
 		if node is Bus:

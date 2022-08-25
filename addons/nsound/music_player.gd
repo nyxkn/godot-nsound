@@ -14,7 +14,7 @@ signal faded_in(track)
 signal faded_out(track)
 
 
-const silence_ogg = preload("res://addons/nframework/assets/audio/silence-10m.ogg")
+const silence_ogg = preload("res://addons/nsound/assets/audio/silence-10m.ogg")
 
 
 # process is the most simple and most independent. might not be the most accurate
@@ -189,11 +189,11 @@ func load_song_section(song_node: Node, section_node: Section):
 		if section.regions[r].loop == true:
 			looping_regions[r] = section.regions[r]
 
-	NSoundUtils.setup_buses(section_node)
+	NUtils.setup_buses(section_node)
 
 	# initialize nodes
 	levels_tracks.clear()
-	for node in Utils.get_all_children(section_node):
+	for node in NUtils.get_all_children(section_node):
 		if node is LevelsTrack:
 			levels_tracks.append(node)
 			for child in node.get_children():
@@ -220,7 +220,7 @@ func start_loop() -> void:
 		reference_stream_song = null
 
 	# testing avg
-	Log.d(["avg:", Math.avg(process_diffs)])
+#	Log.d(["avg:", Math.avg(process_diffs)])
 	process_diffs.clear()
 	test_loop_time_delta = 0
 
@@ -436,7 +436,7 @@ func wait_until(when: int) -> void:
 	return
 
 
-func determine_transition_beat(when: int):
+func determine_transition_beat(when: int, transition_bars):
 	match when:
 		Music.When.NOW:
 			transition_beat = loop_beat
@@ -449,6 +449,9 @@ func determine_transition_beat(when: int):
 		Music.When.LOOP:
 			transition_beat = 0
 
+	transition_beat += beats_per_bar * transition_bars
+
+	# wrapping around total
 	var loop_beats = beats_per_bar * bars
 	transition_beat = transition_beat % loop_beats
 

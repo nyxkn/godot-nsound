@@ -32,7 +32,7 @@ func add_levels_entry(node: Node):
 	if regex_match:
 		var level = 0
 		# try to guess the level number by using the first encountered number
-		var re = StringUtils.compile_regex("([0-9]+)")
+		var re = NUtils.compile_regex("([0-9]+)")
 		var re_match: RegExMatch = re.search(node.name)
 		if re_match:
 			level = int(re_match.get_string())

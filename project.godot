@@ -8,10 +8,141 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Bus",
+"class": "AudioServerBus",
+"language": "GDScript",
+"path": "res://addons/nsound/bus/audioserver_bus.gd"
+}, {
+"base": "Bus",
+"class": "AudioTrack",
+"language": "GDScript",
+"path": "res://addons/nsound/bus/audio_track.gd"
+}, {
+"base": "Node",
+"class": "BBT",
+"language": "GDScript",
+"path": "res://addons/nsound/classes/bbt.gd"
+}, {
+"base": "Node",
+"class": "Bus",
+"language": "GDScript",
+"path": "res://addons/nsound/bus/bus.gd"
+}, {
+"base": "AudioServerBus",
+"class": "LevelsContainer",
+"language": "GDScript",
+"path": "res://addons/nsound/song/containers/levels_track_container.gd"
+}, {
+"base": "AudioServerBus",
+"class": "LevelsTrack",
+"language": "GDScript",
+"path": "res://addons/nsound/song/containers/levels_track.gd"
+}, {
+"base": "Reference",
+"class": "Log",
+"language": "GDScript",
+"path": "res://addons/nsound/logger.gd"
+}, {
+"base": "AudioServerBus",
+"class": "MultiTrack",
+"language": "GDScript",
+"path": "res://addons/nsound/song/containers/multi_track.gd"
+}, {
+"base": "Node",
+"class": "Music",
+"language": "GDScript",
+"path": "res://addons/nsound/music_common.gd"
+}, {
+"base": "Node",
+"class": "MusicPlayer",
+"language": "GDScript",
+"path": "res://addons/nsound/music_player.gd"
+}, {
+"base": "Node",
+"class": "MusicSystem",
+"language": "GDScript",
+"path": "res://addons/nsound/music_system.gd"
+}, {
+"base": "Reference",
+"class": "NUtils",
+"language": "GDScript",
+"path": "res://addons/nsound/utils.gd"
+}, {
+"base": "Button",
+"class": "QuickButton",
+"language": "GDScript",
+"path": "res://addons/nui/quick_button.gd"
+}, {
+"base": "Node",
+"class": "Region",
+"language": "GDScript",
+"path": "res://addons/nsound/classes/region.gd"
+}, {
+"base": "AudioServerBus",
+"class": "Section",
+"language": "GDScript",
+"path": "res://addons/nsound/song/section.gd"
+}, {
+"base": "AudioServerBus",
+"class": "SegmentsTrack",
+"language": "GDScript",
+"path": "res://addons/nsound/song/containers/segments.gd"
+}, {
+"base": "AudioServerBus",
+"class": "Song",
+"language": "GDScript",
+"path": "res://addons/nsound/song/song.gd"
+}, {
+"base": "AudioServerBus",
+"class": "StingersContainer",
+"language": "GDScript",
+"path": "res://addons/nsound/song/containers/stingers_container.gd"
+}, {
+"base": "Resource",
+"class": "Transition",
+"language": "GDScript",
+"path": "res://addons/nsound/classes/transition.gd"
+} ]
+_global_script_class_icons={
+"AudioServerBus": "",
+"AudioTrack": "res://addons/nsound/assets/icons/godot/AudioStreamPlayer.svg",
+"BBT": "",
+"Bus": "",
+"LevelsContainer": "",
+"LevelsTrack": "",
+"Log": "",
+"MultiTrack": "res://addons/nsound/assets/icons/godot/Play.svg",
+"Music": "",
+"MusicPlayer": "",
+"MusicSystem": "",
+"NUtils": "",
+"QuickButton": "",
+"Region": "",
+"Section": "",
+"SegmentsTrack": "",
+"Song": "",
+"StingersContainer": "",
+"Transition": ""
+}
+
 [application]
 
 config/name="nsound"
 config/icon="res://icon.png"
+
+[autoload]
+
+Audio="*res://addons/nsound/audio_framework.gd"
+
+[display]
+
+window/size/width=1366
+window/size/height=768
+
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/nsound/plugin.cfg" )
 
 [gui]
 

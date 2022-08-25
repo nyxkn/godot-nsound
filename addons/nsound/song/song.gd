@@ -45,7 +45,7 @@ func t_Theme1_to_Theme2() -> void:
 
 
 func new_transition(to, from = "", level = 0, stinger = '', bars = 0, fade = -1):
-	var t = A_SongTransition.new()
+	var t = Transition.new()
 	t.from = from
 	t.to = to
 	t.level = level

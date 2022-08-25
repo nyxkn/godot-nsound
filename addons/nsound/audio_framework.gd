@@ -6,6 +6,11 @@ var runtime_buses := {}
 var runtime_tracks := []
 
 
+var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+
+var music_bus := "Master"
+
+
 func _ready() -> void:
 	# TODO should we move this to settings audio?
 	for i in AudioServer.bus_count:
@@ -34,7 +39,7 @@ func register_track(bus: AudioTrack):
 
 
 func get_bus(bus_name: String) -> Bus:
-	var buses = Utils.merge_dict(core_buses, runtime_buses)
+	var buses = NUtils.merge_dict(core_buses, runtime_buses)
 	return buses[bus_name]
 
 

@@ -4,7 +4,7 @@ class_name Bus
 
 # ============================
 # MAIN BUS
-# ++++++++++++++++++++++++
+# ============================
 
 
 # this is a class that encapsulates all bus-related functionality of AudioServer
@@ -72,7 +72,7 @@ func set_fading(value):
 
 func _process(delta: float) -> void:
 	if fading:
-		var t = inverse_lerp(fade_start_time, fade_start_time + fade_duration, F.time())
+		var t = inverse_lerp(fade_start_time, fade_start_time + fade_duration, OS.get_ticks_msec())
 
 		if t >= 1.0:
 			self.volume_db = linear2db(fade_final)
@@ -107,7 +107,7 @@ func _process(delta: float) -> void:
 				# note that we need to swap initial and final
 				self.volume_db = linear2db( lerp(fade_final, fade_initial, t_final) )
 
-			debug.print(self.volume_db, "db_" + name)
+#			debug.print(self.volume_db, "db_" + name)
 
 	#	if is_equal_approx(t, 0.5):
 	#		Log.d([name, stream.volume_db, fade_type])
@@ -127,10 +127,11 @@ func fade(initial, final, duration = 2.0, blend = 1.0):
 		Log.d(["fading to prefade_volume:", prefade_volume], name)
 
 
-	fade_start_time = F.time()
+	fade_start_time = OS.get_ticks_msec()
 	fade_initial = db2linear(initial)
 	fade_final = db2linear(final)
-	fade_duration = duration
+	# using msec
+	fade_duration = duration * 1000
 	fade_blend = blend
 
 	if fade_final > fade_initial:

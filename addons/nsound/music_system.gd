@@ -23,19 +23,21 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_down"):
-		var layout = AudioServer.generate_bus_layout()
-		ResourceSaver.save("res://test/adaptive_music/saves/bus_layout.res", layout)
-		Log.d('saved bus layout', name)
-	if event.is_action_pressed("ui_right"):
-		var song = songs[current_song]
-		var all_children = Utils.get_all_children(song)
-		for c in all_children:
-			# this is because if we own stream we'll end up with duplicated streams
-			if not c is AudioStreamPlayer:
-				c.owner = song
-		FileUtils.save_scene("res://test/adaptive_music/saves/", song, true)
-		Log.d('saved song', name)
+	pass
+#	if event.is_action_pressed("ui_down"):
+#		var layout = AudioServer.generate_bus_layout()
+#		ResourceSaver.save("res://studio/saves/bus_layout.res", layout)
+#		Log.d('saved bus layout', name)
+#	if event.is_action_pressed("ui_right"):
+#		for song in get_children():
+#			if song is Song:
+#				var all_children = NUtils.get_all_children(song)
+#				for c in all_children:
+#					# this is because if we own stream we'll end up with duplicated streams
+#					if not c is AudioStreamPlayer:
+#						c.owner = song
+#				FileUtils.save_scene("res://studio/saves/", song, true)
+#				Log.d('saved song', name)
 
 
 func load_song(song_name: String):
@@ -43,13 +45,13 @@ func load_song(song_name: String):
 
 	sections.clear()
 	stingers.clear()
-	for node in Utils.get_all_children(song_node):
+	for node in NUtils.get_all_children(song_node):
 		if node is Section:
 			sections[node.name] = node
 		elif node is StingersContainer:
 			for track in node.get_children():
 				stingers[track.name] = track
-			NSoundUtils.setup_buses(node)
+			NUtils.setup_buses(node)
 
 	transitions = song_node.transitions
 
@@ -139,7 +141,7 @@ func run_transition(transition_name: String) -> void:
 	var from_music_player = music_players[current_song][from_section]
 	var to_music_player = music_players[current_song][to_section]
 
-	from_music_player.determine_transition_beat(transition.when)
+	from_music_player.determine_transition_beat(transition.when, transition.bars)
 
 	yield(from_music_player.wait_until(transition.when), "completed")
 
@@ -158,7 +160,7 @@ func run_transition(transition_name: String) -> void:
 
 	# crossfade can only happen after the new section has started
 	# i.e. you cannot start the new section at full volume (cannot fade_in before the track even exists)
-	if transition.fade == A_SongTransition.FadeType.CROSS:
+	if transition.fade == Transition.FadeType.CROSS:
 		sections[to_section].volume_db = Music.MIN_DB
 		from_music_player.fade_out(from_music_player.section, Music.When.NOW, from_music_player.beat_length * 4)
 		to_music_player.fade_in(to_music_player.section, Music.When.NOW, from_music_player.beat_length * 4)

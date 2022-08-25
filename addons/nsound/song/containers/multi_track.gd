@@ -29,7 +29,7 @@ func get_next_track() -> Bus:
 
 	match progression:
 		Progression.RANDOM:
-			var rnd = F.rng.randi_range(0, tracks.size() - 1)
+			var rnd = Audio.rng.randi_range(0, tracks.size() - 1)
 			track = tracks[rnd]
 			last_played = rnd
 		Progression.SEQUENCE:
@@ -44,7 +44,7 @@ func get_next_track() -> Bus:
 				# if it is, replace it to a random index != 0
 				if tracks[0] == last_track:
 					tracks.erase(last_track)
-					var rnd = F.rng.randi_range(1, tracks.size())
+					var rnd = Audio.rng.randi_range(1, tracks.size())
 					tracks.insert(rnd, last_track)
 			track = tracks[new_track_number]
 			last_played = new_track_number
