@@ -39,30 +39,42 @@ func init(send_bus_name: String = "Master") -> Bus:
 	bus_idx = AudioServer.bus_count - 1
 
 	# here we try to set audioserver bus name to our node name
-	# but since that's not guaranteed to be unique, we store the actual audioserver bus_name as well
+	# but since our node name is not guaranteed to be unique, and audioserver wants unique names
+	# we store the actual audioserver bus_name as well, auto-unique-ified by audioserver
 #	if not name: name = "Bus"
 	AudioServer.set_bus_name(bus_idx, name)
 	bus_name = AudioServer.get_bus_name(bus_idx)
 
+	# must happen after bus initialization
 	self.send = send_bus_name
 
 	Audio.register_bus(self)
 
+
+	# for whatever reason i do not comprehend, this has to be set AFTER the line
+	# where we set bus_idx to AudioSever bus count
+	# why???
+
 	return self
 
 
-func remove() -> void:
-	AudioServer.remove_bus(bus_idx)
+#func remove() -> void:
+#	AudioServer.remove_bus(bus_idx)
 
 
 func set_volume_db(value: float) -> void:
-	if bus_idx == -1: return
+	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized yet")
+
 	AudioServer.set_bus_volume_db(bus_idx, volume_db)
 	.set_volume_db(value)
 
 
 func set_send(value: String) -> void:
-	if bus_idx == -1: return
+	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized yet")
+#	if bus_idx == -1:
+#		Log.e(["bus", name, "isn't initialized yet"])
+#		return
+
 	AudioServer.set_bus_send(bus_idx, value)
 	.set_send(value)
 
@@ -80,6 +92,7 @@ func set_send(value: String) -> void:
 
 
 func set_mute(value: bool) -> void:
+	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized yet")
 	AudioServer.set_bus_mute(bus_idx, value)
 	.set_mute(value)
 
@@ -94,18 +107,18 @@ func set_mute(value: bool) -> void:
 
 
 func add_effect(effect: AudioEffect):
-	if bus_idx == -1: return
+	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized yet")
 	AudioServer.add_bus_effect(bus_idx, effect)
 #	var effect_idx = AudioServer.get_bus_effect_count(bus_idx) - 1
 
 
 func get_effect(effect_idx: int) -> AudioEffect:
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
+	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized yet")
 	return AudioServer.get_bus_effect(bus_idx, effect_idx)
 
 
 func get_effects() -> Array:
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
+	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized yet")
 
 	var effects := []
 	var effect_count = AudioServer.get_bus_effect_count(bus_idx)
@@ -117,5 +130,5 @@ func get_effects() -> Array:
 
 
 func is_effect_enabled(effect_idx: int) -> bool:
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
+	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized yet")
 	return AudioServer.is_bus_effect_enabled(bus_idx, effect_idx)

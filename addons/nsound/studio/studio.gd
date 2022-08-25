@@ -112,9 +112,6 @@ func _on_MusicSystem_song_loaded(song_node) -> void:
 	for name in music_system.sections:
 		get_node("%Sections").add_item(name)
 
-
-
-
 	get_node("%Mixer").init_song(song_node)
 
 

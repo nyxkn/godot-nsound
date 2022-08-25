@@ -12,7 +12,6 @@ var music_bus := "Master"
 
 
 func _ready() -> void:
-	# TODO should we move this to settings audio?
 	for i in AudioServer.bus_count:
 		var bus_name = AudioServer.get_bus_name(i)
 		var bus = AudioServerBus.new()
@@ -20,9 +19,7 @@ func _ready() -> void:
 		core_buses[bus_name] = bus
 
 
-func register_bus(bus: AudioServerBus):
-#	var bus_path = bus.get_path()
-
+func register_bus(bus: AudioServerBus) -> void:
 	if runtime_buses.has(bus.bus_name):
 		Log.e(["attempting to register bus", bus.name, ", but a bus of the same name is already registered"], name)
 		return
@@ -30,7 +27,7 @@ func register_bus(bus: AudioServerBus):
 	runtime_buses[bus.bus_name] = bus
 
 
-func register_track(bus: AudioTrack):
+func register_track(bus: AudioTrack) -> void:
 	if runtime_tracks.has(bus):
 		Log.e(["attempting to register an already registered track", bus.name])
 		return

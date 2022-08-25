@@ -41,6 +41,8 @@ func load_song(song_name: String):
 				stingers[track.name] = track
 			NUtils.setup_buses(node)
 
+	yield(get_tree(), "idle_frame")
+
 	transitions = song_node.transitions
 
 

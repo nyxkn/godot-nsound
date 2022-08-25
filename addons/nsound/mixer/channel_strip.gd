@@ -9,10 +9,13 @@ onready var spinbox: SpinBox = get_node("%SpinBox")
 onready var vu_l: TextureProgress = get_node("%VuL")
 onready var vu_r: TextureProgress = get_node("%VuR")
 onready var effects: Tree = $"%Effects"
-onready var substrips = $"%Substrips"
+#onready var substrips = $"%Substrips"
+onready var substrips = get_node("%Substrips")
 
 
 func init(bus: Bus) -> Node:
+#	print('initing strip with bus', str(bus))
+
 	self.bus = bus
 
 	get_node("%ShowFold").visible = false
@@ -59,7 +62,6 @@ func _ready() -> void:
 			fx.set_checked(0, bus.is_effect_enabled(i))
 			fx.set_text(0, afx.resource_name)
 			fx.set_metadata(0, i)
-
 
 
 func _process(delta: float) -> void:
