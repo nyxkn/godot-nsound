@@ -40,7 +40,7 @@ func _input(event: InputEvent) -> void:
 #				Log.d('saved song', name)
 
 
-func load_song(song_name: String) -> Song:
+func load_song(song_name: String):
 	var song_node = songs[song_name]
 
 	sections.clear()

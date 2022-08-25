@@ -1,7 +1,7 @@
 extends Control
 
 
-const Fold = preload("res://addons/nsound/mixer/fold.tscn")
+const Fold = preload("res://addons/nui/fold.tscn")
 const ChannelStrip = preload("res://addons/nsound/mixer/channel_strip.tscn")
 
 
