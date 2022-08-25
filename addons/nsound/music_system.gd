@@ -4,8 +4,18 @@ class_name MusicSystem
 
 signal section_started(node)
 signal song_started(node)
+signal song_finished(node)
 signal song_loaded(node)
 signal song_unloaded()
+
+
+# play modes
+# once and stop. at the end of a song we stop there
+# loop. at the end of a song we restart it (does this belong here or in song?)
+# sequence. at the end of a song we move on to the next one
+# shuffle. at the end of a song we randomly choose another one
+enum PlayMode { SONG_ONCE, LOOP_SONG, SEQUENCE, SHUFFLE }
+export(PlayMode) var play_mode = PlayMode.SEQUENCE
 
 
 var songs := {}
@@ -64,7 +74,6 @@ func load_song(song_name: String):
 
 	transitions[song_name] = song_node.transitions
 
-
 	music_players[song_name] = {}
 	for section_name in sections[song_name]:
 		var section_node = sections[song_name][section_name]
@@ -72,6 +81,8 @@ func load_song(song_name: String):
 		var music_player := MusicPlayer.new()
 		add_child(music_player)
 		music_players[song_name][section_name] = music_player
+
+		music_player.connect("end", self, "on_section_end")
 
 		music_player.load_song_section(song_node, section_node)
 
@@ -101,6 +112,10 @@ func unload_song(song_name: String):
 #	if current_music_player:
 #		current_music_player.queue_free()
 #	current_music_player = null
+
+	for k in music_players[current_song]:
+		music_players[current_song][k].queue_free()
+	music_players.erase(current_song)
 
 	Audio.remove_all_buses()
 
@@ -241,4 +256,34 @@ func queue_stinger(stinger: String, when: int = Music.When.BAR) -> void:
 	current_music_player().play_track(stingers[current_song][stinger])
 
 
+func on_section_end(song_name: String, section_name: String) -> void:
+	var sections = songs[song_name].get_children()
+
+	var section_idx = -1
+	for i in sections.size():
+		if sections[i].name == section_name:
+			section_idx = i
+			break
+
+	if section_idx == sections.size() - 1:
+		pass
+		# play next song
+		match play_mode:
+			PlayMode.SONG_ONCE:
+				emit_signal("song_finished", songs[song_name])
+
+			PlayMode.LOOP_SONG:
+				play_and_switch(song_name, sections[0].name)
+
+			PlayMode.SEQUENCE:
+				pass
+				# play next song
+
+			PlayMode.SHUFFLE:
+				pass
+				# play a random song
+
+	elif section_idx < sections.size() - 1:
+		# play next section
+		play_and_switch(song_name, sections[section_idx + 1].name)
 

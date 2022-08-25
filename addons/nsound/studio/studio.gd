@@ -23,12 +23,12 @@ func init(music_system: MusicSystem) -> void:
 
 
 func attach_to_player(music_player):
-	if _current_music_player:
-		_current_music_player.disconnect("beat", self, "_on_Music_beat")
-		_current_music_player.disconnect("loop_beat", self, "_on_Music_loop_beat")
-		_current_music_player.disconnect("bar", self, "_on_Music_bar")
-		_current_music_player.disconnect("loop", self, "_on_Music_loop")
-		_current_music_player.disconnect("level", self, "_on_Music_level")
+#	if _current_music_player:
+#		_current_music_player.disconnect("beat", self, "_on_Music_beat")
+#		_current_music_player.disconnect("loop_beat", self, "_on_Music_loop_beat")
+#		_current_music_player.disconnect("bar", self, "_on_Music_bar")
+#		_current_music_player.disconnect("loop", self, "_on_Music_loop")
+#		_current_music_player.disconnect("level", self, "_on_Music_level")
 
 	_current_music_player = music_player
 

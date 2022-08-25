@@ -7,8 +7,9 @@ signal bar(n)
 signal barbeat(n)
 signal odd_bar(n)
 signal loop(n)
-signal end(n)
 signal level(n)
+
+signal end(song, section)
 
 signal faded_in(track)
 signal faded_out(track)
@@ -45,6 +46,7 @@ var last_beat: int
 # except that start section starts it the first time, and play loop reruns every loop
 
 #var sections: Dictionary
+var song: Song
 var section: Section
 
 # section-specific variables
@@ -145,12 +147,13 @@ func ________LOAD_START_SONG(): pass
 
 
 func load_song_section(song_node: Node, section_node: Section):
+	song = song_node
 	section = section_node
 
 	# from song
 #	_copy_props_from(song)
-	bpm = song_node.bpm
-	beats_per_bar = song_node.beats_per_bar
+	bpm = song.bpm
+	beats_per_bar = song.beats_per_bar
 
 	# from section
 #	_copy_props_from(section, true)
@@ -600,5 +603,5 @@ func _loop_end() -> void:
 		emit_signal("loop", loop)
 	else:
 		stop()
-		emit_signal("end", section)
+		emit_signal("end", song.name, section.name)
 
