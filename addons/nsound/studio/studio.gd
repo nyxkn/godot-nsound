@@ -8,6 +8,7 @@ var music_system
 var _current_music_player
 var _song_name
 
+
 func init(music_system: MusicSystem) -> void:
 	self.music_system = music_system
 
@@ -15,7 +16,9 @@ func init(music_system: MusicSystem) -> void:
 	music_system.connect("song_started", self, "_on_MusicSystem_song_started")
 	music_system.connect("song_loaded", self, "_on_MusicSystem_song_loaded")
 
-
+	get_node("%Songs").clear()
+	for name in music_system.songs:
+		get_node("%Songs").add_item(name)
 
 
 func attach_to_player(music_player):
@@ -70,19 +73,16 @@ func _process(delta: float) -> void:
 		$"%Timeline".value = _current_music_player.loop_time
 		$"%Time".text = str("%0.1f" % _current_music_player.loop_time, 's')
 		$"%BBT".value = _current_music_player.bbt.to_float()
-#	print(_current_music_player.loop_time)
-
 
 
 func _on_Music_beat(n) -> void:
-	$"%Beat".value = n
 #	print(str('beat: ', n))
+	$"%Beat".value = n
 
 
 func _on_Music_loop_beat(n) -> void:
-	$"%LoopBeat".value = n
-#	$PlayingDisplay.update()
 #	print(str('loop_beat: ', n))
+	$"%LoopBeat".value = n
 
 
 func _on_Music_bar(n) -> void:
@@ -112,9 +112,7 @@ func _on_MusicSystem_song_loaded(song_node) -> void:
 	for name in music_system.sections:
 		get_node("%Sections").add_item(name)
 
-	get_node("%Songs").clear()
-	for name in music_system.songs:
-		get_node("%Songs").add_item(name)
+
 
 
 	get_node("%Mixer").init_song(song_node)
@@ -129,17 +127,11 @@ func _on_MusicSystem_song_started(song_node) -> void:
 
 
 func _on_Music_level(n) -> void:
-#	print('changed level')
 	$"%Level/SpinBox".value = n
 
 
-
 func _on_Play_pressed() -> void:
-#	$Music.start_song(song, "Battle")
 	music_system.play_and_switch(_song_name)
-
-
-#	$PlayingDisplay.setup(song.get_child(0))
 
 
 func _on_Level_value_changed(value) -> void:
@@ -148,10 +140,6 @@ func _on_Level_value_changed(value) -> void:
 
 func _on_NextLoop_pressed() -> void:
 	_current_music_player._loop_end()
-
-
-#func _on_Transitions_item_selected(index: int) -> void:
-
 
 
 func _on_RunTransition_pressed() -> void:
@@ -171,20 +159,20 @@ func _on_GotoSection_pressed() -> void:
 #	attach_to_player(music_system._current_music_player)
 
 
+func _on_GotoSong_pressed() -> void:
+	var options = get_node("%Songs")
+	var item = options.get_item_text(options.get_selected_id())
+	music_system.goto_song(item)
+
+
 func _on_Stop_pressed() -> void:
-	_current_music_player.stop()
+	music_system.stop()
 
 
 func _on_Timeline_value_changed(value) -> void:
 	_current_music_player.seek(value)
 	yield(get_tree().create_timer(0.1), "timeout")
 	update_status()
-
-
-func _on_GotoSong_pressed() -> void:
-	var options = get_node("%Songs")
-	var item = options.get_item_text(options.get_selected_id())
-	music_system.goto_song(item)
 
 
 func _on_HookValue_value_changed(value) -> void:

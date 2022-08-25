@@ -7,18 +7,11 @@ const ChannelStrip = preload("res://addons/nsound/mixer/channel_strip.tscn")
 
 func _ready() -> void:
 	pass
-#	get_node("%MusicSystem").connect("song_loaded", self, "_on_song_loaded")
 	init_core_buses()
 
 
 func show_section(section):
 	pass
-
-
-func _on_song_loaded(song_name: String):
-	print("signal")
-	var song_node = get_node("%Music").get_node(song_name)
-	init_song(song_node)
 
 
 func init_core_buses():

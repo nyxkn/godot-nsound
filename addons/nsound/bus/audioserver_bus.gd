@@ -51,6 +51,10 @@ func init(send_bus_name: String = "Master") -> Bus:
 	return self
 
 
+func remove() -> void:
+	AudioServer.remove_bus(bus_idx)
+
+
 func set_volume_db(value: float) -> void:
 	if bus_idx == -1: return
 	AudioServer.set_bus_volume_db(bus_idx, volume_db)

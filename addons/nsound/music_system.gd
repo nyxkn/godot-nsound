@@ -1,50 +1,38 @@
 extends Node
 class_name MusicSystem
 
+
 signal section_started(node)
 signal song_started(node)
 signal song_loaded(song_name)
 
-var music_players := {}
+
 var songs := {}
+# we instance one music player for each song
+var music_players := {}
+
+# song-specific
 var sections := {}
 var stingers := {}
 var transitions := {}
 
-
-var current_section: String
+# state
 var current_song: String
-
+var current_section: String
 var current_music_player: MusicPlayer
+
 
 func _ready() -> void:
 	for song in get_children():
 		songs[song.name] = song
 
-
-func _input(event: InputEvent) -> void:
-	pass
-#	if event.is_action_pressed("ui_down"):
-#		var layout = AudioServer.generate_bus_layout()
-#		ResourceSaver.save("res://studio/saves/bus_layout.res", layout)
-#		Log.d('saved bus layout', name)
-#	if event.is_action_pressed("ui_right"):
-#		for song in get_children():
-#			if song is Song:
-#				var all_children = NUtils.get_all_children(song)
-#				for c in all_children:
-#					# this is because if we own stream we'll end up with duplicated streams
-#					if not c is AudioStreamPlayer:
-#						c.owner = song
-#				FileUtils.save_scene("res://studio/saves/", song, true)
-#				Log.d('saved song', name)
+	# set initial values
+	unload_song()
 
 
 func load_song(song_name: String):
 	var song_node = songs[song_name]
 
-	sections.clear()
-	stingers.clear()
 	for node in NUtils.get_all_children(song_node):
 		if node is Section:
 			sections[node.name] = node
@@ -73,6 +61,22 @@ func load_song(song_name: String):
 
 	return song_node
 
+
+func unload_song():
+	if current_music_player:
+		current_music_player.queue_free()
+	current_section = ""
+	current_song = ""
+#	current_music_player = null
+
+	sections.clear()
+	stingers.clear()
+	transitions.clear()
+
+
+
+func stop():
+	current_music_player.stop()
 
 
 func play_only(song_name: String, section_name: String = ""):
@@ -104,7 +108,9 @@ func goto_section(section_name: String, when: int = Music.When.ODD_BAR) -> void:
 
 
 func goto_song(song_name: String) -> void:
-	pass
+	unload_song()
+	load_song(song_name)
+	play_and_switch(song_name)
 
 
 func run_transition(transition_name: String) -> void:

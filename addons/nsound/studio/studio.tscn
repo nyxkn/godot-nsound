@@ -159,35 +159,10 @@ margin_right = 222.0
 margin_bottom = 22.0
 text = "Section"
 
-[node name="Song" type="HBoxContainer" parent="Controls/Run"]
+[node name="Stingers" type="HBoxContainer" parent="Controls/Run"]
 margin_top = 108.0
 margin_right = 245.0
 margin_bottom = 130.0
-custom_constants/separation = 16
-
-[node name="Label" type="Label" parent="Controls/Run/Song"]
-margin_top = 4.0
-margin_right = 69.0
-margin_bottom = 18.0
-text = "Goto song:"
-
-[node name="GotoSong" type="Button" parent="Controls/Run/Song"]
-margin_left = 85.0
-margin_right = 113.0
-margin_bottom = 22.0
-icon = ExtResource( 2 )
-
-[node name="Songs" type="OptionButton" parent="Controls/Run/Song"]
-unique_name_in_owner = true
-margin_left = 129.0
-margin_right = 188.0
-margin_bottom = 22.0
-text = "Song"
-
-[node name="Stingers" type="HBoxContainer" parent="Controls/Run"]
-margin_top = 162.0
-margin_right = 245.0
-margin_bottom = 184.0
 custom_constants/separation = 16
 
 [node name="Label" type="Label" parent="Controls/Run/Stingers"]
@@ -275,6 +250,32 @@ margin_right = 64.0
 margin_bottom = 68.0
 separator = ":"
 
+[node name="Songs" type="HBoxContainer" parent="Controls"]
+margin_left = 28.9999
+margin_top = 25.0
+margin_right = 274.0
+margin_bottom = 47.0
+custom_constants/separation = 16
+
+[node name="Label" type="Label" parent="Controls/Songs"]
+margin_top = 4.0
+margin_right = 69.0
+margin_bottom = 18.0
+text = "Goto song:"
+
+[node name="GotoSong" type="Button" parent="Controls/Songs"]
+margin_left = 85.0
+margin_right = 113.0
+margin_bottom = 22.0
+icon = ExtResource( 2 )
+
+[node name="Songs" type="OptionButton" parent="Controls/Songs"]
+unique_name_in_owner = true
+margin_left = 129.0
+margin_right = 188.0
+margin_bottom = 22.0
+text = "Song"
+
 [node name="Song" type="VBoxContainer" parent="Controls"]
 margin_left = 407.126
 margin_top = 29.3665
@@ -337,8 +338,8 @@ margin_bottom = 367.0
 [connection signal="value_changed" from="Controls/Sliders/BBT" to="." method="_on_BBT_value_changed"]
 [connection signal="pressed" from="Controls/Run/Transitions/RunTransition" to="." method="_on_RunTransition_pressed"]
 [connection signal="pressed" from="Controls/Run/Section/GotoSection" to="." method="_on_GotoSection_pressed"]
-[connection signal="pressed" from="Controls/Run/Song/GotoSong" to="." method="_on_GotoSong_pressed"]
 [connection signal="pressed" from="Controls/Run/Stingers/RunStinger" to="." method="_on_RunStinger_pressed"]
 [connection signal="pressed" from="Controls/Transport/Play" to="." method="_on_Play_pressed"]
 [connection signal="pressed" from="Controls/Transport/Stop" to="." method="_on_Stop_pressed"]
 [connection signal="pressed" from="Controls/Transport/NextLoop" to="." method="_on_NextLoop_pressed"]
+[connection signal="pressed" from="Controls/Songs/GotoSong" to="." method="_on_GotoSong_pressed"]
