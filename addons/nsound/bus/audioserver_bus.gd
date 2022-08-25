@@ -3,6 +3,8 @@ class_name AudioServerBus
 
 
 # identifies which audioserver bus we're encapsulating. same as the audioserver bus idx
+# note: this is not a reliable index. if a previous index bus is removed, all will be shifted down
+# you should use bus_name instead as your unique id, and fetch bus_idx everytime you need it
 var bus_idx: int = -1
 
 # name is not unique. this is just the name in the scene editor
@@ -35,6 +37,30 @@ func wrap(audio_server_bus_name: String = "Master") -> void:
 func init(send_bus_name: String = "Master") -> Bus:
 	assert(bus_idx == -1, "bus " + str(self) + " is already initialized")
 
+	register()
+
+	# must happen after bus initialization
+	self.send = send_bus_name
+
+	Log.d(["bus", bus_name, "was initialized with id", bus_idx])
+
+	return self
+
+
+func on_bus_layout_changed() -> void:
+	# reobtaining the correct index after a layout change
+	# should we rather just use bus_name?
+	bus_idx = AudioServer.get_bus_index(bus_name)
+
+
+# this is guaranteed to always return the correct index
+func idx() -> int:
+	return AudioServer.get_bus_index(bus_name)
+
+
+func register() -> void:
+	assert(bus_idx == -1, "trying to register an already initialized bus")
+
 	AudioServer.add_bus()
 	bus_idx = AudioServer.bus_count - 1
 
@@ -45,34 +71,33 @@ func init(send_bus_name: String = "Master") -> Bus:
 	AudioServer.set_bus_name(bus_idx, name)
 	bus_name = AudioServer.get_bus_name(bus_idx)
 
-	# must happen after bus initialization
-	self.send = send_bus_name
-
 	Audio.register_bus(self)
 
-
-	# for whatever reason i do not comprehend, this has to be set AFTER the line
-	# where we set bus_idx to AudioSever bus count
-	# why???
-
-	return self
+	AudioServer.connect("bus_layout_changed", self, "on_bus_layout_changed")
 
 
-#func remove() -> void:
-#	AudioServer.remove_bus(bus_idx)
+func unregister() -> void:
+	AudioServer.remove_bus(bus_idx)
+	bus_idx = -1
+
+#	Audio.unregister_bus(self)
+
+	AudioServer.disconnect("bus_layout_changed", self, "on_bus_layout_changed")
 
 
 func set_volume_db(value: float) -> void:
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized yet")
+	if bus_idx == -1:
+		Log.w(["bus", name, "isn't initialized"])
+		return
 
 	AudioServer.set_bus_volume_db(bus_idx, volume_db)
 	.set_volume_db(value)
 
 
 func set_send(value: String) -> void:
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized yet")
+	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
 #	if bus_idx == -1:
-#		Log.e(["bus", name, "isn't initialized yet"])
+#		Log.e(["bus", name, "isn't initialized"])
 #		return
 
 	AudioServer.set_bus_send(bus_idx, value)
@@ -92,7 +117,7 @@ func set_send(value: String) -> void:
 
 
 func set_mute(value: bool) -> void:
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized yet")
+	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
 	AudioServer.set_bus_mute(bus_idx, value)
 	.set_mute(value)
 
@@ -107,18 +132,18 @@ func set_mute(value: bool) -> void:
 
 
 func add_effect(effect: AudioEffect):
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized yet")
+	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
 	AudioServer.add_bus_effect(bus_idx, effect)
 #	var effect_idx = AudioServer.get_bus_effect_count(bus_idx) - 1
 
 
 func get_effect(effect_idx: int) -> AudioEffect:
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized yet")
+	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
 	return AudioServer.get_bus_effect(bus_idx, effect_idx)
 
 
 func get_effects() -> Array:
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized yet")
+	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
 
 	var effects := []
 	var effect_count = AudioServer.get_bus_effect_count(bus_idx)
@@ -130,5 +155,5 @@ func get_effects() -> Array:
 
 
 func is_effect_enabled(effect_idx: int) -> bool:
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized yet")
+	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
 	return AudioServer.is_bus_effect_enabled(bus_idx, effect_idx)

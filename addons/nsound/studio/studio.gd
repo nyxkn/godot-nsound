@@ -6,7 +6,7 @@ signal hook_value_changed(value)
 var music_system
 
 var _current_music_player
-var _song_name
+var _current_song
 
 
 func init(music_system: MusicSystem) -> void:
@@ -15,6 +15,7 @@ func init(music_system: MusicSystem) -> void:
 	music_system.connect("section_started", self, "_on_MusicSystem_section_started")
 	music_system.connect("song_started", self, "_on_MusicSystem_song_started")
 	music_system.connect("song_loaded", self, "_on_MusicSystem_song_loaded")
+	music_system.connect("song_unloaded", self, "_on_MusicSystem_song_unloaded")
 
 	get_node("%Songs").clear()
 	for name in music_system.songs:
@@ -69,7 +70,7 @@ func update_status():
 
 
 func _process(delta: float) -> void:
-	if _current_music_player:
+	if music_system.current_music_player():
 		$"%Timeline".value = _current_music_player.loop_time
 		$"%Time".text = str("%0.1f" % _current_music_player.loop_time, 's')
 		$"%BBT".value = _current_music_player.bbt.to_float()
@@ -95,28 +96,32 @@ func _on_Music_loop(n) -> void:
 	$"%Loop".value = n
 
 
+func _on_MusicSystem_song_unloaded() -> void:
+	get_node("%Mixer").clear()
+
+
 func _on_MusicSystem_song_loaded(song_node) -> void:
-	_song_name = song_node.name
-	$"%SongTitle".text = _song_name
+	_current_song = song_node.name
+	$"%SongTitle".text = _current_song
 
 
 	get_node("%Transitions").clear()
-	for name in music_system.transitions:
+	for name in music_system.transitions[_current_song]:
 		get_node("%Transitions").add_item(name)
 
 	get_node("%Stingers").clear()
-	for name in music_system.stingers:
+	for name in music_system.stingers[_current_song]:
 		get_node("%Stingers").add_item(name)
 
 	get_node("%Sections").clear()
-	for name in music_system.sections:
+	for name in music_system.sections[_current_song]:
 		get_node("%Sections").add_item(name)
 
 	get_node("%Mixer").init_song(song_node)
 
 
 func _on_MusicSystem_section_started(section_node) -> void:
-	attach_to_player(music_system.current_music_player)
+	attach_to_player(music_system.current_music_player())
 
 
 func _on_MusicSystem_song_started(song_node) -> void:
@@ -128,7 +133,7 @@ func _on_Music_level(n) -> void:
 
 
 func _on_Play_pressed() -> void:
-	music_system.play_and_switch(_song_name)
+	music_system.play_and_switch()
 
 
 func _on_Level_value_changed(value) -> void:
@@ -178,3 +183,7 @@ func _on_HookValue_value_changed(value) -> void:
 
 func _on_BBT_value_changed(value) -> void:
 	_current_music_player.seek_to_barbeat(float(value))
+
+
+func _on_Unload_pressed() -> void:
+	music_system.unload_song(_current_song)

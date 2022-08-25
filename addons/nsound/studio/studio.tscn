@@ -18,6 +18,13 @@ anchor_right = 1.0
 size_flags_vertical = 3
 size_flags_stretch_ratio = 2.0
 
+[node name="Unload" type="Button" parent="Controls"]
+margin_left = 30.0
+margin_top = 72.0
+margin_right = 121.0
+margin_bottom = 92.0
+text = "Unload song"
+
 [node name="Sliders" type="GridContainer" parent="Controls"]
 margin_left = 292.732
 margin_top = 161.252
@@ -329,6 +336,7 @@ margin_top = 32.0
 margin_right = 1334.0
 margin_bottom = 367.0
 
+[connection signal="pressed" from="Controls/Unload" to="." method="_on_Unload_pressed"]
 [connection signal="value_changed" from="Controls/Sliders/Level" to="." method="_on_Level_value_changed"]
 [connection signal="value_changed" from="Controls/Sliders/HookValue" to="." method="_on_HookValue_value_changed"]
 [connection signal="value_changed" from="Controls/Sliders/Timeline" to="." method="_on_Timeline_value_changed"]

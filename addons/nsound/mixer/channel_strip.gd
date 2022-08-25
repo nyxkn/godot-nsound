@@ -65,7 +65,13 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if bus is AudioServerBus:
+#	if not is_instance_valid(bus):
+#		return
+
+#	if bus.bus_idx == -1:
+#		return
+
+	if bus is AudioServerBus and bus.bus_idx != -1:
 		var real_peak = [-100, -100]
 
 		var cc = AudioServer.get_bus_channels(bus.bus_idx)

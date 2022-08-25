@@ -3,6 +3,8 @@ extends Control
 
 const Fold = preload("res://addons/nui/fold.tscn")
 const ChannelStrip = preload("res://addons/nsound/mixer/channel_strip.tscn")
+onready var core_strips: HBoxContainer = $Strips/CoreStrips
+onready var runtime_strips: HBoxContainer = $Strips/RuntimeStrips
 
 
 func _ready() -> void:
@@ -17,7 +19,7 @@ func show_section(section):
 func init_core_buses():
 	for bus in Audio.core_buses.values():
 		var abc = ChannelStrip.instance().init(bus)
-		$Strips/CoreStrips.add_child(abc)
+		core_strips.add_child(abc)
 
 
 #func init_all_buses() -> void:
@@ -25,6 +27,10 @@ func init_core_buses():
 #		var abc = ChannelStrip.instance().init(bus)
 #		abc.name = bus.bus_name
 #		$Strips/RuntimeStrips.add_child(abc)
+
+func clear() -> void:
+	for s in runtime_strips.get_children():
+		s.queue_free()
 
 
 func init_song(root_node: Node) -> void:
@@ -51,9 +57,9 @@ func init_song(root_node: Node) -> void:
 	# adding all top-level strips
 	for k in strips:
 		if strips[k].bus.send in Audio.core_buses:
-			$Strips/RuntimeStrips.add_child(strips[k])
+			runtime_strips.add_child(strips[k])
 
-	# waiting for the strips to be readied
+	# waiting for the top-level strips to be readied
 	yield(get_tree(), "idle_frame")
 
 	for k in strips:

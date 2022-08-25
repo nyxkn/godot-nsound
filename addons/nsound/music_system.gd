@@ -4,11 +4,13 @@ class_name MusicSystem
 
 signal section_started(node)
 signal song_started(node)
-signal song_loaded(song_name)
+signal song_loaded(node)
+signal song_unloaded()
 
 
 var songs := {}
-# we instance one music player for each song
+# we instance one music player for each section of a song
+# music_players[song][section]
 var music_players := {}
 
 # song-specific
@@ -17,38 +19,55 @@ var stingers := {}
 var transitions := {}
 
 # state
+#var loaded_songs := []
 var current_song: String
 var current_section: String
-var current_music_player: MusicPlayer
+#var current_music_player: MusicPlayer #!!!!! dont kepp this refrerce. jusr keep string
+#var song_loaded: bool = false
 
 
 func _ready() -> void:
 	for song in get_children():
 		songs[song.name] = song
+		sections[song.name] = {}
+		stingers[song.name] = {}
+		transitions[song.name] = {}
 
 	# set initial values
-	unload_song()
+#	unload_song()
+
+
+# the advantage of using a getter is that you don't have to store
+# current_music_player as a variable
+# which will create problems if you try to free it and recreate it
+func current_music_player() -> MusicPlayer:
+	if current_song and current_section:
+		return music_players[current_song][current_section]
+	else:
+		return null
 
 
 func load_song(song_name: String):
+	Log.i(["loading song", song_name], name)
+
 	var song_node = songs[song_name]
 
 	for node in NUtils.get_all_children(song_node):
 		if node is Section:
-			sections[node.name] = node
+			sections[song_name][node.name] = node
 		elif node is StingersContainer:
 			for track in node.get_children():
-				stingers[track.name] = track
+				stingers[song_name][track.name] = track
 			NUtils.setup_buses(node)
 
-	yield(get_tree(), "idle_frame")
+#	yield(get_tree(), "idle_frame")
 
-	transitions = song_node.transitions
+	transitions[song_name] = song_node.transitions
 
 
 	music_players[song_name] = {}
-	for section_name in sections:
-		var section_node = sections[section_name]
+	for section_name in sections[song_name]:
+		var section_node = sections[song_name][section_name]
 
 		var music_player := MusicPlayer.new()
 		add_child(music_player)
@@ -58,65 +77,101 @@ func load_song(song_name: String):
 
 	song_node.music_system = self
 	song_node._setup()
+#	song_node.connect("hook_value_changed", self, "on_hook_value_changed")
 
+	current_song = song_name
+
+#	song_loaded = true
 	emit_signal("song_loaded", song_node)
+
+	Log.i(["buses count:", Audio.get_buses_count()], name)
 
 	return song_node
 
 
-func unload_song():
-	if current_music_player:
-		current_music_player.queue_free()
-	current_section = ""
-	current_song = ""
+func unload_song(song_name: String):
+	Log.i(["unloading song", song_name], name)
+
+	stop()
+
+#	loaded_songs.erase(song_name)
+
+#	song_loaded = false
+
+#	if current_music_player:
+#		current_music_player.queue_free()
 #	current_music_player = null
 
-	sections.clear()
-	stingers.clear()
-	transitions.clear()
+	Audio.remove_all_buses()
 
+	sections[song_name].clear()
+	stingers[song_name].clear()
+	transitions[song_name].clear()
+
+#	songs.erase(current_song)
+
+	current_section = ""
+	current_song = ""
+
+	emit_signal("song_unloaded")
+
+	Log.i(["buses count:", Audio.get_buses_count()], name)
 
 
 func stop():
-	current_music_player.stop()
+	if current_music_player():
+		current_music_player().stop()
 
 
-func play_only(song_name: String, section_name: String = ""):
-	music_players[song_name][section_name].start()
+#func play_only(song_name: String, section_name: String = ""):
+#	music_players[song_name][section_name].start()
 
 
-func play_and_switch(song_name: String, section_name: String = "", stop: bool = true):
-	if song_name != current_song:
-		emit_signal("song_started", songs[song_name])
+func play_and_switch(song_name: String = "", section_name: String = "", stop: bool = true):
+	# check whether song is loaded
+#	if not song_name in loaded_songs:
+#		Log.e(["song", song_name, "isn't loaded"])
+#		return
 
-	current_song = song_name
+	if current_song:
+		if not song_name:
+			song_name = current_song
+	else:
+		Log.e(["trying to play a song but no song is loaded"], name)
+		return
+
+#	if song_name != current_song:
+#		Log.e(["trying to play a song that isn't loaded:", song_name], name)
+##		emit_signal("song_started", songs[song_name])
+
 
 	if not section_name:
 		section_name = music_players[current_song].keys()[0]
 	current_section = section_name
 
-	if stop and current_music_player:
-		current_music_player.stop()
+	if stop and current_music_player():
+		current_music_player().stop()
 
-	current_music_player = music_players[current_song][current_section]
-	current_music_player.start()
+#	current_music_player = music_players[current_song][current_section]
+	current_music_player().start()
 
-	emit_signal("section_started", sections[section_name])
+	emit_signal("section_started", sections[song_name][section_name])
 
 
 func goto_section(section_name: String, when: int = Music.When.ODD_BAR) -> void:
-	yield(current_music_player.wait_until(when), "completed")
+	yield(current_music_player().wait_until(when), "completed")
 	play_and_switch(current_song, section_name)
 
 
 func goto_song(song_name: String) -> void:
-	unload_song()
+	if current_song:
+		unload_song(current_song)
 	load_song(song_name)
-	play_and_switch(song_name)
+#	play_and_switch(song_name)
 
 
 func run_transition(transition_name: String) -> void:
-	var transition = transitions[transition_name]
+	var transition = transitions[current_song][transition_name]
 	Log.d(["running transition", transition_name])
 
 	var from_section = ""
@@ -168,7 +223,7 @@ func run_transition(transition_name: String) -> void:
 	# crossfade can only happen after the new section has started
 	# i.e. you cannot start the new section at full volume (cannot fade_in before the track even exists)
 	if transition.fade == Transition.FadeType.CROSS:
-		sections[to_section].volume_db = Music.MIN_DB
+		sections[current_song][to_section].volume_db = Music.MIN_DB
 		from_music_player.fade_out(from_music_player.section, Music.When.NOW, from_music_player.beat_length * 4)
 		to_music_player.fade_in(to_music_player.section, Music.When.NOW, from_music_player.beat_length * 4)
 		yield(from_music_player, "faded_out")
@@ -180,10 +235,10 @@ func run_transition(transition_name: String) -> void:
 
 
 func queue_stinger(stinger: String, when: int = Music.When.BAR) -> void:
-	yield(current_music_player.wait_until(when), "completed")
+	yield(current_music_player().wait_until(when), "completed")
 
 	Log.d(["playing stinger", stinger], name)
-	current_music_player.play_track(stingers[stinger])
+	current_music_player().play_track(stingers[current_song][stinger])
 
 
 
