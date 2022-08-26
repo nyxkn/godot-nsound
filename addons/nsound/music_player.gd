@@ -364,29 +364,48 @@ func set_level(value: int, when: int = Music.When.ODD_BAR) -> void:
 #	Log.d(["set level", value])
 
 	for levels_track in levels_tracks:
+		# if levels_track has no children, skip
 		if levels_track.get_child_count() == 0:
 			continue
 
-		# fetch the highest level track that fits under current level
-		var highest_track: String
-		for i in range(level, 0, -1):
-			var find_res = levels_track.levels.values().find(i)
-			if find_res != -1:
-				highest_track = levels_track.levels.keys()[find_res]
-				break
+		match levels_track.layer_mode:
 
-		# did we find a track to play?
-		var selected_track: Bus = null
-		if highest_track:
-			selected_track = levels_track.get_node(highest_track)
-#			Log.d(["fade in", selected_track])
-			fade_in(selected_track, when)
+			LevelsTrack.LayerMode.SINGLE:
+				# fetch the highest level track that fits under current level
+				var highest_track: String
+				for i in range(level, 0, -1):
+					var levels_track_idx = levels_track.levels.values().find(i)
+					if levels_track_idx != -1:
+						highest_track = levels_track.levels.keys()[levels_track_idx]
+						break
+
+				# did we find a track to play?
+				var selected_track: Bus = null
+				if highest_track:
+					selected_track = levels_track.get_node(highest_track)
+#					Log.d(["fade in", selected_track])
+					fade_in(selected_track, when)
+
+				for track in levels_track.get_children():
+					if track != selected_track:
+#						Log.d(["fade out", track])
+						fade_out(track, when)
+
+			LevelsTrack.LayerMode.ADD:
+				for track_name in levels_track.levels:
+					var track_level = levels_track.levels[track_name]
+					if track_level <= level:
+						fade_in(levels_track.get_node(track_name))
+					else:
+						fade_out(levels_track.get_node(track_name))
+#				if highest_track:
+#					for track_name in levels_track.levels:
+#						fade_in(levels_track.get_node(track_name))
+#						if track_name == highest_track:
+#							break
 
 
-		for track in levels_track.get_children():
-			if track != selected_track:
-#				Log.d(["fade out", track])
-				fade_out(track, when)
+
 
 
 	emit_signal("level", value)

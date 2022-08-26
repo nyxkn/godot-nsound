@@ -64,8 +64,8 @@ func _ready() -> void:
 # current_music_player as a variable
 # which will create problems if you try to free it and recreate it
 func current_music_player() -> MusicPlayer:
-	if current_song and current_section:
-		return music_players[current_song][current_section]
+	if current_song in music_players and current_section in music_players[current_song]:
+			return music_players[current_song][current_section]
 	else:
 		return null
 
@@ -161,6 +161,7 @@ func stop():
 
 
 func play_and_switch(song_name: String = "", section_name: String = "", stop: bool = true):
+	# if no song_name, replay current song
 	if not song_name:
 		song_name = current_song
 
@@ -176,6 +177,8 @@ func play_and_switch(song_name: String = "", section_name: String = "", stop: bo
 		Log.i(["stopping current song/section", current_song, current_section], name)
 		current_music_player().stop()
 
+	if song_name != current_song:
+		emit_signal("song_started", songs[song_name])
 
 	current_song = song_name
 

@@ -14,8 +14,8 @@ export(bool) var regex_match := false
 # single only activates the highest level (elias)
 # add activates everything up to level
 # pad activates level and adjacent levels
-enum Type { SINGLE, ADD, PAD }
-export(Type) var type := Type.SINGLE
+enum LayerMode { SINGLE, ADD, PAD }
+export(LayerMode) var layer_mode := LayerMode.SINGLE
 
 
 func _ready() -> void:

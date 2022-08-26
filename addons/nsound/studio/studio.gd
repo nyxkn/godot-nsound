@@ -101,6 +101,14 @@ func _on_MusicSystem_song_unloaded() -> void:
 
 
 func _on_MusicSystem_song_loaded(song_node) -> void:
+	pass
+
+
+func _on_MusicSystem_section_started(section_node) -> void:
+	attach_to_player(music_system.current_music_player())
+
+
+func _on_MusicSystem_song_started(song_node) -> void:
 	_current_song = song_node.name
 	$"%SongTitle".text = _current_song
 
@@ -120,22 +128,11 @@ func _on_MusicSystem_song_loaded(song_node) -> void:
 	get_node("%Mixer").init_song(song_node)
 
 
-func _on_MusicSystem_section_started(section_node) -> void:
-	attach_to_player(music_system.current_music_player())
-
-
-func _on_MusicSystem_song_started(song_node) -> void:
-	pass
-
-
 func _on_Music_level(n) -> void:
 	$"%Level/SpinBox".value = n
 
 
-func _on_Play_pressed() -> void:
-	var options = get_node("%Songs")
-	var item = options.get_item_text(options.get_selected_id())
-	music_system.play_and_switch(item)
+
 
 
 func _on_Level_value_changed(value) -> void:
@@ -168,10 +165,19 @@ func _on_GotoSong_pressed() -> void:
 	var item = options.get_item_text(options.get_selected_id())
 	music_system.goto_song(item)
 
+func _on_Play_pressed() -> void:
+	var options = get_node("%Songs")
+	var item = options.get_item_text(options.get_selected_id())
+	music_system.play_and_switch(item)
 
 func _on_Stop_pressed() -> void:
 	music_system.stop()
 
+
+func _on_Unload_pressed() -> void:
+	var options = get_node("%Songs")
+	var item = options.get_item_text(options.get_selected_id())
+	music_system.unload_song(item)
 
 func _on_Timeline_value_changed(value) -> void:
 	_current_music_player.seek(value)
@@ -187,5 +193,3 @@ func _on_BBT_value_changed(value) -> void:
 	_current_music_player.seek_to_barbeat(float(value))
 
 
-func _on_Unload_pressed() -> void:
-	music_system.unload_song(_current_song)
