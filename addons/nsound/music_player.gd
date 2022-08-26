@@ -235,7 +235,7 @@ func start_loop() -> void:
 	if reference_method == ReferenceMethod.SILENCE:
 		reference_stream_silence.play()
 
-	set_level(level)
+	set_level(level, Music.When.NOW)
 
 #	for node in section.get_children():
 #		play_track(node)
@@ -269,9 +269,6 @@ func play_track(track: Bus):
 		for subtrack in track.get_children():
 			play_track(subtrack)
 	# if we're dealing with levels tracks, simply play all tracks
-#	elif track is LevelsContainer:
-#		for subtrack in track.get_children():
-#			play_track(subtrack)
 	elif track is LevelsTrack:
 		for subtrack in track.get_children():
 			play_track(subtrack)
@@ -395,9 +392,9 @@ func set_level(value: int, when: int = Music.When.ODD_BAR) -> void:
 				for track_name in levels_track.levels:
 					var track_level = levels_track.levels[track_name]
 					if track_level <= level:
-						fade_in(levels_track.get_node(track_name))
+						fade_in(levels_track.get_node(track_name), when)
 					else:
-						fade_out(levels_track.get_node(track_name))
+						fade_out(levels_track.get_node(track_name), when)
 #				if highest_track:
 #					for track_name in levels_track.levels:
 #						fade_in(levels_track.get_node(track_name))

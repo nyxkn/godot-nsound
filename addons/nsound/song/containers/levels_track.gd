@@ -12,9 +12,9 @@ export(Dictionary) var levels: Dictionary
 export(bool) var regex_match := false
 
 # single only activates the highest level (elias)
-# add activates everything up to level
-# pad activates level and adjacent levels
-enum LayerMode { SINGLE, ADDITIVE, PADDING }
+# additive activates everything up to level
+# padding activates level and adjacent levels. is this useful?
+enum LayerMode { SINGLE, ADDITIVE }
 export(LayerMode) var layer_mode := LayerMode.SINGLE
 
 
@@ -26,6 +26,12 @@ func _ready() -> void:
 		if levels.empty():
 			for node in get_children():
 				add_levels_entry(node)
+
+	for track_name in levels:
+		if not get_node(track_name):
+			Log.e(["missing track", track_name, "defined in levels"], name)
+
+
 
 
 func add_levels_entry(node: Node):
