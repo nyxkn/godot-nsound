@@ -361,7 +361,7 @@ func ________LEVELS(): pass
 
 func set_level(value: int, when: int = Music.When.ODD_BAR) -> void:
 	level = value
-	Log.d(["set level", value])
+#	Log.d(["set level", value])
 
 	for levels_track in levels_tracks:
 		if levels_track.get_child_count() == 0:
@@ -602,6 +602,7 @@ func _loop_end() -> void:
 		start_loop()
 		emit_signal("loop", loop)
 	else:
+		# we have to at least set playing=false so that processing stops
 		stop()
 		emit_signal("end", song.name, section.name)
 

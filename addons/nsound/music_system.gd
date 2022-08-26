@@ -29,11 +29,14 @@ var stingers := {}
 var transitions := {}
 
 # state
-#var loaded_songs := []
+var loaded_songs := []
+
 var current_song: String
 var current_section: String
-#var current_music_player: MusicPlayer #!!!!! dont kepp this refrerce. jusr keep string
+
 #var song_loaded: bool = false
+
+var _music_players_node
 
 
 func _ready() -> void:
@@ -46,6 +49,14 @@ func _ready() -> void:
 	# set initial values
 #	unload_song()
 
+	# placeholder node for adding music_players
+	_music_players_node = Node.new()
+	_music_players_node.name = "MusicPlayers"
+	add_child(_music_players_node)
+
+	for song_name in songs:
+		load_song(song_name)
+
 
 # the advantage of using a getter is that you don't have to store
 # current_music_player as a variable
@@ -55,6 +66,10 @@ func current_music_player() -> MusicPlayer:
 		return music_players[current_song][current_section]
 	else:
 		return null
+
+#func set_current_music_player(song_name: String, section_name: String):
+#	current_song = song_name
+#	current_section = section_name
 
 
 func load_song(song_name: String):
@@ -79,7 +94,8 @@ func load_song(song_name: String):
 		var section_node = sections[song_name][section_name]
 
 		var music_player := MusicPlayer.new()
-		add_child(music_player)
+		music_player.name = "MusicPlayer_" + song_name + "_" + section_name
+		_music_players_node.add_child(music_player)
 		music_players[song_name][section_name] = music_player
 
 		music_player.connect("end", self, "on_section_end")
@@ -90,9 +106,9 @@ func load_song(song_name: String):
 	song_node._setup()
 #	song_node.connect("hook_value_changed", self, "on_hook_value_changed")
 
-	current_song = song_name
 
-#	song_loaded = true
+	loaded_songs.append(song_name)
+
 	emit_signal("song_loaded", song_node)
 
 	Log.i(["buses count:", Audio.get_buses_count()], name)
@@ -113,9 +129,9 @@ func unload_song(song_name: String):
 #		current_music_player.queue_free()
 #	current_music_player = null
 
-	for k in music_players[current_song]:
-		music_players[current_song][k].queue_free()
-	music_players.erase(current_song)
+	for k in music_players[song_name]:
+		music_players[song_name][k].queue_free()
+	music_players.erase(song_name)
 
 	Audio.remove_all_buses()
 
@@ -125,8 +141,8 @@ func unload_song(song_name: String):
 
 #	songs.erase(current_song)
 
-	current_section = ""
-	current_song = ""
+#	current_section = ""
+#	current_song = ""
 
 	emit_signal("song_unloaded")
 
@@ -143,29 +159,30 @@ func stop():
 
 
 func play_and_switch(song_name: String = "", section_name: String = "", stop: bool = true):
-	# check whether song is loaded
-#	if not song_name in loaded_songs:
-#		Log.e(["song", song_name, "isn't loaded"])
-#		return
+	if not song_name:
+		song_name = current_song
 
-	if current_song:
-		if not song_name:
-			song_name = current_song
-	else:
-		Log.e(["trying to play a song but no song is loaded"], name)
+	# check whether song is loaded
+	if not song_name in loaded_songs:
+		Log.e(["song", song_name, "isn't loaded"])
 		return
 
-#	if song_name != current_song:
-#		Log.e(["trying to play a song that isn't loaded:", song_name], name)
-##		emit_signal("song_started", songs[song_name])
+	# using current music player here and later is confusing
+	# what's happeneing is that by changing current_song and section
+	# current music player will return a different player
+	if stop and current_music_player():
+		Log.i(["stopping current song/section", current_song, current_section], name)
+		current_music_player().stop()
 
+
+	current_song = song_name
 
 	if not section_name:
 		section_name = music_players[current_song].keys()[0]
 	current_section = section_name
 
-	if stop and current_music_player():
-		current_music_player().stop()
+	Log.i(["starting song/section", current_song, current_section], name)
+
 
 #	current_music_player = music_players[current_song][current_section]
 	current_music_player().start()
@@ -179,9 +196,13 @@ func goto_section(section_name: String, when: int = Music.When.ODD_BAR) -> void:
 
 
 func goto_song(song_name: String) -> void:
-	if current_song:
-		unload_song(current_song)
-	load_song(song_name)
+#	if current_song:
+#		unload_song(current_song)
+
+	if not song_name in loaded_songs:
+		Log.i(["song", song_name, "wasn't loaded. loading"])
+		load_song(song_name)
+
 #	play_and_switch(song_name)
 
 
@@ -257,33 +278,55 @@ func queue_stinger(stinger: String, when: int = Music.When.BAR) -> void:
 
 
 func on_section_end(song_name: String, section_name: String) -> void:
-	var sections = songs[song_name].get_children()
+#	var section_nodes = songs[song_name].get_children()
+	var section_nodes = sections[song_name].values()
+#	var song_nodes = get_children()
+	var song_nodes = songs.values()
+#	song_nodes
+
+	Log.d(["section_nodes:", section_nodes])
+	Log.d(["song_nodes:", song_nodes])
 
 	var section_idx = -1
-	for i in sections.size():
-		if sections[i].name == section_name:
+	for i in section_nodes.size():
+		if section_nodes[i].name == section_name:
 			section_idx = i
 			break
 
-	if section_idx == sections.size() - 1:
+	# we need children array, not dict
+	var song_idx = -1
+	for i in song_nodes.size():
+		if song_nodes[i].name == song_name:
+			song_idx = i
+			break
+
+	if section_idx == section_nodes.size() - 1:
 		pass
 		# play next song
 		match play_mode:
 			PlayMode.SONG_ONCE:
+				Log.i("song finished. stopping")
 				emit_signal("song_finished", songs[song_name])
 
 			PlayMode.LOOP_SONG:
-				play_and_switch(song_name, sections[0].name)
+				Log.i("looping song")
+				play_and_switch(song_name, section_nodes[0].name)
 
 			PlayMode.SEQUENCE:
-				pass
-				# play next song
+				Log.i("moving on to next song in sequence")
+				if song_idx == song_nodes.size() - 1:
+					# stop?
+					Log.i("end of sequence. stopping")
+				else:
+					play_and_switch(song_nodes[song_idx + 1].name)
 
 			PlayMode.SHUFFLE:
 				pass
 				# play a random song
 
-	elif section_idx < sections.size() - 1:
+	elif section_idx < section_nodes.size() - 1:
 		# play next section
-		play_and_switch(song_name, sections[section_idx + 1].name)
+		# switching to the next section should happen exactly in time
+		# so ensure everything is already loaded
+		play_and_switch(song_name, section_nodes[section_idx + 1].name)
 

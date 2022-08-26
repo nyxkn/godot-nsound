@@ -23,20 +23,20 @@ func init(music_system: MusicSystem) -> void:
 
 
 func attach_to_player(music_player):
-#	if _current_music_player:
-#		_current_music_player.disconnect("beat", self, "_on_Music_beat")
-#		_current_music_player.disconnect("loop_beat", self, "_on_Music_loop_beat")
-#		_current_music_player.disconnect("bar", self, "_on_Music_bar")
-#		_current_music_player.disconnect("loop", self, "_on_Music_loop")
-#		_current_music_player.disconnect("level", self, "_on_Music_level")
-
 	_current_music_player = music_player
 
-	_current_music_player.connect("beat", self, "_on_Music_beat")
-	_current_music_player.connect("loop_beat", self, "_on_Music_loop_beat")
-	_current_music_player.connect("bar", self, "_on_Music_bar")
-	_current_music_player.connect("loop", self, "_on_Music_loop")
-	_current_music_player.connect("level", self, "_on_Music_level")
+#	_current_music_player.disconnect("beat", self, "_on_Music_beat")
+#	_current_music_player.disconnect("loop_beat", self, "_on_Music_loop_beat")
+#	_current_music_player.disconnect("bar", self, "_on_Music_bar")
+#	_current_music_player.disconnect("loop", self, "_on_Music_loop")
+#	_current_music_player.disconnect("level", self, "_on_Music_level")
+
+	if not _current_music_player.is_connected("beat", self, "_on_Music_beat"):
+		_current_music_player.connect("beat", self, "_on_Music_beat")
+		_current_music_player.connect("loop_beat", self, "_on_Music_loop_beat")
+		_current_music_player.connect("bar", self, "_on_Music_bar")
+		_current_music_player.connect("loop", self, "_on_Music_loop")
+		_current_music_player.connect("level", self, "_on_Music_level")
 
 	$"%BPB".value = _current_music_player.beats_per_bar
 	$"%BPM".value = _current_music_player.bpm
@@ -133,7 +133,9 @@ func _on_Music_level(n) -> void:
 
 
 func _on_Play_pressed() -> void:
-	music_system.play_and_switch()
+	var options = get_node("%Songs")
+	var item = options.get_item_text(options.get_selected_id())
+	music_system.play_and_switch(item)
 
 
 func _on_Level_value_changed(value) -> void:
