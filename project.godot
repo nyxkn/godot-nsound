@@ -30,11 +30,6 @@ _global_script_classes=[ {
 "path": "res://addons/nsound/bus/bus.gd"
 }, {
 "base": "AudioServerBus",
-"class": "LevelsContainer",
-"language": "GDScript",
-"path": "res://addons/nsound/song/containers/levels_track_container.gd"
-}, {
-"base": "AudioServerBus",
 "class": "LevelsTrack",
 "language": "GDScript",
 "path": "res://addons/nsound/song/containers/levels_track.gd"
@@ -109,7 +104,6 @@ _global_script_class_icons={
 "AudioTrack": "res://addons/nsound/assets/icons/godot/AudioStreamPlayer.svg",
 "BBT": "",
 "Bus": "",
-"LevelsContainer": "",
 "LevelsTrack": "",
 "Log": "",
 "MultiTrack": "res://addons/nsound/assets/icons/godot/Play.svg",

@@ -14,7 +14,7 @@ export(bool) var regex_match := false
 # single only activates the highest level (elias)
 # add activates everything up to level
 # pad activates level and adjacent levels
-enum LayerMode { SINGLE, ADD, PAD }
+enum LayerMode { SINGLE, ADDITIVE, PADDING }
 export(LayerMode) var layer_mode := LayerMode.SINGLE
 
 

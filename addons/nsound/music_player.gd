@@ -269,9 +269,9 @@ func play_track(track: Bus):
 		for subtrack in track.get_children():
 			play_track(subtrack)
 	# if we're dealing with levels tracks, simply play all tracks
-	elif track is LevelsContainer:
-		for subtrack in track.get_children():
-			play_track(subtrack)
+#	elif track is LevelsContainer:
+#		for subtrack in track.get_children():
+#			play_track(subtrack)
 	elif track is LevelsTrack:
 		for subtrack in track.get_children():
 			play_track(subtrack)
@@ -391,7 +391,7 @@ func set_level(value: int, when: int = Music.When.ODD_BAR) -> void:
 #						Log.d(["fade out", track])
 						fade_out(track, when)
 
-			LevelsTrack.LayerMode.ADD:
+			LevelsTrack.LayerMode.ADDITIVE:
 				for track_name in levels_track.levels:
 					var track_level = levels_track.levels[track_name]
 					if track_level <= level:
