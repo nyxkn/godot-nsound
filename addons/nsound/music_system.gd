@@ -34,6 +34,8 @@ var loaded_songs := []
 var current_song: String
 var current_section: String
 
+var played_songs := []
+
 #var song_loaded: bool = false
 
 var _music_players_node
@@ -293,12 +295,7 @@ func on_section_end(song_name: String, section_name: String) -> void:
 			section_idx = i
 			break
 
-	# we need children array, not dict
-	var song_idx = -1
-	for i in song_nodes.size():
-		if song_nodes[i].name == song_name:
-			song_idx = i
-			break
+
 
 	if section_idx == section_nodes.size() - 1:
 		pass
@@ -314,6 +311,13 @@ func on_section_end(song_name: String, section_name: String) -> void:
 
 			PlayMode.SEQUENCE:
 				Log.i("moving on to next song in sequence")
+
+				var song_idx = -1
+				for i in song_nodes.size():
+					if song_nodes[i].name == song_name:
+						song_idx = i
+						break
+
 				if song_idx == song_nodes.size() - 1:
 					# stop?
 					Log.i("end of sequence. stopping")
@@ -321,8 +325,19 @@ func on_section_end(song_name: String, section_name: String) -> void:
 					play_and_switch(song_nodes[song_idx + 1].name)
 
 			PlayMode.SHUFFLE:
-				pass
-				# play a random song
+				Log.i("shuffling for the next song")
+
+				for song in played_songs:
+					song_nodes.erase(song)
+
+				if song_nodes.size() == 0:
+					song_nodes = songs.values()
+					song_nodes.erase(played_songs[-1])
+
+				var song_idx = Audio.rng.randi_range(0, song_nodes.size() - 1)
+				play_and_switch(song_nodes[song_idx].name)
+				played_songs.append(song_nodes[song_idx])
+
 
 	elif section_idx < section_nodes.size() - 1:
 		# play next section
