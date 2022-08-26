@@ -1,6 +1,7 @@
 class_name NUtils
 
 
+
 # ================
 # utils
 # ================
@@ -34,11 +35,11 @@ static func setup_buses(node: Bus) -> void:
 			var parent_node = child.get_parent()
 			var send_bus
 			if parent_node is Song and not parent_node is Section:
-				send_bus = Audio.music_bus
+				send_bus = NAudio.music_bus
 			elif parent_node is AudioServerBus:
 				send_bus = parent_node.bus_name
 			else:
-				send_bus = Audio.music_bus
+				send_bus = NAudio.music_bus
 			child.init(send_bus)
 
 
@@ -51,7 +52,7 @@ static func compile_regex(regex_string: String) -> RegEx:
 	var re := RegEx.new()
 	re.compile(regex_string)
 	if not re.is_valid():
-		Log.e(['warning: regex', regex_string, 'is not valid'], 'compile_regex')
+		NAudio.Log.e(['warning: regex', regex_string, 'is not valid'], 'compile_regex')
 	return re
 
 
@@ -131,7 +132,7 @@ static func print_file_error(err: int, file_path: String = "", category = "FileU
 	if category != "FileUtils":
 		category = "FileUtils." + category
 
-	Log.e(["error while opening file: ", file_path], category, err)
+	NAudio.Log.e(["error while opening file: ", file_path], category, err)
 
 
 static func get_files_in_dir_recursive(dir_path: String, ext: String = "", regex = null) -> Array:
@@ -197,7 +198,7 @@ static func get_files_in_dir(dir_path: String, ext: String = "", regex = null) -
 ## if you want the children to be saved, make sure node owns them
 static func save_scene(dir_path: String, node: Node, tscn: bool = false) -> void:
 	if not dir_exists(dir_path):
-		Log.e(["directory", dir_path, "does not exist"], "save_scene")
+		NAudio.Log.e(["directory", dir_path, "does not exist"], "save_scene")
 		return
 
 	var scene = PackedScene.new()
@@ -211,6 +212,6 @@ static func save_scene(dir_path: String, node: Node, tscn: bool = false) -> void
 	if result == OK:
 		var err = ResourceSaver.save(file_path, scene)
 		if err != OK:
-			Log.e(["an error occurred while saving scene", file_path, "to disk"], "save_scene", err)
+			NAudio.Log.e(["an error occurred while saving scene", file_path, "to disk"], "save_scene", err)
 
 

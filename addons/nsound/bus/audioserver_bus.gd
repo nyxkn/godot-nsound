@@ -1,7 +1,6 @@
 extends Bus
 class_name AudioServerBus
 
-
 # identifies which audioserver bus we're encapsulating. same as the audioserver bus idx
 # note: this is not a reliable index. if a previous index bus is removed, all will be shifted down
 # you should use bus_name instead as your unique id, and fetch bus_idx everytime you need it
@@ -71,7 +70,7 @@ func register() -> void:
 	AudioServer.set_bus_name(bus_idx, name)
 	bus_name = AudioServer.get_bus_name(bus_idx)
 
-	Audio.register_bus(self)
+	NAudio.register_bus(self)
 
 	AudioServer.connect("bus_layout_changed", self, "on_bus_layout_changed")
 
@@ -80,7 +79,7 @@ func unregister() -> void:
 	AudioServer.remove_bus(bus_idx)
 	bus_idx = -1
 
-#	Audio.unregister_bus(self)
+#	NAudio.unregister_bus(self)
 
 	AudioServer.disconnect("bus_layout_changed", self, "on_bus_layout_changed")
 

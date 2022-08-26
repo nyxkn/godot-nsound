@@ -34,11 +34,6 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/nsound/song/containers/levels_track.gd"
 }, {
-"base": "Reference",
-"class": "Log",
-"language": "GDScript",
-"path": "res://addons/nsound/logger.gd"
-}, {
 "base": "AudioServerBus",
 "class": "MultiTrack",
 "language": "GDScript",
@@ -67,7 +62,7 @@ _global_script_classes=[ {
 "base": "Button",
 "class": "QuickButton",
 "language": "GDScript",
-"path": "res://addons/nui/quick_button.gd"
+"path": "res://addons/nsound/nui/quick_button.gd"
 }, {
 "base": "Node",
 "class": "Region",
@@ -105,7 +100,6 @@ _global_script_class_icons={
 "BBT": "",
 "Bus": "",
 "LevelsTrack": "",
-"Log": "",
 "MultiTrack": "res://addons/nsound/assets/icons/godot/Play.svg",
 "Music": "",
 "MusicPlayer": "",
@@ -129,6 +123,7 @@ config/icon="res://icon.png"
 [autoload]
 
 Audio="*res://addons/nsound/audio_framework.gd"
+NAudio="*res://addons/nsound/audio_framework.gd"
 
 [display]
 

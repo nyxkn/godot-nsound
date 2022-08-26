@@ -1,7 +1,8 @@
 extends Control
 
+var Log = preload("res://addons/nsound/logger.gd").new().init(self)
 
-const Fold = preload("res://addons/nui/fold.tscn")
+const Fold = preload("res://addons/nsound/nui/fold.tscn")
 const ChannelStrip = preload("res://addons/nsound/mixer/channel_strip.tscn")
 onready var core_strips: HBoxContainer = $Strips/CoreStrips
 onready var runtime_strips: HBoxContainer = $Strips/RuntimeStrips
@@ -17,13 +18,13 @@ func show_section(section):
 
 
 func init_core_buses():
-	for bus in Audio.core_buses.values():
+	for bus in NAudio.core_buses.values():
 		var abc = ChannelStrip.instance().init(bus)
 		core_strips.add_child(abc)
 
 
 #func init_all_buses() -> void:
-#	for bus in Audio.runtime_buses.values():
+#	for bus in NAudio.runtime_buses.values():
 #		var abc = ChannelStrip.instance().init(bus)
 #		abc.name = bus.bus_name
 #		$Strips/RuntimeStrips.add_child(abc)
@@ -56,7 +57,7 @@ func init_song(root_node: Node) -> void:
 
 	# adding all top-level strips
 	for k in strips:
-		if strips[k].bus.send in Audio.core_buses:
+		if strips[k].bus.send in NAudio.core_buses:
 			runtime_strips.add_child(strips[k])
 
 	# waiting for the top-level strips to be readied
@@ -67,7 +68,7 @@ func init_song(root_node: Node) -> void:
 		var bus_send = strip.bus.send
 		if not bus_send:
 			Log.e(["strip", strip, "has no bus send"], name)
-		elif bus_send in Audio.core_buses:
+		elif bus_send in NAudio.core_buses:
 			pass
 			# already added
 		elif bus_send in strips:

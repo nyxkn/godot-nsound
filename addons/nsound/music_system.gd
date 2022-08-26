@@ -1,6 +1,7 @@
 extends Node
 class_name MusicSystem
 
+var Log = preload("res://addons/nsound/logger.gd").new().init(self)
 
 signal section_started(node)
 signal song_started(node)
@@ -113,7 +114,7 @@ func load_song(song_name: String):
 
 	emit_signal("song_loaded", song_node)
 
-	Log.i(["buses count:", Audio.get_buses_count()], name)
+	Log.i(["buses count:", NAudio.get_buses_count()], name)
 
 	return song_node
 
@@ -135,7 +136,7 @@ func unload_song(song_name: String):
 		music_players[song_name][k].queue_free()
 	music_players.erase(song_name)
 
-	Audio.remove_all_buses()
+	NAudio.remove_all_buses()
 
 	sections[song_name].clear()
 	stingers[song_name].clear()
@@ -148,7 +149,7 @@ func unload_song(song_name: String):
 
 	emit_signal("song_unloaded")
 
-	Log.i(["buses count:", Audio.get_buses_count()], name)
+	Log.i(["buses count:", NAudio.get_buses_count()], name)
 
 
 func stop():
@@ -337,7 +338,7 @@ func on_section_end(song_name: String, section_name: String) -> void:
 					song_nodes = songs.values()
 					song_nodes.erase(played_songs[-1])
 
-				var song_idx = Audio.rng.randi_range(0, song_nodes.size() - 1)
+				var song_idx = NAudio.rng.randi_range(0, song_nodes.size() - 1)
 				play_and_switch(song_nodes[song_idx].name)
 				played_songs.append(song_nodes[song_idx])
 

@@ -1,6 +1,8 @@
 extends Node
 class_name MusicPlayer
 
+var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+
 signal loop_beat(n)
 signal beat(n)
 signal bar(n)

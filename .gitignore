@@ -19,5 +19,6 @@ mono_crash.*.json
 README.md.tmp
 
 # project
-/assets/temp
+/scripts
 /test
+*.sh

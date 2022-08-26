@@ -1,9 +1,10 @@
 tool
 extends MarginContainer
 
+var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+
 
 # to use, unpack as editable children, then add your content under the Content node
-
 
 onready var content := $VBoxContainer/Content
 

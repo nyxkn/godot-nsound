@@ -1,7 +1,6 @@
 extends Bus
 class_name AudioTrack, "res://addons/nsound/assets/icons/godot/AudioStreamPlayer.svg"
 
-
 export(bool) var loop := false
 
 var stream: AudioStreamPlayer
@@ -36,7 +35,7 @@ func _ready() -> void:
 func init(send_bus_name: String = "Master") -> Bus:
 	stream.name = name
 	self.send = send_bus_name
-	Audio.register_track(self)
+	NAudio.register_track(self)
 	return self
 
 

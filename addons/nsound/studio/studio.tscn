@@ -1,11 +1,11 @@
 [gd_scene load_steps=8 format=2]
 
-[ext_resource path="res://addons/nui/combo/slider_value.gd" type="Script" id=1]
+[ext_resource path="res://addons/nsound/nui/combo/slider_value.gd" type="Script" id=1]
 [ext_resource path="res://addons/nsound/assets/icons/godot/Play.svg" type="Texture" id=2]
-[ext_resource path="res://addons/nui/quick_button.gd" type="Script" id=3]
+[ext_resource path="res://addons/nsound/nui/quick_button.gd" type="Script" id=3]
 [ext_resource path="res://addons/nsound/studio/studio.gd" type="Script" id=4]
-[ext_resource path="res://addons/nui/combo/slider_value.tscn" type="PackedScene" id=5]
-[ext_resource path="res://addons/nui/combo/label_value.tscn" type="PackedScene" id=6]
+[ext_resource path="res://addons/nsound/nui/combo/slider_value.tscn" type="PackedScene" id=5]
+[ext_resource path="res://addons/nsound/nui/combo/label_value.tscn" type="PackedScene" id=6]
 [ext_resource path="res://addons/nsound/mixer/mixer.tscn" type="PackedScene" id=7]
 
 [node name="Studio" type="Control"]
@@ -38,14 +38,12 @@ columns = 2
 unique_name_in_owner = true
 margin_right = 308.0
 rect_min_size = Vector2( 300, 0 )
-max_value = 20.0
 
 [node name="HookValue" parent="Controls/Sliders" instance=ExtResource( 5 )]
 unique_name_in_owner = true
 margin_left = 372.0
 margin_right = 679.0
 rect_min_size = Vector2( 300, 0 )
-max_value = 80.0
 
 [node name="Timeline" type="HBoxContainer" parent="Controls/Sliders"]
 unique_name_in_owner = true
@@ -337,8 +335,6 @@ margin_right = 1334.0
 margin_bottom = 367.0
 
 [connection signal="pressed" from="Controls/Unload" to="." method="_on_Unload_pressed"]
-[connection signal="value_changed" from="Controls/Sliders/Level" to="." method="_on_Level_value_changed"]
-[connection signal="value_changed" from="Controls/Sliders/HookValue" to="." method="_on_HookValue_value_changed"]
 [connection signal="value_changed" from="Controls/Sliders/Timeline" to="." method="_on_Timeline_value_changed"]
 [connection signal="drag_ended" from="Controls/Sliders/Timeline/HSlider" to="Controls/Sliders/Timeline" method="_on_HSlider_drag_ended"]
 [connection signal="drag_started" from="Controls/Sliders/Timeline/HSlider" to="Controls/Sliders/Timeline" method="_on_HSlider_drag_started"]

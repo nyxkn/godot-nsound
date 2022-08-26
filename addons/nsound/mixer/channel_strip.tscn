@@ -1,6 +1,6 @@
 [gd_scene load_steps=21 format=2]
 
-[ext_resource path="res://addons/nui/fold.gd" type="Script" id=1]
+[ext_resource path="res://addons/nsound/nui/fold.gd" type="Script" id=1]
 [ext_resource path="res://addons/nsound/assets/icons/godot/AudioBusSolo.svg" type="Texture" id=2]
 [ext_resource path="res://addons/nsound/assets/icons/godot/Play.svg" type="Texture" id=3]
 [ext_resource path="res://addons/nsound/mixer/channel_strip.gd" type="Script" id=4]

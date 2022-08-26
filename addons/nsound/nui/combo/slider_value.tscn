@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://addons/nui/combo/slider_value.gd" type="Script" id=1]
+[ext_resource path="res://addons/nsound/nui/combo/slider_value.gd" type="Script" id=1]
 
 [node name="SliderValue" type="HBoxContainer"]
 margin_right = 380.0

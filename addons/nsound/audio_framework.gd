@@ -1,5 +1,7 @@
 extends Node
 
+var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+
 # { bus_name: Bus }
 var core_buses := {}
 var runtime_buses := {}

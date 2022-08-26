@@ -1,14 +1,18 @@
-class_name Log
-
-const LOG_SHOW = true
+extends Node
 
 enum Level { DEBUG, INFO, WARN, ERROR }
 
-## category can be a string or a value from Category enum
+const LOG_SHOW = true
+
+var registered_context: String = ""
+
+#class LoggerClass:
+
 ## objects can be an array or a single basic type
-static func print_log(objects, category: String, level: int = Level.DEBUG):
+func print_log(objects, context = null, level: int = Level.DEBUG):
 	# Don't log if globally off
 	if not LOG_SHOW: return
+#	if config.log_hide_level.has(level) and config.log_hide_level[level] == true: return
 
 	# Format objects depending on type
 	var objects_str = ""
@@ -19,10 +23,17 @@ static func print_log(objects, category: String, level: int = Level.DEBUG):
 	else:
 		objects_str = str(objects)
 
+	var context_str = registered_context
+	if context:
+		if context is String:
+			context_str = context
+		elif context is Object:
+			context_str = context.get_script().resource_path.get_file().trim_suffix(".gd")
+
 	var final_str = "[%s] [%s] [%s] %s" % [
 		Time.get_datetime_string_from_system(false, true),
 		Level.keys()[level],
-		category,
+		context_str,
 		objects_str]
 
 	final_str = final_str.replace(" [] ", " ")
@@ -37,14 +48,30 @@ static func print_log(objects, category: String, level: int = Level.DEBUG):
 		print(final_str)
 
 
-static func d(objects, category = "") -> void:
-	print_log(objects, category, Level.DEBUG)
+func d(objects, context = "") -> void:
+	print_log(objects, context, Level.DEBUG)
 
-static func i(objects, category = "") -> void:
-	print_log(objects, category, Level.INFO)
+func i(objects, context = "") -> void:
+	print_log(objects, context, Level.INFO)
 
-static func w(objects, category = "") -> void:
-	print_log(objects, category, Level.WARN)
+func w(objects, context = "") -> void:
+	print_log(objects, context, Level.WARN)
 
-static func e(objects, category = "", error_code = 0) -> void:
-	print_log(objects, category, Level.ERROR)
+func e(objects, context = "", error_code = 0) -> void:
+	print_log(objects, context, Level.ERROR)
+
+
+# inspired by godot heightmap plugin
+# https://github.com/Zylann/godot_heightmap_plugin/blob/master/addons/zylann.hterrain/util/logger.gd
+# but instead of returning a new instance from a static function
+# we simply initialize when already instanced
+# var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+# this has the advantage that it's fully compatible with using this class as an autoload
+# it's up to the user whether to initialize the instance or just call the autoload methods
+func init(owner):
+	if owner is Object:
+		registered_context = owner.get_script().resource_path.get_file().trim_suffix(".gd")
+	elif owner is String:
+		registered_context = owner
+
+	return self

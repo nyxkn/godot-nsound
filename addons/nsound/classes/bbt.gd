@@ -1,6 +1,7 @@
 extends Node
 class_name BBT
 
+var Log = preload("res://addons/nsound/logger.gd").new().init(self)
 
 var bar: int
 var beat: int
