@@ -18,7 +18,7 @@ func _ready() -> void:
 			break
 
 	if not stream:
-		Log.w(["bus", name, "has no audiostream"], name)
+		Log.w(["bus", name, "has no audiostream"])
 		return
 
 	stream.connect("finished", self, "_stream_finished")

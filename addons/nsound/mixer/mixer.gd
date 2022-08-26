@@ -67,14 +67,14 @@ func init_song(root_node: Node) -> void:
 		var strip = strips[k]
 		var bus_send = strip.bus.send
 		if not bus_send:
-			Log.e(["strip", strip, "has no bus send"], name)
+			Log.e(["strip", strip, "has no bus send"])
 		elif bus_send in NAudio.core_buses:
 			pass
 			# already added
 		elif bus_send in strips:
 			if not strips[bus_send].is_inside_tree():
-				Log.e(["the strip for bus", bus_send, "wasn't created successfully"], name)
+				Log.e(["the strip for bus", bus_send, "wasn't created successfully"])
 			else:
 				strips[bus_send].add_substrip(strip)
 		else:
-			Log.e(["the bus", bus_send, "(bus_send of bus", strip.bus.name, ") does not exist"], name)
+			Log.e(["the bus", bus_send, "(bus_send of bus", strip.bus.name, ") does not exist"])

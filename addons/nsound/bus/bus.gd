@@ -117,7 +117,7 @@ func _process(delta: float) -> void:
 # we take the values in decibels but then convert to linear for calculations
 func fade(initial, final, duration = 2.0, blend = 1.0):
 	if duration <= 0:
-		Log.e(["cannot use negative duration:", duration], name)
+		Log.e(["cannot use negative duration:", duration])
 
 	if initial == null:
 		initial = volume_db
@@ -125,7 +125,7 @@ func fade(initial, final, duration = 2.0, blend = 1.0):
 	if final == null:
 #		final = volume_db
 		final = prefade_volume if prefade_volume else 0
-		Log.d(["fading to prefade_volume:", prefade_volume], name)
+		Log.d(["fading to prefade_volume:", prefade_volume])
 
 
 	fade_start_time = OS.get_ticks_msec()

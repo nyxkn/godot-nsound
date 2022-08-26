@@ -1,5 +1,7 @@
 class_name NUtils
 
+# it's useless to load the Log class since static functions cannot use it
+# workaround is to make use of the Log instance of NAudio autoload
 
 
 # ================
@@ -188,7 +190,7 @@ static func get_files_in_dir(dir_path: String, ext: String = "", regex = null) -
 			file_name = dir.get_next()
 	else:
 		print_file_error(err, dir_path, "get_files_in_dir")
-#		Log.e(["error", err, "opening dir_path"], "get_files_in_dir")
+#		NAudio.Log.e(["error", err, "opening dir_path"], "get_files_in_dir")
 
 	return files
 

@@ -11,7 +11,7 @@ onready var content := $VBoxContainer/Content
 
 func _ready() -> void:
 	if content.get_child_count() == 0:
-		Log.w("you need to add your own content under the Content node", name)
+		Log.w("you need to add your own content under the Content node")
 
 	get_node("%ShowFold").connect("pressed", self, "_on_ShowFold_pressed")
 	# ensure content is hidden

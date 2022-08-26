@@ -25,7 +25,7 @@ func wrap(audio_server_bus_name: String = "Master") -> void:
 		# setting bus_send without calling the setter (we don't need to write to audioserver again)
 		send = AudioServer.get_bus_send(bus_idx)
 	else:
-		Log.e(["bus named", bus_name, "does not exist"], name)
+		Log.e(["bus named", bus_name, "does not exist"])
 
 
 # we have to initialize buses manually from top to bottom

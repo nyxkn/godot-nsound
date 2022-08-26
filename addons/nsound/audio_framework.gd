@@ -25,9 +25,10 @@ func _ready() -> void:
 		core_buses[bus_name] = bus
 
 
+# would like to use type AudioServerBus but sometimes we get cyclic dependency errors
 func register_bus(bus: AudioServerBus) -> void:
 	if runtime_buses.has(bus.bus_name):
-		Log.e(["attempting to register bus", bus.name, ", but a bus of the same name is already registered"], name)
+		Log.e(["attempting to register bus", bus.name, ", but a bus of the same name is already registered"])
 		return
 
 	runtime_buses[bus.bus_name] = bus
@@ -38,6 +39,7 @@ func register_bus(bus: AudioServerBus) -> void:
 #		runtime_buses.erase(bus.bus_name)
 
 
+# would like to use type AudioTrack but sometimes we get cyclic dependency errors
 func register_track(bus: AudioTrack) -> void:
 	if runtime_tracks.has(bus):
 		Log.e(["attempting to register an already registered track", bus.name])

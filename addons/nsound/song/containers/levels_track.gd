@@ -29,7 +29,7 @@ func _ready() -> void:
 
 	for track_name in levels:
 		if not get_node(track_name):
-			Log.e(["missing track", track_name, "defined in levels"], name)
+			Log.e(["missing track", track_name, "defined in levels"])
 
 
 

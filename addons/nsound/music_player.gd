@@ -104,7 +104,7 @@ func _process(delta: float) -> void:
 		match reference_method:
 			ReferenceMethod.SONG_STREAM:
 				if not reference_stream_song:
-					Log.e("we don't have a reference stream. cannot play", name)
+					Log.e("we don't have a reference stream. cannot play")
 					playing = false
 					return
 				else:
@@ -265,7 +265,7 @@ func play_track(track: Bus):
 		play_audiotrack(track)
 		if reference_method == ReferenceMethod.SONG_STREAM and not reference_stream_song:
 			reference_stream_song = track.stream
-			Log.d(["set reference stream to", track], name)
+			Log.d(["set reference stream to", track])
 
 	elif track is Section:
 		for subtrack in track.get_children():
@@ -288,7 +288,7 @@ func play_track(track: Bus):
 
 	elif track is MultiTrack:
 		var sub_track = track.get_next_track()
-		Log.d(["multi-track", track, "now playing", sub_track], name)
+		Log.d(["multi-track", track, "now playing", sub_track])
 		play_track(sub_track)
 
 
@@ -298,11 +298,11 @@ func play_audiotrack(track: AudioTrack):
 
 
 func seek(to_position: float) -> void:
-	Log.d(["seeking to time:", to_position, "s"], name)
+	Log.d(["seeking to time:", to_position, "s"])
 	loop_time = to_position
 
 	if OS.get_ticks_msec() < last_seek_time + 10:
-		Log.w(["seeking too quickly. ignoring seek."], name)
+		Log.w(["seeking too quickly. ignoring seek."])
 		return
 
 	if reference_method == ReferenceMethod.SILENCE:
@@ -586,9 +586,9 @@ func _beat() -> void:
 	for t in tracks_queue:
 		if loop_beat == t[0]:
 			if loop_beat == transition_beat:
-				Log.d(["skipping playing of track", t[1], "because it falls on transition beat"], name)
+				Log.d(["skipping playing of track", t[1], "because it falls on transition beat"])
 			else:
-				Log.d(["playing queued track", t[1]], name)
+				Log.d(["playing queued track", t[1]])
 				play_audiotrack(t[1])
 
 	for k in looping_regions:

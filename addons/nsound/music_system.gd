@@ -76,7 +76,7 @@ func current_music_player() -> MusicPlayer:
 
 
 func load_song(song_name: String):
-	Log.i(["loading song", song_name], name)
+	Log.i(["loading song", song_name])
 
 	var song_node = songs[song_name]
 
@@ -114,13 +114,13 @@ func load_song(song_name: String):
 
 	emit_signal("song_loaded", song_node)
 
-	Log.i(["buses count:", NAudio.get_buses_count()], name)
+	Log.i(["buses count:", NAudio.get_buses_count()])
 
 	return song_node
 
 
 func unload_song(song_name: String):
-	Log.i(["unloading song", song_name], name)
+	Log.i(["unloading song", song_name])
 
 	stop()
 
@@ -149,7 +149,7 @@ func unload_song(song_name: String):
 
 	emit_signal("song_unloaded")
 
-	Log.i(["buses count:", NAudio.get_buses_count()], name)
+	Log.i(["buses count:", NAudio.get_buses_count()])
 
 
 func stop():
@@ -175,7 +175,7 @@ func play_and_switch(song_name: String = "", section_name: String = "", stop: bo
 	# what's happeneing is that by changing current_song and section
 	# current music player will return a different player
 	if stop and current_music_player():
-		Log.i(["stopping current song/section", current_song, current_section], name)
+		Log.i(["stopping current song/section", current_song, current_section])
 		current_music_player().stop()
 
 	if song_name != current_song:
@@ -187,7 +187,7 @@ func play_and_switch(song_name: String = "", section_name: String = "", stop: bo
 		section_name = music_players[current_song].keys()[0]
 	current_section = section_name
 
-	Log.i(["starting song/section", current_song, current_section], name)
+	Log.i(["starting song/section", current_song, current_section])
 
 
 #	current_music_player = music_players[current_song][current_section]
@@ -226,7 +226,7 @@ func run_transition(transition_name: String) -> void:
 		from_section = transition.from
 
 	if from_section != current_section:
-		Log.i("running transition from the wrong section", name)
+		Log.i("running transition from the wrong section")
 		return
 
 	var to_section
@@ -279,7 +279,7 @@ func run_transition(transition_name: String) -> void:
 func queue_stinger(stinger: String, when: int = Music.When.BAR) -> void:
 	yield(current_music_player().wait_until(when), "completed")
 
-	Log.d(["playing stinger", stinger], name)
+	Log.d(["playing stinger", stinger])
 	current_music_player().play_track(stingers[current_song][stinger])
 
 

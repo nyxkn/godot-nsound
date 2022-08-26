@@ -122,7 +122,6 @@ config/icon="res://icon.png"
 
 [autoload]
 
-Audio="*res://addons/nsound/audio_framework.gd"
 NAudio="*res://addons/nsound/audio_framework.gd"
 
 [display]
