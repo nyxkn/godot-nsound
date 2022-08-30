@@ -5,7 +5,8 @@ var Log = preload("res://addons/nsound/logger.gd").new().init(self)
 var bus: Bus
 var channel: Dictionary = { "peak_l": -100, "peak_r": -100 }
 
-onready var slider: VSlider = get_node("%Slider")
+onready var user_volume_slider: VSlider = get_node("%UserVolumeSlider")
+onready var auto_volume_slider: VSlider = get_node("%AutoVolumeSlider")
 onready var spinbox: SpinBox = get_node("%SpinBox")
 onready var vu_l: TextureProgress = get_node("%VuL")
 onready var vu_r: TextureProgress = get_node("%VuR")
@@ -43,13 +44,15 @@ func _ready() -> void:
 		Log.e(["bus", name, "wasn't initialized"])
 		return
 
-	bus.connect("volume_changed", self, "_volume_changed")
+	bus.connect("user_volume_changed", self, "on_user_volume_changed")
+	bus.connect("auto_volume_changed", self, "on_auto_volume_changed")
 
 #	set_process(false)
 #	if bus is AudioServerBus:
 #		set_process(true)
 
-	_volume_changed(bus.volume_db)
+	on_user_volume_changed(bus.user_volume_db)
+	on_auto_volume_changed(bus.auto_volume_db)
 
 	if bus is AudioServerBus:
 		var bus_effects = bus.get_effects()
@@ -109,16 +112,26 @@ func add_substrip(strip: Node):
 	get_node("%ShowFold").visible = true
 
 
-func _volume_changed(db):
+func on_user_volume_changed(db):
 	spinbox.value = db
 	var norm = _scaled_db_to_normalized_volume(db)
-	slider.value = norm
+	user_volume_slider.value = norm
 
 
-func _on_Slider_value_changed(value: float) -> void:
+func on_auto_volume_changed(db):
+	var norm = _scaled_db_to_normalized_volume(db)
+	auto_volume_slider.value = norm
+
+
+func _on_UserVolumeSlider_value_changed(value: float) -> void:
 	var db = _normalized_volume_to_scaled_db(value)
 	spinbox.value = db
-	bus.volume_db = db
+	bus.user_volume_db = db
+
+
+func _on_AutoVolumeSlider_value_changed(value: float) -> void:
+	var db = _normalized_volume_to_scaled_db(value)
+	bus.auto_volume_db = db
 
 
 func _on_Solo_toggled(button_pressed: bool) -> void:
@@ -157,4 +170,3 @@ func _scaled_db_to_normalized_volume(db: float) -> float:
 			return reflected_position.x
 		else:
 			return pow(db / 45.0, 1.0 / 3.0) + 1.0
-

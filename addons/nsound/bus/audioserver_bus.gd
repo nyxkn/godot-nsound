@@ -89,7 +89,7 @@ func set_volume_db(value: float) -> void:
 		Log.w(["bus", name, "isn't initialized"])
 		return
 
-	AudioServer.set_bus_volume_db(bus_idx, volume_db)
+	AudioServer.set_bus_volume_db(bus_idx, _volume_db)
 	.set_volume_db(value)
 
 

@@ -201,9 +201,9 @@ func load_song_section(song_node: Node, section_node: Section):
 	for node in NUtils.get_all_children(section_node):
 		if node is LevelsTrack:
 			levels_tracks.append(node)
-			for child in node.get_children():
-				if child is Bus:
-					child.volume_db = Music.MIN_DB
+#			for child in node.get_children():
+#				if child is Bus:
+#					child.volume_db = Music.MIN_DB
 
 
 func start():
@@ -211,6 +211,7 @@ func start():
 	last_beat = -1
 	transition_beat = -1
 	start_loop()
+	set_level(level, Music.When.NOW)
 
 
 func start_loop() -> void:
@@ -236,8 +237,6 @@ func start_loop() -> void:
 	# restart the silence stream
 	if reference_method == ReferenceMethod.SILENCE:
 		reference_stream_silence.play()
-
-	set_level(level, Music.When.NOW)
 
 #	for node in section.get_children():
 #		play_track(node)
@@ -486,11 +485,11 @@ func fade_in(track: Bus, when: int = Music.When.ODD_BAR, duration: float = -1) -
 		# if we were ordered to fade while we weren't playing, just set the new level directly
 		# this is so set_level works before starting the play
 		# TODO might have to move this to set_level if this here creates unforseen issues
-		track.volume_db = 0
+		track.auto_volume_db = 0
 		return
 	else:
 		yield(wait_until(when), "completed")
-		track.fade(null, null, dur)
+		track.fade(null, 0.0, dur)
 #		Log.d(["fading in track", track, "duration", dur])
 
 	yield(get_tree().create_timer(dur), "timeout")
@@ -503,7 +502,7 @@ func fade_out(track: Bus, when: int = Music.When.ODD_BAR, duration: float = -1) 
 		dur = determine_fade_duration(when)
 
 	if dur == 0:
-		track.volume_db = Music.MIN_DB
+		track.auto_volume_db = Music.MIN_DB
 		return
 	else:
 		yield(wait_until(when), "completed")

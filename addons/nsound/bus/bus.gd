@@ -13,7 +13,9 @@ var Log = preload("res://addons/nsound/logger.gd").new().init(self)
 # or create a new one
 
 #signal bus_initialized
-signal volume_changed(value)
+#signal volume_changed(value)
+signal auto_volume_changed(value)
+signal user_volume_changed(value)
 
 
 export(bool) var mute := false setget set_mute
@@ -27,10 +29,18 @@ export(bool) var disabled := false setget set_disabled
 
 
 # we'd use MIN_DB but export doesn't seem to accept that
-export(float, -80, 0) var volume_db setget set_volume_db, get_volume_db
+# this is the true volume. users are not supposed to interact with this
+export(float, -80, 24) var _volume_db setget set_volume_db, get_volume_db
 
 # this is the bus to which we send our output
 export(String) var send setget set_send, get_send
+
+
+# this can also b
+var auto_volume_db := 0.0 setget set_auto_volume_db
+# volume set through the mixer or manually through code
+# this is so that fades can happen independently of the real volume
+var user_volume_db := 0.0 setget set_user_volume_db
 
 
 # fade variables
@@ -46,7 +56,7 @@ var fading: bool setget set_fading
 
 # last volume before fade
 # useful for restoring the previous volume level we had before fading out
-var prefade_volume: float = 0
+#var prefade_volume: float = 0
 
 
 onready var debug = get_tree().root.find_node("Debug", true, false)
@@ -76,8 +86,11 @@ func _process(delta: float) -> void:
 		var t = inverse_lerp(fade_start_time, fade_start_time + fade_duration, OS.get_ticks_msec())
 
 		if t >= 1.0:
-			self.volume_db = linear2db(fade_final)
-#			Log.d(["final", volume_db])
+#			self._volume_db = linear2db(fade_final)
+			self.auto_volume_db = linear2db(fade_final)
+#			self.auto_volume_db = fade_final
+
+#			Log.d(["final", _volume_db])
 			self.fading = false
 		else:
 			if fade_type == FadeType.IN:
@@ -100,18 +113,22 @@ func _process(delta: float) -> void:
 				# we can choose the blend between linear and square
 				# often signals aren't perfectly correlated or uncorrelated
 				var t_final = lerp(linear_t, square_t, fade_blend)
-				self.volume_db = linear2db( lerp(fade_initial, fade_final, t_final) )
+#				self._volume_db = linear2db( lerp(fade_initial, fade_final, t_final) )
+				self.auto_volume_db = linear2db( lerp(fade_initial, fade_final, t_final) )
+#				self.auto_volume_db = lerp(fade_initial, fade_final, t_final)
 			elif fade_type == FadeType.OUT:
 				var linear_t = 1.0 - t
 				var square_t = sqrt(1.0 - t)
 				var t_final = lerp(linear_t, square_t, fade_blend)
 				# note that we need to swap initial and final
-				self.volume_db = linear2db( lerp(fade_final, fade_initial, t_final) )
+#				self._volume_db = linear2db( lerp(fade_final, fade_initial, t_final) )
+				self.auto_volume_db = linear2db( lerp(fade_final, fade_initial, t_final) )
+#				self.auto_volume_db = lerp(fade_final, fade_initial, t_final)
 
-#			debug.print(self.volume_db, "db_" + name)
+#			debug.print(self.auto_volume_db, "db_" + name)
 
 	#	if is_equal_approx(t, 0.5):
-	#		Log.d([name, stream.volume_db, fade_type])
+	#		Log.d([name, stream._volume_db, fade_type])
 
 
 # we take the values in decibels but then convert to linear for calculations
@@ -120,12 +137,12 @@ func fade(initial, final, duration = 2.0, blend = 1.0):
 		Log.e(["cannot use negative duration:", duration])
 
 	if initial == null:
-		initial = volume_db
+		initial = auto_volume_db
 
 	if final == null:
-#		final = volume_db
-		final = prefade_volume if prefade_volume else 0
-		Log.d(["fading to prefade_volume:", prefade_volume])
+		final = auto_volume_db
+#		final = prefade_volume if prefade_volume else 0
+#		Log.d(["fading to prefade_volume:", prefade_volume])
 
 
 	fade_start_time = OS.get_ticks_msec()
@@ -139,20 +156,38 @@ func fade(initial, final, duration = 2.0, blend = 1.0):
 		fade_type = FadeType.IN
 	else:
 		fade_type = FadeType.OUT
-		if initial != Music.MIN_DB:
-			prefade_volume = volume_db
+#		if initial != Music.MIN_DB:
+#			prefade_volume = _volume_db
 
 	self.fading = true
 
 
+
+func get_true_volume() -> float:
+	var true_volume = db2linear(user_volume_db) * db2linear(auto_volume_db)
+	return linear2db(true_volume)
+
+
+func set_auto_volume_db(value: float) -> void:
+	auto_volume_db = value
+	self._volume_db = get_true_volume()
+	emit_signal("auto_volume_changed", auto_volume_db)
+
+
+func set_user_volume_db(value: float) -> void:
+	user_volume_db = value
+	self._volume_db = get_true_volume()
+	emit_signal("user_volume_changed", user_volume_db)
+
+
 func set_volume_db(value: float) -> void:
-	volume_db = value
-	emit_signal("volume_changed", volume_db)
+	_volume_db = value
+#	emit_signal("volume_changed", _volume_db)
 #	Log.d(["bus volume changed", name, AudioServer.get_bus_volume_db(bus_idx)])
 
 
 func get_volume_db() -> float:
-	return volume_db
+	return _volume_db
 
 
 func set_send(value: String) -> void:

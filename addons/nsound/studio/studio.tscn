@@ -335,6 +335,8 @@ margin_right = 1334.0
 margin_bottom = 367.0
 
 [connection signal="pressed" from="Controls/Unload" to="." method="_on_Unload_pressed"]
+[connection signal="value_changed" from="Controls/Sliders/Level" to="." method="_on_Level_value_changed"]
+[connection signal="value_changed" from="Controls/Sliders/HookValue" to="." method="_on_HookValue_value_changed"]
 [connection signal="value_changed" from="Controls/Sliders/Timeline" to="." method="_on_Timeline_value_changed"]
 [connection signal="drag_ended" from="Controls/Sliders/Timeline/HSlider" to="Controls/Sliders/Timeline" method="_on_HSlider_drag_ended"]
 [connection signal="drag_started" from="Controls/Sliders/Timeline/HSlider" to="Controls/Sliders/Timeline" method="_on_HSlider_drag_started"]

@@ -42,32 +42,32 @@ script = ExtResource( 4 )
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 margin_left = 7.0
 margin_top = 7.0
-margin_right = 84.0
+margin_right = 87.0
 margin_bottom = 394.0
 size_flags_vertical = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
-margin_right = 73.0
+margin_right = 76.0
 margin_bottom = 387.0
 size_flags_vertical = 3
 
 [node name="BusName" type="Label" parent="HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
-margin_right = 73.0
+margin_right = 76.0
 margin_bottom = 14.0
 text = "Master"
 
 [node name="AudioServerBusName" type="LineEdit" parent="HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 margin_top = 18.0
-margin_right = 73.0
+margin_right = 76.0
 margin_bottom = 42.0
 text = "Master"
 editable = false
 
 [node name="Controls" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
 margin_top = 46.0
-margin_right = 73.0
+margin_right = 76.0
 margin_bottom = 62.0
 
 [node name="Solo" type="ToolButton" parent="HBoxContainer/VBoxContainer/Controls"]
@@ -114,13 +114,13 @@ flat = false
 
 [node name="HSeparator" type="HSeparator" parent="HBoxContainer/VBoxContainer"]
 margin_top = 66.0
-margin_right = 73.0
+margin_right = 76.0
 margin_bottom = 70.0
 
 [node name="SpinBox" type="SpinBox" parent="HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 margin_top = 74.0
-margin_right = 73.0
+margin_right = 76.0
 margin_bottom = 98.0
 custom_icons/updown = SubResource( 16 )
 min_value = -80.0
@@ -128,40 +128,50 @@ step = 0.1
 
 [node name="Fader" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
 margin_top = 102.0
-margin_right = 73.0
+margin_right = 76.0
 margin_bottom = 230.0
 size_flags_horizontal = 3
 alignment = 1
 
-[node name="Slider" type="VSlider" parent="HBoxContainer/VBoxContainer/Fader"]
+[node name="AutoVolumeSlider" type="VSlider" parent="HBoxContainer/VBoxContainer/Fader"]
 unique_name_in_owner = true
-margin_left = 8.0
-margin_right = 24.0
+margin_right = 16.0
+margin_bottom = 128.0
+rect_min_size = Vector2( 0, 128 )
+max_value = 1.0
+step = 0.001
+value = 0.729
+editable = false
+
+[node name="UserVolumeSlider" type="VSlider" parent="HBoxContainer/VBoxContainer/Fader"]
+unique_name_in_owner = true
+margin_left = 20.0
+margin_right = 36.0
 margin_bottom = 128.0
 rect_min_size = Vector2( 0, 128 )
 max_value = 1.0
 step = 0.001
 value = 0.729
 
-[node name="AudioValuePreviewBox" type="Panel" parent="HBoxContainer/VBoxContainer/Fader/Slider"]
+[node name="AudioValuePreviewBox" type="Panel" parent="HBoxContainer/VBoxContainer/Fader/UserVolumeSlider"]
 visible = false
 margin_right = 40.0
 margin_bottom = 40.0
 
-[node name="AudioPreviewHbc" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Fader/Slider/AudioValuePreviewBox"]
+[node name="AudioPreviewHbc" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Fader/UserVolumeSlider/AudioValuePreviewBox"]
 margin_right = 40.0
 margin_bottom = 40.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="AudioValuePreviewLabel" type="Label" parent="HBoxContainer/VBoxContainer/Fader/Slider/AudioValuePreviewBox/AudioPreviewHbc"]
+[node name="AudioValuePreviewLabel" type="Label" parent="HBoxContainer/VBoxContainer/Fader/UserVolumeSlider/AudioValuePreviewBox/AudioPreviewHbc"]
 margin_top = 13.0
 margin_bottom = 27.0
 
 [node name="VuMeter" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Fader"]
 unique_name_in_owner = true
-margin_left = 28.0
-margin_right = 64.0
+margin_left = 40.0
+margin_right = 76.0
 margin_bottom = 128.0
 
 [node name="VuL" type="TextureProgress" parent="HBoxContainer/VBoxContainer/Fader/VuMeter"]
@@ -190,12 +200,12 @@ fill_mode = 3
 [node name="Progress" type="VBoxContainer" parent="HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 margin_top = 234.0
-margin_right = 73.0
+margin_right = 76.0
 margin_bottom = 268.0
 
 [node name="Icons" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Progress"]
 unique_name_in_owner = true
-margin_right = 73.0
+margin_right = 76.0
 margin_bottom = 16.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -214,7 +224,7 @@ texture = ExtResource( 7 )
 [node name="ProgressBar" type="ProgressBar" parent="HBoxContainer/VBoxContainer/Progress/Icons"]
 unique_name_in_owner = true
 margin_left = 20.0
-margin_right = 73.0
+margin_right = 76.0
 margin_bottom = 16.0
 rect_min_size = Vector2( 0, 16 )
 size_flags_horizontal = 3
@@ -224,7 +234,7 @@ percent_visible = false
 
 [node name="Hb" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Progress"]
 margin_top = 20.0
-margin_right = 73.0
+margin_right = 76.0
 margin_bottom = 34.0
 size_flags_horizontal = 3
 
@@ -277,15 +287,15 @@ text = "subtracks"
 [node name="SendName" type="LineEdit" parent="HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 margin_top = 296.0
-margin_right = 73.0
+margin_right = 76.0
 margin_bottom = 320.0
 text = "Master"
 editable = false
 
 [node name="FoldingContent" type="MarginContainer" parent="HBoxContainer"]
 unique_name_in_owner = true
-margin_left = 77.0
-margin_right = 77.0
+margin_left = 80.0
+margin_right = 80.0
 margin_bottom = 387.0
 script = ExtResource( 1 )
 
@@ -304,4 +314,5 @@ unique_name_in_owner = true
 [connection signal="toggled" from="HBoxContainer/VBoxContainer/Controls/Solo" to="." method="_on_Solo_toggled"]
 [connection signal="toggled" from="HBoxContainer/VBoxContainer/Controls/Mute" to="." method="_on_Mute_toggled"]
 [connection signal="toggled" from="HBoxContainer/VBoxContainer/Controls/Bypass" to="." method="_on_Bypass_toggled"]
-[connection signal="value_changed" from="HBoxContainer/VBoxContainer/Fader/Slider" to="." method="_on_Slider_value_changed"]
+[connection signal="value_changed" from="HBoxContainer/VBoxContainer/Fader/AutoVolumeSlider" to="." method="_on_AutoVolumeSlider_value_changed"]
+[connection signal="value_changed" from="HBoxContainer/VBoxContainer/Fader/UserVolumeSlider" to="." method="_on_UserVolumeSlider_value_changed"]

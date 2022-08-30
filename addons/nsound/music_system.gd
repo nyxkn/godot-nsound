@@ -265,7 +265,7 @@ func run_transition(transition_name: String) -> void:
 	# crossfade can only happen after the new section has started
 	# i.e. you cannot start the new section at full volume (cannot fade_in before the track even exists)
 	if transition.fade == Transition.FadeType.CROSS:
-		sections[current_song][to_section].volume_db = Music.MIN_DB
+		sections[current_song][to_section].auto_volume_db = Music.MIN_DB
 		from_music_player.fade_out(from_music_player.section, Music.When.NOW, from_music_player.beat_length * 4)
 		to_music_player.fade_in(to_music_player.section, Music.When.NOW, from_music_player.beat_length * 4)
 		yield(from_music_player, "faded_out")

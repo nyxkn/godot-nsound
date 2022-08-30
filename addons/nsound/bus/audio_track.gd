@@ -70,9 +70,11 @@ func set_mute(value: bool) -> void:
 	if not stream: return
 
 	if value:
-		stream.volume_db = Music.MIN_DB
+#		stream.volume_db = Music.MIN_DB
+		self.auto_volume_db = Music.MIN_DB
 	else:
-		stream.volume_db = volume_db
+#		stream.volume_db = _volume_db
+		self.auto_volume_db = 0.0
 	.set_mute(value)
 
 
