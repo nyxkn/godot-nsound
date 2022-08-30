@@ -1,18 +1,17 @@
 extends Node
 
+
 enum Level { DEBUG, INFO, WARN, ERROR }
 
-const LOG_SHOW = true
+const LOG_SHOW := true
 
-var registered_context: String = ""
 
-#class LoggerClass:
+var _registered_context: String = ""
 
-## objects can be an array or a single basic type
+
 func print_log(objects, context = null, level: int = Level.DEBUG):
 	# Don't log if globally off
 	if not LOG_SHOW: return
-#	if config.log_hide_level.has(level) and config.log_hide_level[level] == true: return
 
 	# Format objects depending on type
 	var objects_str = ""
@@ -23,15 +22,17 @@ func print_log(objects, context = null, level: int = Level.DEBUG):
 	else:
 		objects_str = str(objects)
 
-	var context_str = registered_context
+	var context_str = ""
 	if context:
 		if context is String:
 			context_str = context
 		elif context is Object:
 			context_str = context.get_script().resource_path.get_file().trim_suffix(".gd")
+	else:
+		context_str = _registered_context
 
 	var final_str = "[%s] [%s] [%s] %s" % [
-		Time.get_datetime_string_from_system(false, true),
+		Time.get_time_string_from_system(),
 		Level.keys()[level],
 		context_str,
 		objects_str]
@@ -70,8 +71,8 @@ func e(objects, context = "", error_code = 0) -> void:
 # it's up to the user whether to initialize the instance or just call the autoload methods
 func init(owner):
 	if owner is Object:
-		registered_context = owner.get_script().resource_path.get_file().trim_suffix(".gd")
+		_registered_context = owner.get_script().resource_path.get_file().trim_suffix(".gd")
 	elif owner is String:
-		registered_context = owner
+		_registered_context = owner
 
 	return self
