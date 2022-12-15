@@ -62,7 +62,7 @@ _global_script_classes=[ {
 "base": "Button",
 "class": "QuickButton",
 "language": "GDScript",
-"path": "res://addons/nsound/nui/quick_button.gd"
+"path": "res://studio/ui/quick_button.gd"
 }, {
 "base": "Node",
 "class": "Region",

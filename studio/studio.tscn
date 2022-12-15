@@ -1,12 +1,12 @@
 [gd_scene load_steps=8 format=2]
 
-[ext_resource path="res://addons/nsound/nui/combo/slider_value.gd" type="Script" id=1]
+[ext_resource path="res://studio/ui/combo/slider_value.gd" type="Script" id=1]
 [ext_resource path="res://addons/nsound/assets/icons/godot/Play.svg" type="Texture" id=2]
-[ext_resource path="res://addons/nsound/nui/quick_button.gd" type="Script" id=3]
-[ext_resource path="res://addons/nsound/studio/studio.gd" type="Script" id=4]
-[ext_resource path="res://addons/nsound/nui/combo/slider_value.tscn" type="PackedScene" id=5]
-[ext_resource path="res://addons/nsound/nui/combo/label_value.tscn" type="PackedScene" id=6]
-[ext_resource path="res://addons/nsound/mixer/mixer.tscn" type="PackedScene" id=7]
+[ext_resource path="res://studio/ui/quick_button.gd" type="Script" id=3]
+[ext_resource path="res://studio/studio.gd" type="Script" id=4]
+[ext_resource path="res://studio/ui/combo/slider_value.tscn" type="PackedScene" id=5]
+[ext_resource path="res://studio/ui/combo/label_value.tscn" type="PackedScene" id=6]
+[ext_resource path="res://studio/mixer/mixer.tscn" type="PackedScene" id=7]
 
 [node name="Studio" type="Control"]
 anchor_right = 1.0

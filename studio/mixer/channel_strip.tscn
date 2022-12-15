@@ -1,13 +1,13 @@
 [gd_scene load_steps=21 format=2]
 
-[ext_resource path="res://addons/nsound/nui/fold.gd" type="Script" id=1]
-[ext_resource path="res://addons/nsound/assets/icons/godot/AudioBusSolo.svg" type="Texture" id=2]
-[ext_resource path="res://addons/nsound/assets/icons/godot/Play.svg" type="Texture" id=3]
-[ext_resource path="res://addons/nsound/mixer/channel_strip.gd" type="Script" id=4]
-[ext_resource path="res://addons/nsound/assets/icons/godot/AudioBusMute.svg" type="Texture" id=5]
-[ext_resource path="res://addons/nsound/assets/icons/godot/AudioBusBypass.svg" type="Texture" id=6]
-[ext_resource path="res://addons/nsound/assets/icons/godot/Pause.svg" type="Texture" id=7]
-[ext_resource path="res://addons/nsound/assets/icons/godot/BusVuFull.svg" type="Texture" id=8]
+[ext_resource path="res://studio/ui/fold.gd" type="Script" id=1]
+[ext_resource path="res://studio/mixer/channel_strip.gd" type="Script" id=2]
+[ext_resource path="res://addons/nsound/assets/icons/godot/AudioBusSolo.svg" type="Texture" id=3]
+[ext_resource path="res://addons/nsound/assets/icons/godot/Play.svg" type="Texture" id=4]
+[ext_resource path="res://addons/nsound/assets/icons/godot/AudioBusBypass.svg" type="Texture" id=5]
+[ext_resource path="res://addons/nsound/assets/icons/godot/AudioBusMute.svg" type="Texture" id=6]
+[ext_resource path="res://addons/nsound/assets/icons/godot/BusVuFull.svg" type="Texture" id=7]
+[ext_resource path="res://addons/nsound/assets/icons/godot/Pause.svg" type="Texture" id=8]
 [ext_resource path="res://addons/nsound/assets/icons/godot/BusVuEmpty.svg" type="Texture" id=9]
 
 [sub_resource type="Theme" id=9]
@@ -35,7 +35,7 @@
 [node name="Strip" type="PanelContainer"]
 margin_right = 72.0
 margin_bottom = 401.0
-script = ExtResource( 4 )
+script = ExtResource( 2 )
 
 [node name="PreviewTimer" type="Timer" parent="."]
 
@@ -82,7 +82,7 @@ custom_styles/focus = SubResource( 12 )
 custom_styles/normal = SubResource( 13 )
 toggle_mode = true
 enabled_focus_mode = 0
-icon = ExtResource( 2 )
+icon = ExtResource( 3 )
 flat = false
 
 [node name="Mute" type="ToolButton" parent="HBoxContainer/VBoxContainer/Controls"]
@@ -95,7 +95,7 @@ custom_styles/focus = SubResource( 7 )
 custom_styles/normal = SubResource( 8 )
 toggle_mode = true
 enabled_focus_mode = 0
-icon = ExtResource( 5 )
+icon = ExtResource( 6 )
 flat = false
 
 [node name="Bypass" type="ToolButton" parent="HBoxContainer/VBoxContainer/Controls"]
@@ -109,7 +109,7 @@ custom_styles/focus = SubResource( 7 )
 custom_styles/normal = SubResource( 8 )
 toggle_mode = true
 enabled_focus_mode = 0
-icon = ExtResource( 6 )
+icon = ExtResource( 5 )
 flat = false
 
 [node name="HSeparator" type="HSeparator" parent="HBoxContainer/VBoxContainer"]
@@ -182,7 +182,7 @@ min_value = -80.0
 max_value = 24.0
 step = 0.1
 texture_under = ExtResource( 9 )
-texture_progress = ExtResource( 8 )
+texture_progress = ExtResource( 7 )
 fill_mode = 3
 
 [node name="VuR" type="TextureProgress" parent="HBoxContainer/VBoxContainer/Fader/VuMeter"]
@@ -194,7 +194,7 @@ min_value = -80.0
 max_value = 24.0
 step = 0.1
 texture_under = ExtResource( 9 )
-texture_progress = ExtResource( 8 )
+texture_progress = ExtResource( 7 )
 fill_mode = 3
 
 [node name="Progress" type="VBoxContainer" parent="HBoxContainer/VBoxContainer"]
@@ -214,12 +214,12 @@ size_flags_vertical = 3
 visible = false
 margin_right = 16.0
 margin_bottom = 16.0
-texture = ExtResource( 3 )
+texture = ExtResource( 4 )
 
 [node name="Pause" type="TextureRect" parent="HBoxContainer/VBoxContainer/Progress/Icons"]
 margin_right = 16.0
 margin_bottom = 16.0
-texture = ExtResource( 7 )
+texture = ExtResource( 8 )
 
 [node name="ProgressBar" type="ProgressBar" parent="HBoxContainer/VBoxContainer/Progress/Icons"]
 unique_name_in_owner = true

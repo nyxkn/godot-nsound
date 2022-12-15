@@ -520,18 +520,13 @@ func fade_out(track: Bus, when: int = Music.When.ODD_BAR, duration: float = -1) 
 func ________PRIVATE_UTIL(): pass
 
 
-func _copy_props_from(node: Node, if_not_zero = false) -> void:
-	var props = node.get_property_list()
-	for prop in props:
-		if prop.usage == (PROPERTY_USAGE_SCRIPT_VARIABLE | PROPERTY_USAGE_DEFAULT):
-			if if_not_zero:
-				if node.get(prop.name) != 0:
-					set(prop.name, node.get(prop.name))
-			else:
-				set(prop.name, node.get(prop.name))
-
-
-
+#func _copy_props_from(node: Node, if_not_zero = false) -> void:
+#	for prop in NUtils.get_export_variables(node):
+#		if if_not_zero:
+#			if node.get(prop.name) != 0:
+#				set(prop.name, node.get(prop.name))
+#		else:
+#			set(prop.name, node.get(prop.name))
 
 
 #func _get_all_tracks(node: Node) -> Array:

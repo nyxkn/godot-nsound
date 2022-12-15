@@ -2,8 +2,8 @@ extends Control
 
 var Log = preload("res://addons/nsound/logger.gd").new().init(self)
 
-const Fold = preload("res://addons/nsound/nui/fold.tscn")
-const ChannelStrip = preload("res://addons/nsound/mixer/channel_strip.tscn")
+const Fold = preload("res://studio/ui/fold.tscn")
+const ChannelStrip = preload("res://studio/mixer/channel_strip.tscn")
 onready var core_strips: HBoxContainer = $Strips/CoreStrips
 onready var runtime_strips: HBoxContainer = $Strips/RuntimeStrips
 
