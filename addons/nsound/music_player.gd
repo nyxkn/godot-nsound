@@ -59,9 +59,9 @@ var bars: int
 
 # status
 var playing: bool = false
-var reference_stream_song: AudioStreamPlayer # track we use to get our time from
-var reference_stream_silence: AudioStreamPlayer = AudioStreamPlayer.new()
-var active_streams := []
+var reference_stream_player_song: AudioStreamPlayer # track we use to get our time from
+var reference_stream_player_silence: AudioStreamPlayer = AudioStreamPlayer.new()
+var active_stream_players := []
 
 var loop_time: float # current time in seconds within the reference track loop
 var test_loop_time_delta: float
@@ -89,11 +89,11 @@ var transition_beat := -1
 
 
 func _ready() -> void:
-	reference_stream_silence.stream = silence_ogg
-	reference_stream_silence.volume_db = -80
-	reference_stream_silence.bus = "Null"
-	reference_stream_silence.name = "ReferenceStreamSilence"
-	add_child(reference_stream_silence)
+	reference_stream_player_silence.stream = silence_ogg
+	reference_stream_player_silence.volume_db = -80
+	reference_stream_player_silence.bus = "Null"
+	reference_stream_player_silence.name = "ReferenceStreamSilence"
+	add_child(reference_stream_player_silence)
 
 
 #var test_diff
@@ -103,16 +103,16 @@ func _process(delta: float) -> void:
 	if playing:
 		match reference_method:
 			ReferenceMethod.SONG_STREAM:
-				if not reference_stream_song:
-					Log.e("we don't have a reference stream. cannot play")
+				if not reference_stream_player_song:
+					Log.e("we don't have a reference stream_player. cannot play")
 					playing = false
 					return
 				else:
-					loop_time = reference_stream_song.get_playback_position()
+					loop_time = reference_stream_player_song.get_playback_position()
 			ReferenceMethod.PROCESS:
 				loop_time += delta
 			ReferenceMethod.SILENCE:
-				loop_time = reference_stream_silence.get_playback_position()
+				loop_time = reference_stream_player_silence.get_playback_position()
 
 		# peformance testing
 		test_loop_time_delta += delta
@@ -176,7 +176,7 @@ func load_song_section(song_node: Node, section_node: Section):
 		if not first_audiotrack is AudioTrack:
 			Log.e(["failed to calculate bars value. input manually"])
 			assert(1 == 2)
-		var beats_in_track = (bpm / 60.0) * first_audiotrack.stream.stream.get_length()
+		var beats_in_track = (bpm / 60.0) * first_audiotrack.stream_player.stream.get_length()
 		bars = round(beats_in_track / beats_per_bar)
 		Log.i(["autocalculated bars for section", section.name, "to", bars])
 
@@ -223,7 +223,7 @@ func start_loop() -> void:
 	loop_time = 0.0
 	if reference_method == ReferenceMethod.SONG_STREAM:
 		# reset the song stream so we can set it anew in play_track by using the first found track
-		reference_stream_song = null
+		reference_stream_player_song = null
 
 	# testing avg
 #	Log.d(["avg:", Math.avg(process_diffs)])
@@ -236,7 +236,7 @@ func start_loop() -> void:
 
 	# restart the silence stream
 	if reference_method == ReferenceMethod.SILENCE:
-		reference_stream_silence.play()
+		reference_stream_player_silence.play()
 
 #	for node in section.get_children():
 #		play_track(node)
@@ -244,7 +244,7 @@ func start_loop() -> void:
 
 	# we only get song's reference stream after calling play_track
 	if reference_method == ReferenceMethod.SONG_STREAM:
-		loop_length = reference_stream_song.stream.get_length()
+		loop_length = reference_stream_player_song.stream_player.get_length()
 
 	playing = true
 
@@ -262,9 +262,9 @@ func play_track(track: Bus):
 
 	if track is AudioTrack:
 		play_audiotrack(track)
-		if reference_method == ReferenceMethod.SONG_STREAM and not reference_stream_song:
-			reference_stream_song = track.stream
-			Log.d(["set reference stream to", track])
+		if reference_method == ReferenceMethod.SONG_STREAM and not reference_stream_player_song:
+			reference_stream_player_song = track.stream_player
+			Log.d(["set reference stream_player to", track])
 
 	elif track is Section:
 		for subtrack in track.get_children():
@@ -293,7 +293,7 @@ func play_track(track: Bus):
 
 func play_audiotrack(track: AudioTrack):
 	track.play()
-	active_streams.append(track.stream)
+	active_stream_players.append(track.stream_player)
 
 
 func seek(to_position: float) -> void:
@@ -305,9 +305,9 @@ func seek(to_position: float) -> void:
 		return
 
 	if reference_method == ReferenceMethod.SILENCE:
-		reference_stream_silence.seek(to_position)
-	for stream in active_streams:
-		stream.seek(to_position)
+		reference_stream_player_silence.seek(to_position)
+	for stream_player in active_stream_players:
+		stream_player.seek(to_position)
 
 	last_seek_time = OS.get_ticks_msec()
 
@@ -323,27 +323,27 @@ func seek_to_barbeat(barbeat: float) -> void:
 
 
 func stop_all_streams() -> void:
-	for stream in active_streams:
-#		print(stream.name)
-		if _is_stream_stinger(stream):
-			Log.d(["not stopping stinger", stream])
+	for stream_player in active_stream_players:
+#		print(stream_player.name)
+		if _is_stream_stinger(stream_player):
+			Log.d(["not stopping stinger", stream_player])
 		else:
-			stream.stop()
+			stream_player.stop()
 
 	# WARN: it is possible for streams not to have stopped properly
 	# e.g. if you call stop() on the same frame as play(), stop will fail
 	# nonetheless, it's somewhat hard to check whether the stream has truly stopped
-	active_streams.clear()
+	active_stream_players.clear()
 
 #	yield(get_tree(), "idle_frame")
 
 #	var streams_still_playing = []
-#	for stream in active_streams:
-#		if stream.playing:
-#			Log.e(["failed to stop stream", stream])
-#			streams_still_playing.append(stream)
+#	for stream_player in active_stream_players:
+#		if stream_player.playing:
+#			Log.e(["failed to stop stream_player", stream_player])
+#			streams_still_playing.append(stream_player)
 #
-#	active_streams = streams_still_playing
+#	active_stream_players = streams_still_playing
 
 
 func stop() -> void:

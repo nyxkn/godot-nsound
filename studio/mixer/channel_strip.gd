@@ -32,8 +32,8 @@ func init(bus: Bus) -> Node:
 		get_node("%AudioServerBusName").hide()
 		get_node("%VuMeter").hide()
 		get_node("%Effects").hide()
-		$"%Time".text = "%.1f" % bus.stream.get_playback_position()
-		$"%TotalTime".text = "%.1f" % bus.stream.stream.get_length() + "s"
+		$"%Time".text = "%.1f" % bus.stream_player.get_playback_position()
+		$"%TotalTime".text = "%.1f" % bus.stream_player.stream.get_length() + "s"
 
 	return self
 
@@ -102,9 +102,9 @@ func _process(delta: float) -> void:
 		$"%Icons".get_node("Pause").visible = not is_playing
 
 		if is_playing:
-			var time = bus.stream.get_playback_position()
+			var time = bus.stream_player.get_playback_position()
 			$"%Time".text = "%.1f" % time
-			$"%ProgressBar".value = inverse_lerp(0, bus.stream.stream.get_length(), time)
+			$"%ProgressBar".value = inverse_lerp(0, bus.stream_player.stream.get_length(), time)
 
 
 func add_substrip(strip: Node):
