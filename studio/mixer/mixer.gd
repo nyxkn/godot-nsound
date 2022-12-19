@@ -1,6 +1,7 @@
 extends Control
 
 var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+const Utils = preload("res://addons/nsound/utils.gd")
 
 const Fold = preload("res://studio/ui/fold.tscn")
 const ChannelStrip = preload("res://studio/mixer/channel_strip.tscn")
@@ -37,8 +38,8 @@ func clear() -> void:
 func init_song(root_node: Node) -> void:
 	var strips = {}
 
-	var all_nodes = NUtils.get_all_children(root_node)
-#	all_nodes.push_front(root_node)
+	var all_nodes = Utils.get_all_children(root_node)
+	all_nodes.push_front(root_node)
 	for node in all_nodes:
 		if node is Bus:
 			var bus: Bus = node
