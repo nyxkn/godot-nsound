@@ -2,6 +2,7 @@ extends Node
 class_name BBT
 
 var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+const Utils = preload("res://addons/nsound/utils.gd")
 
 var bar: int
 var beat: int
@@ -24,7 +25,7 @@ func from_float(bbt: float) -> BBT:
 
 
 func from_string(bbt: String) -> BBT:
-	var re := NUtils.compile_regex("\\d+(\\.\\d+)?(\\.\\d+)?")
+	var re := Utils.compile_regex("\\d+(\\.\\d+)?(\\.\\d+)?")
 	var result = re.search_all(bbt)
 	if not result.size() == 1:
 		Log.e(["float bbt", bbt, "is incorrectly formatted"])

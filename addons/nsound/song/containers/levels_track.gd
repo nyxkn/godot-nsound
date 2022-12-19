@@ -2,6 +2,8 @@ tool
 extends AudioServerBus
 class_name LevelsTrack
 
+const Utils = preload("res://addons/nsound/utils.gd")
+
 # you must NOT initialize levels to a default value in here
 # if you do it will be shared between all instances
 # for some very strange reason, this dictionary doesn't preserve order across reloads
@@ -38,7 +40,7 @@ func add_levels_entry(node: Node):
 	if regex_match:
 		var level = 0
 		# try to guess the level number by using the first encountered number
-		var re = NUtils.compile_regex("([0-9]+)")
+		var re = Utils.compile_regex("([0-9]+)")
 		var re_match: RegExMatch = re.search(node.name)
 		if re_match:
 			level = int(re_match.get_string())

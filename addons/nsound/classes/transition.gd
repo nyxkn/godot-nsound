@@ -18,7 +18,7 @@ export(float) var barbeat := 1.1
 # how many bars does the transition take (e.g. if playing stinger)
 # that is, how many bars are we staying on the from track
 export(int) var bars
-export(Music.When) var when := Music.When.ODD_BAR
+export(NDef.When) var when := NDef.When.ODD_BAR
 
 enum FadeType { CROSS, IN, OUT }
 export(FadeType) var fade

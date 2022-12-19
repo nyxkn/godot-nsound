@@ -1,8 +1,6 @@
-class_name NUtils
 
 # it's useless to load the Log class since static functions cannot use it
 # workaround is to make use of the Log instance of NAudio autoload
-
 
 # ================
 # utils
@@ -37,7 +35,8 @@ static func setup_buses(node: Bus) -> void:
 			var parent_node = child.get_parent()
 			var send_bus
 			if parent_node is Song and not parent_node is Section:
-				send_bus = NAudio.music_bus
+#				send_bus = NAudio.music_bus
+				send_bus = parent_node.bus_name
 			elif parent_node is AudioServerBus:
 				send_bus = parent_node.bus_name
 			else:

@@ -1,7 +1,10 @@
 extends Node
-class_name MusicSystem
+class_name MusicPlayer
 
 var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+const Utils = preload("res://addons/nsound/utils.gd")
+const SectionPlayer = preload("res://addons/nsound/section_player.gd")
+#const BBT = preload("res://addons/nsound/classes/bbt.gd")
 
 signal section_started(node)
 signal song_started(node)
@@ -15,14 +18,14 @@ signal song_unloaded()
 # loop. at the end of a song we restart it (does this belong here or in song?)
 # sequence. at the end of a song we move on to the next one
 # shuffle. at the end of a song we randomly choose another one
-enum PlayMode { SONG_ONCE, LOOP_SONG, SEQUENCE, SHUFFLE }
+enum PlayMode { ONCE_EACH, LOOP_EACH, SEQUENCE, SHUFFLE }
 export(PlayMode) var play_mode = PlayMode.SEQUENCE
 
 
 var songs := {}
 # we instance one music player for each section of a song
-# music_players[song][section]
-var music_players := {}
+# section_players[song][section]
+var section_players := {}
 
 # song-specific
 var sections := {}
@@ -39,7 +42,9 @@ var played_songs := []
 
 #var song_loaded: bool = false
 
-var _music_players_node
+var _section_players_node
+
+var goto_section_call_id := 0
 
 
 func _ready() -> void:
@@ -52,25 +57,25 @@ func _ready() -> void:
 	# set initial values
 #	unload_song()
 
-	# placeholder node for adding music_players
-	_music_players_node = Node.new()
-	_music_players_node.name = "MusicPlayers"
-	add_child(_music_players_node)
+	# placeholder node for adding section_players
+	_section_players_node = Node.new()
+	_section_players_node.name = "MusicPlayers"
+	add_child(_section_players_node)
 
 	for song_name in songs:
 		load_song(song_name)
 
 
 # the advantage of using a getter is that you don't have to store
-# current_music_player as a variable
+# current_section_player as a variable
 # which will create problems if you try to free it and recreate it
-func current_music_player() -> MusicPlayer:
-	if current_song in music_players and current_section in music_players[current_song]:
-			return music_players[current_song][current_section]
+func current_section_player() -> SectionPlayer:
+	if current_song in section_players and current_section in section_players[current_song]:
+		return section_players[current_song][current_section]
 	else:
 		return null
 
-#func set_current_music_player(song_name: String, section_name: String):
+#func set_current_section_player(song_name: String, section_name: String):
 #	current_song = song_name
 #	current_section = section_name
 
@@ -80,30 +85,31 @@ func load_song(song_name: String):
 
 	var song_node = songs[song_name]
 
-	for node in NUtils.get_all_children(song_node):
+	song_node.init(NAudio.music_bus)
+	for node in Utils.get_all_children(song_node):
 		if node is Section:
 			sections[song_name][node.name] = node
 		elif node is StingersContainer:
 			for track in node.get_children():
 				stingers[song_name][track.name] = track
-			NUtils.setup_buses(node)
+			Utils.setup_buses(node)
 
 #	yield(get_tree(), "idle_frame")
 
 	transitions[song_name] = song_node.transitions
 
-	music_players[song_name] = {}
+	section_players[song_name] = {}
 	for section_name in sections[song_name]:
 		var section_node = sections[song_name][section_name]
 
-		var music_player := MusicPlayer.new()
-		music_player.name = "MusicPlayer_" + song_name + "_" + section_name
-		_music_players_node.add_child(music_player)
-		music_players[song_name][section_name] = music_player
+		var section_player := SectionPlayer.new()
+		section_player.name = "MusicPlayer_" + song_name + "_" + section_name
+		_section_players_node.add_child(section_player)
+		section_players[song_name][section_name] = section_player
 
-		music_player.connect("end", self, "on_section_end")
+		section_player.connect("end", self, "on_section_end")
 
-		music_player.load_song_section(song_node, section_node)
+		section_player.load_song_section(song_node, section_node)
 
 	song_node.music_system = self
 	song_node._setup()
@@ -128,13 +134,13 @@ func unload_song(song_name: String):
 
 #	song_loaded = false
 
-#	if current_music_player:
-#		current_music_player.queue_free()
-#	current_music_player = null
+#	if current_section_player:
+#		current_section_player.queue_free()
+#	current_section_player = null
 
-	for k in music_players[song_name]:
-		music_players[song_name][k].queue_free()
-	music_players.erase(song_name)
+	for k in section_players[song_name]:
+		section_players[song_name][k].queue_free()
+	section_players.erase(song_name)
 
 	NAudio.remove_all_buses()
 
@@ -153,12 +159,12 @@ func unload_song(song_name: String):
 
 
 func stop():
-	if current_music_player():
-		current_music_player().stop()
+	if current_section_player():
+		current_section_player().stop()
 
 
 #func play_only(song_name: String, section_name: String = ""):
-#	music_players[song_name][section_name].start()
+#	section_players[song_name][section_name].start()
 
 
 func play_and_switch(song_name: String = "", section_name: String = "", stop: bool = true):
@@ -174,9 +180,9 @@ func play_and_switch(song_name: String = "", section_name: String = "", stop: bo
 	# using current music player here and later is confusing
 	# what's happeneing is that by changing current_song and section
 	# current music player will return a different player
-	if stop and current_music_player():
+	if stop and current_section_player():
 		Log.i(["stopping current song/section", current_song, current_section])
-		current_music_player().stop()
+		current_section_player().stop()
 
 	if song_name != current_song:
 		emit_signal("song_started", songs[song_name])
@@ -184,21 +190,31 @@ func play_and_switch(song_name: String = "", section_name: String = "", stop: bo
 	current_song = song_name
 
 	if not section_name:
-		section_name = music_players[current_song].keys()[0]
+		section_name = section_players[current_song].keys()[0]
 	current_section = section_name
 
 	Log.i(["starting song/section", current_song, current_section])
 
 
-#	current_music_player = music_players[current_song][current_section]
-	current_music_player().start()
+#	current_section_player = section_players[current_song][current_section]
+	current_section_player().start()
 
 	emit_signal("section_started", sections[song_name][section_name])
 
 
-func goto_section(section_name: String, when: int = Music.When.ODD_BAR) -> void:
-	yield(current_music_player().wait_until(when), "completed")
-	play_and_switch(current_song, section_name)
+func goto_section(section_name: String, when: int = NDef.When.ODD_BAR) -> void:
+	goto_section_call_id += 1
+	var current_id = goto_section_call_id
+
+	yield(current_section_player().wait_until(when), "completed")
+
+	# if id is still the same as when we started the function, proceed
+	# otherwise ignore the call because a new one was made
+	if current_id == goto_section_call_id:
+		play_and_switch(current_song, section_name)
+	else:
+		Log.e(["this goto section call has been superseded"])
+
 
 
 func goto_song(song_name: String) -> void:
@@ -242,45 +258,45 @@ func run_transition(transition_name: String) -> void:
 			to_section = to_section.name
 		to_barbeat = transition.barbeat
 
-	var from_music_player = music_players[current_song][from_section]
-	var to_music_player = music_players[current_song][to_section]
+	var from_section_player = section_players[current_song][from_section]
+	var to_section_player = section_players[current_song][to_section]
 
-	from_music_player.determine_transition_beat(transition.when, transition.bars)
+	from_section_player.determine_transition_beat(transition.when, transition.bars)
 
-	yield(from_music_player.wait_until(transition.when), "completed")
+	yield(from_section_player.wait_until(transition.when), "completed")
 
 	if transition.stinger:
-		queue_stinger(transition.stinger, Music.When.NOW)
+		queue_stinger(transition.stinger, NDef.When.NOW)
 
 	for i in transition.bars:
-		yield(from_music_player, "bar")
+		yield(from_section_player, "bar")
 
-	to_music_player.set_level(transition.level, Music.When.NOW)
+	to_section_player.set_level(transition.level, NDef.When.NOW)
 	play_and_switch(current_song, to_section, false)
 
 #	if transition.barbeat != 1.1:
 	if to_barbeat and to_barbeat != 1.1:
-		to_music_player.seek_to_bbt(BBT.new().from_float(to_barbeat))
+		to_section_player.seek_to_bbt(BBT.new().from_float(to_barbeat))
 
 	# crossfade can only happen after the new section has started
 	# i.e. you cannot start the new section at full volume (cannot fade_in before the track even exists)
 	if transition.fade == Transition.FadeType.CROSS:
-		sections[current_song][to_section].auto_volume_db = Music.MIN_DB
-		from_music_player.fade_out(from_music_player.section, Music.When.NOW, from_music_player.beat_length * 4)
-		to_music_player.fade_in(to_music_player.section, Music.When.NOW, from_music_player.beat_length * 4)
-		yield(from_music_player, "faded_out")
-		from_music_player.stop()
+		sections[current_song][to_section].auto_volume_db = NDef.MIN_DB
+		from_section_player.fade_out(from_section_player.section, NDef.When.NOW, from_section_player.beat_length * 4)
+		to_section_player.fade_in(to_section_player.section, NDef.When.NOW, from_section_player.beat_length * 4)
+		yield(from_section_player, "faded_out")
+		from_section_player.stop()
 	else:
 		# always duplicate?
-		if from_music_player != to_music_player:
-			from_music_player.stop()
+		if from_section_player != to_section_player:
+			from_section_player.stop()
 
 
-func queue_stinger(stinger: String, when: int = Music.When.BAR) -> void:
-	yield(current_music_player().wait_until(when), "completed")
+func queue_stinger(stinger: String, when: int = NDef.When.BAR) -> void:
+	yield(current_section_player().wait_until(when), "completed")
 
 	Log.d(["playing stinger", stinger])
-	current_music_player().play_track(stingers[current_song][stinger])
+	current_section_player().play_track(stingers[current_song][stinger])
 
 
 func on_section_end(song_name: String, section_name: String) -> void:
@@ -305,11 +321,11 @@ func on_section_end(song_name: String, section_name: String) -> void:
 		pass
 		# play next song
 		match play_mode:
-			PlayMode.SONG_ONCE:
+			PlayMode.ONCE_EACH:
 				Log.i("song finished. stopping")
 				emit_signal("song_finished", songs[song_name])
 
-			PlayMode.LOOP_SONG:
+			PlayMode.LOOP_EACH:
 				Log.i("looping song")
 				play_and_switch(song_name, section_nodes[0].name)
 

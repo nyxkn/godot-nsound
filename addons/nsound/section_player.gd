@@ -1,7 +1,8 @@
 extends Node
-class_name MusicPlayer
 
 var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+const Utils = preload("res://addons/nsound/utils.gd")
+#const BBT = preload("res://addons/nsound/classes/bbt.gd")
 
 signal loop_beat(n)
 signal beat(n)
@@ -57,7 +58,7 @@ var beats_per_bar: int
 var bars: int
 
 
-# status
+# state
 var playing: bool = false
 var reference_stream_player_song: AudioStreamPlayer # track we use to get our time from
 var reference_stream_player_silence: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -86,6 +87,9 @@ var transition_beat := -1
 
 #var stingers := {}
 #var transitions := {}
+
+var waiting := false
+var wait_id := 0
 
 
 func _ready() -> void:
@@ -194,16 +198,16 @@ func load_song_section(song_node: Node, section_node: Section):
 		if section.regions[r].loop == true:
 			looping_regions[r] = section.regions[r]
 
-	NUtils.setup_buses(section_node)
+	Utils.setup_buses(section_node)
 
 	# initialize nodes
 	levels_tracks.clear()
-	for node in NUtils.get_all_children(section_node):
+	for node in Utils.get_all_children(section_node):
 		if node is LevelsTrack:
 			levels_tracks.append(node)
 #			for child in node.get_children():
 #				if child is Bus:
-#					child.volume_db = Music.MIN_DB
+#					child.volume_db = NDef.MIN_DB
 
 
 func start():
@@ -211,7 +215,7 @@ func start():
 	last_beat = -1
 	transition_beat = -1
 	start_loop()
-	set_level(level, Music.When.NOW)
+	set_level(level, NDef.When.NOW)
 
 
 func start_loop() -> void:
@@ -351,13 +355,27 @@ func stop() -> void:
 	playing = false
 
 
+func pause() -> void:
+	playing = false
+	for stream_player in active_stream_players:
+		stream_player.stream_paused = true
+	if reference_method == ReferenceMethod.SILENCE:
+		reference_stream_player_silence.stream_paused = true
+
+func unpause() -> void:
+	for stream_player in active_stream_players:
+		stream_player.stream_paused = false
+	if reference_method == ReferenceMethod.SILENCE:
+		reference_stream_player_silence.stream_paused = false
+	playing = true
+
 # ================================
 # adaptive management
 # ================================
 func ________LEVELS(): pass
 
 
-func set_level(value: int, when: int = Music.When.ODD_BAR) -> void:
+func set_level(value: int, when: int = NDef.When.ODD_BAR) -> void:
 	level = value
 #	Log.d(["set level", value])
 
@@ -427,13 +445,13 @@ func queue_track_on_beat(on_beat: int, track: Bus):
 func determine_fade_duration(when: int) -> float:
 	var duration: float
 	match when:
-		Music.When.NOW:
+		NDef.When.NOW:
 			duration = 0.0
-		Music.When.BEAT:
+		NDef.When.BEAT:
 			duration = beat_length * 0.5
-		Music.When.BAR:
+		NDef.When.BAR:
 			duration = beat_length * (beats_per_bar / 2)
-		Music.When.ODD_BAR:
+		NDef.When.ODD_BAR:
 			duration = beat_length * beats_per_bar
 
 	return duration
@@ -441,32 +459,30 @@ func determine_fade_duration(when: int) -> float:
 
 func wait_until(when: int) -> void:
 	match when:
-		Music.When.NOW:
+		NDef.When.NOW:
 			# hack. we need to wait at least one frame for yield to register
 			yield(get_tree(), "idle_frame")
-		Music.When.BEAT:
+		NDef.When.BEAT:
 			yield(self, "beat")
-		Music.When.BAR:
+		NDef.When.BAR:
 			yield(self, "bar")
-		Music.When.ODD_BAR:
+		NDef.When.ODD_BAR:
 			yield(self, "odd_bar")
-		Music.When.LOOP:
+		NDef.When.LOOP:
 			yield(self, "loop")
-
-	return
 
 
 func determine_transition_beat(when: int, transition_bars):
 	match when:
-		Music.When.NOW:
+		NDef.When.NOW:
 			transition_beat = loop_beat
-		Music.When.BEAT:
+		NDef.When.BEAT:
 			transition_beat = loop_beat + 1
-		Music.When.BAR:
+		NDef.When.BAR:
 			transition_beat = bbt.bar * beats_per_bar + 1
-		Music.When.ODD_BAR:
+		NDef.When.ODD_BAR:
 			transition_beat = (bbt.bar + (bbt.bar % 2)) * beats_per_bar + 1
-		Music.When.LOOP:
+		NDef.When.LOOP:
 			transition_beat = 0
 
 	transition_beat += beats_per_bar * transition_bars
@@ -476,7 +492,7 @@ func determine_transition_beat(when: int, transition_bars):
 	transition_beat = transition_beat % loop_beats
 
 
-func fade_in(track: Bus, when: int = Music.When.ODD_BAR, duration: float = -1) -> void:
+func fade_in(track: Bus, when: int = NDef.When.ODD_BAR, duration: float = -1) -> void:
 	var dur = duration
 	if dur == -1:
 		dur = determine_fade_duration(when)
@@ -496,17 +512,17 @@ func fade_in(track: Bus, when: int = Music.When.ODD_BAR, duration: float = -1) -
 	emit_signal("faded_in", track)
 
 
-func fade_out(track: Bus, when: int = Music.When.ODD_BAR, duration: float = -1) -> void:
+func fade_out(track: Bus, when: int = NDef.When.ODD_BAR, duration: float = -1) -> void:
 	var dur = duration
 	if dur == -1:
 		dur = determine_fade_duration(when)
 
 	if dur == 0:
-		track.auto_volume_db = Music.MIN_DB
+		track.auto_volume_db = NDef.MIN_DB
 		return
 	else:
 		yield(wait_until(when), "completed")
-		track.fade(null, Music.MIN_DB, dur)
+		track.fade(null, NDef.MIN_DB, dur)
 #		Log.d(["fading out track", track])
 
 	yield(get_tree().create_timer(dur), "timeout")
@@ -521,7 +537,7 @@ func ________PRIVATE_UTIL(): pass
 
 
 #func _copy_props_from(node: Node, if_not_zero = false) -> void:
-#	for prop in NUtils.get_export_variables(node):
+#	for prop in Utils.get_export_variables(node):
 #		if if_not_zero:
 #			if node.get(prop.name) != 0:
 #				set(prop.name, node.get(prop.name))

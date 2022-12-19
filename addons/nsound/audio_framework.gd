@@ -1,6 +1,7 @@
 extends Node
 
 var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+const Utils = preload("res://addons/nsound/utils.gd")
 
 # { bus_name: Bus }
 var core_buses := {}
@@ -49,7 +50,7 @@ func register_track(bus: AudioTrack) -> void:
 
 
 func get_bus(bus_name: String) -> Bus:
-	var buses = NUtils.merge_dict(core_buses, runtime_buses)
+	var buses = Utils.merge_dict(core_buses, runtime_buses)
 	return buses[bus_name]
 
 

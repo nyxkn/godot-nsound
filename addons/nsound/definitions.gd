@@ -1,5 +1,5 @@
 extends Node
-class_name Music
+class_name NDef
 
 # the value for inaudible db. should be between -80 and -60
 # https://docs.godotengine.org/en/stable/tutorials/audio/audio_buses.html

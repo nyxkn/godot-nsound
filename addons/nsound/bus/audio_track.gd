@@ -1,6 +1,8 @@
 extends Bus
 class_name AudioTrack, "res://addons/nsound/assets/icons/godot/AudioStreamPlayer.svg"
 
+const Utils = preload("res://addons/nsound/utils.gd")
+
 export(bool) var loop := false
 export(AudioStream) var audio_file: AudioStream
 
@@ -29,8 +31,8 @@ func _ready() -> void:
 			Log.w(["bus", name, "has no audiostream"])
 			return
 
-	print(NUtils.get_filename(stream_player.stream.resource_path))
-	stream_player.name = NUtils.get_filename(stream_player.stream.resource_path).replace(".", "_")
+	print(Utils.get_filename(stream_player.stream.resource_path))
+	stream_player.name = Utils.get_filename(stream_player.stream.resource_path).replace(".", "_")
 
 	stream_player.connect("finished", self, "_stream_player_finished")
 
@@ -82,8 +84,8 @@ func set_mute(value: bool) -> void:
 	if not stream_player: return
 
 	if value:
-#		stream_player.volume_db = Music.MIN_DB
-		self.auto_volume_db = Music.MIN_DB
+#		stream_player.volume_db = NDef.MIN_DB
+		self.auto_volume_db = NDef.MIN_DB
 	else:
 #		stream_player.volume_db = _volume_db
 		self.auto_volume_db = 0.0
