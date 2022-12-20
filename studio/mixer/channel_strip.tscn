@@ -314,5 +314,7 @@ unique_name_in_owner = true
 [connection signal="toggled" from="HBoxContainer/VBoxContainer/Controls/Solo" to="." method="_on_Solo_toggled"]
 [connection signal="toggled" from="HBoxContainer/VBoxContainer/Controls/Mute" to="." method="_on_Mute_toggled"]
 [connection signal="toggled" from="HBoxContainer/VBoxContainer/Controls/Bypass" to="." method="_on_Bypass_toggled"]
+[connection signal="drag_ended" from="HBoxContainer/VBoxContainer/Fader/AutoVolumeSlider" to="." method="_on_AutoVolumeSlider_drag_ended"]
 [connection signal="value_changed" from="HBoxContainer/VBoxContainer/Fader/AutoVolumeSlider" to="." method="_on_AutoVolumeSlider_value_changed"]
+[connection signal="drag_ended" from="HBoxContainer/VBoxContainer/Fader/UserVolumeSlider" to="." method="_on_UserVolumeSlider_drag_ended"]
 [connection signal="value_changed" from="HBoxContainer/VBoxContainer/Fader/UserVolumeSlider" to="." method="_on_UserVolumeSlider_value_changed"]

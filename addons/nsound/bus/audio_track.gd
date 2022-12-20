@@ -1,6 +1,10 @@
 extends Bus
 class_name AudioTrack, "res://addons/nsound/assets/icons/godot/AudioStreamPlayer.svg"
 
+# this is a bus that does not make use of a godot audioserver
+# it interacts with audiostream directly
+
+
 const Utils = preload("res://addons/nsound/utils.gd")
 
 export(bool) var loop := false

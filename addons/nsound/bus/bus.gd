@@ -30,17 +30,18 @@ export(bool) var disabled := false setget set_disabled
 
 # we'd use MIN_DB but export doesn't seem to accept that
 # this is the true volume. users are not supposed to interact with this
-export(float, -80, 24) var _volume_db setget set_volume_db, get_volume_db
+#export(float, -80, 24) var _volume_db setget set_volume_db, get_volume_db
+var _volume_db setget set_volume_db, get_volume_db
 
 # this is the bus to which we send our output
 export(String) var send setget set_send, get_send
 
 
-# this can also b
+# automation volume. meant to be used mostly through fade
 var auto_volume_db := 0.0 setget set_auto_volume_db
 # volume set through the mixer or manually through code
 # this is so that fades can happen independently of the real volume
-var user_volume_db := 0.0 setget set_user_volume_db
+export(float, -80, 24) var user_volume_db := 0.0 setget set_user_volume_db
 
 
 # fade variables
@@ -168,15 +169,16 @@ func get_true_volume() -> float:
 
 
 func set_auto_volume_db(value: float, from_fade = false) -> void:
-	auto_volume_db = value
-	self._volume_db = get_true_volume()
-
+#func set_auto_volume_db(value: float) -> void:
 	# if setting autovolume from fade process, skip the signal. it will get called at the end of the fade
 	if not from_fade:
 		if fading:
 			Log.w("cancelling fade")
 			self.fading = false
-		emit_signal("auto_volume_changed", auto_volume_db)
+
+	auto_volume_db = value
+	self._volume_db = get_true_volume()
+	emit_signal("auto_volume_changed", auto_volume_db)
 
 
 func set_user_volume_db(value: float) -> void:
