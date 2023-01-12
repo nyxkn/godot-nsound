@@ -26,6 +26,7 @@ func _ready() -> void:
 		var bus = AudioServerBus.new()
 		bus.wrap(bus_name)
 		core_buses[bus_name] = bus
+	Log.d(["core buses", core_buses])
 
 
 # would like to use type AudioServerBus but sometimes we get cyclic dependency errors

@@ -35,7 +35,7 @@ func _ready() -> void:
 			Log.w(["bus", name, "has no audiostream"])
 			return
 
-	print(Utils.get_filename(stream_player.stream.resource_path))
+#	print(Utils.get_filename(stream_player.stream.resource_path))
 	stream_player.name = Utils.get_filename(stream_player.stream.resource_path).replace(".", "_")
 
 	stream_player.connect("finished", self, "_stream_player_finished")

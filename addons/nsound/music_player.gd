@@ -21,6 +21,8 @@ signal song_unloaded()
 enum PlayMode { ONCE_EACH, LOOP_EACH, SEQUENCE, SHUFFLE }
 export(PlayMode) var play_mode = PlayMode.SEQUENCE
 
+export(bool) var stop_on_pause := false
+export(float) var pause_duck_volume := -12.0
 
 var songs := {}
 # we instance one music player for each section of a song
@@ -48,6 +50,12 @@ var goto_section_call_id := 0
 
 
 func _ready() -> void:
+	if stop_on_pause:
+		pause_mode = Node.PAUSE_MODE_STOP
+	else:
+		# section players inherit the mode because they're our child
+		pause_mode = Node.PAUSE_MODE_PROCESS
+
 	for song in get_children():
 		songs[song.name] = song
 		sections[song.name] = {}
@@ -64,6 +72,14 @@ func _ready() -> void:
 
 	for song_name in songs:
 		load_song(song_name)
+
+
+func _process(delta: float) -> void:
+	if current_section_player():
+		if get_tree().paused and pause_duck_volume != 0:
+			songs[current_song].auto_volume_db = pause_duck_volume
+		else:
+			songs[current_song].auto_volume_db = 0
 
 
 # shortcut for getting currently active section player
@@ -185,10 +201,6 @@ func play_and_switch(song_name: String = "", section_name: String = "", stop: bo
 
 	Log.d([section_players])
 
-#	if song_name != current_song:
-#		emit_signal("song_started", songs[song_name])
-
-
 	# start new song (setting new song as current_song)
 
 	if not section_name:
@@ -196,9 +208,13 @@ func play_and_switch(song_name: String = "", section_name: String = "", stop: bo
 
 	Log.i(["starting song/section", song_name, section_name])
 
-	current_song = song_name
-	current_section = section_name
-	section_players[current_song][current_section].start()
+	section_players[song_name][section_name].start()
+
+	# changing to a new song rather than just a different section
+	if song_name != current_song:
+		current_song = song_name
+		current_section = section_name
+		emit_signal("song_started", songs[current_song])
 
 	emit_signal("section_started", sections[current_song][current_section])
 

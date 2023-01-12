@@ -92,8 +92,6 @@ var wait_id := 0
 
 
 func _ready() -> void:
-	pause_mode = Node.PAUSE_MODE_PROCESS
-
 	reference_stream_player_silence.stream = silence_ogg
 	reference_stream_player_silence.volume_db = -80
 	reference_stream_player_silence.bus = "Null"
