@@ -9,6 +9,16 @@ const LOG_SHOW := true
 var _registered_context: String = ""
 
 
+# when calling new() you want to pass in a context name or the object self
+# var Log = preload("res://addons/nsound/logger.gd").new(self)
+# but actually if we use the call stack method you don't need either, and make this param optional
+func _init(context):
+	if context is Object:
+		_registered_context = context.get_script().resource_path.get_file().trim_suffix(".gd")
+	elif context is String:
+		_registered_context = context
+
+
 func print_log(objects, context = null, level: int = Level.DEBUG):
 	# Don't log if globally off
 	if not LOG_SHOW: return
@@ -62,17 +72,3 @@ func e(objects, context = "", error_code = 0) -> void:
 	print_log(objects, context, Level.ERROR)
 
 
-# inspired by godot heightmap plugin
-# https://github.com/Zylann/godot_heightmap_plugin/blob/master/addons/zylann.hterrain/util/logger.gd
-# but instead of returning a new instance from a static function
-# we simply initialize when already instanced
-# var Log = preload("res://addons/nsound/logger.gd").new().init(self)
-# this has the advantage that it's fully compatible with using this class as an autoload
-# it's up to the user whether to initialize the instance or just call the autoload methods
-func init(owner):
-	if owner is Object:
-		_registered_context = owner.get_script().resource_path.get_file().trim_suffix(".gd")
-	elif owner is String:
-		_registered_context = owner
-
-	return self

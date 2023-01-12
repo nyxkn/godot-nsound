@@ -1,7 +1,7 @@
 extends Node
 class_name Bus
 
-var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+var Log = preload("res://addons/nsound/logger.gd").new(self)
 
 # ============================
 # MAIN BUS

@@ -1,6 +1,6 @@
 extends Node
 
-var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+var Log = preload("res://addons/nsound/logger.gd").new(self)
 const Utils = preload("res://addons/nsound/utils.gd")
 #const BBT = preload("res://addons/nsound/classes/bbt.gd")
 

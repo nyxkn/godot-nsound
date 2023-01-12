@@ -2,7 +2,7 @@ extends Node
 
 # nsound core autoload where we keep state
 
-var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+var Log = preload("res://addons/nsound/logger.gd").new(self)
 const Utils = preload("res://addons/nsound/utils.gd")
 
 # { bus_name: Bus }

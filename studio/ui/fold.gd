@@ -1,7 +1,7 @@
 tool
 extends MarginContainer
 
-var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+var Log = preload("res://addons/nsound/logger.gd").new(self)
 
 
 # to use, unpack as editable children, then add your content under the Content node

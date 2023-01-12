@@ -1,6 +1,6 @@
 extends PanelContainer
 
-var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+var Log = preload("res://addons/nsound/logger.gd").new(self)
 
 var bus: Bus
 var channel: Dictionary = { "peak_l": -100, "peak_r": -100 }

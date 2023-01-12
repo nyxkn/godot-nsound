@@ -1,6 +1,6 @@
 extends Control
 
-var Log = preload("res://addons/nsound/logger.gd").new().init(self)
+var Log = preload("res://addons/nsound/logger.gd").new(self)
 const Utils = preload("res://addons/nsound/utils.gd")
 
 const Fold = preload("res://studio/ui/fold.tscn")
