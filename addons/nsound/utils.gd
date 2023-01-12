@@ -1,6 +1,6 @@
 
 # it's useless to load the Log class since static functions cannot use it
-# workaround is to make use of the Log instance of NAudio autoload
+# workaround is to make use of the Log instance of NSound autoload
 
 # ================
 # utils
@@ -35,12 +35,12 @@ static func setup_buses(node: Bus) -> void:
 			var parent_node = child.get_parent()
 			var send_bus
 			if parent_node is Song and not parent_node is Section:
-#				send_bus = NAudio.music_bus
+#				send_bus = NSound.music_bus
 				send_bus = parent_node.bus_name
 			elif parent_node is AudioServerBus:
 				send_bus = parent_node.bus_name
 			else:
-				send_bus = NAudio.music_bus
+				send_bus = NSound.music_bus
 			child.init(send_bus)
 
 
@@ -53,7 +53,7 @@ static func compile_regex(regex_string: String) -> RegEx:
 	var re := RegEx.new()
 	re.compile(regex_string)
 	if not re.is_valid():
-		NAudio.Log.e(['warning: regex', regex_string, 'is not valid'], 'compile_regex')
+		NSound.Log.e(['warning: regex', regex_string, 'is not valid'], 'compile_regex')
 	return re
 
 
@@ -133,7 +133,7 @@ static func print_file_error(err: int, file_path: String = "", category = "FileU
 	if category != "FileUtils":
 		category = "FileUtils." + category
 
-	NAudio.Log.e(["error while opening file: ", file_path], category, err)
+	NSound.Log.e(["error while opening file: ", file_path], category, err)
 
 
 static func get_files_in_dir_recursive(dir_path: String, ext: String = "", regex = null) -> Array:
@@ -189,7 +189,7 @@ static func get_files_in_dir(dir_path: String, ext: String = "", regex = null) -
 			file_name = dir.get_next()
 	else:
 		print_file_error(err, dir_path, "get_files_in_dir")
-#		NAudio.Log.e(["error", err, "opening dir_path"], "get_files_in_dir")
+#		NSound.Log.e(["error", err, "opening dir_path"], "get_files_in_dir")
 
 	return files
 
@@ -199,7 +199,7 @@ static func get_files_in_dir(dir_path: String, ext: String = "", regex = null) -
 ## if you want the children to be saved, make sure node owns them
 static func save_scene(dir_path: String, node: Node, tscn: bool = false) -> void:
 	if not dir_exists(dir_path):
-		NAudio.Log.e(["directory", dir_path, "does not exist"], "save_scene")
+		NSound.Log.e(["directory", dir_path, "does not exist"], "save_scene")
 		return
 
 	var scene = PackedScene.new()
@@ -213,6 +213,6 @@ static func save_scene(dir_path: String, node: Node, tscn: bool = false) -> void
 	if result == OK:
 		var err = ResourceSaver.save(file_path, scene)
 		if err != OK:
-			NAudio.Log.e(["an error occurred while saving scene", file_path, "to disk"], "save_scene", err)
+			NSound.Log.e(["an error occurred while saving scene", file_path, "to disk"], "save_scene", err)
 
 

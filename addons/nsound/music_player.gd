@@ -85,7 +85,7 @@ func load_song(song_name: String):
 
 	var song_node = songs[song_name]
 
-	song_node.init(NAudio.music_bus)
+	song_node.init(NSound.music_bus)
 	for node in Utils.get_all_children(song_node):
 		if node is Section:
 			sections[song_name][node.name] = node
@@ -120,7 +120,7 @@ func load_song(song_name: String):
 
 	emit_signal("song_loaded", song_node)
 
-	Log.i(["buses count:", NAudio.get_buses_count()])
+	Log.i(["buses count:", NSound.get_buses_count()])
 
 	return song_node
 
@@ -142,7 +142,7 @@ func unload_song(song_name: String):
 		section_players[song_name][k].queue_free()
 	section_players.erase(song_name)
 
-	NAudio.remove_all_buses()
+	NSound.remove_all_buses()
 
 	sections[song_name].clear()
 	stingers[song_name].clear()
@@ -155,7 +155,7 @@ func unload_song(song_name: String):
 
 	emit_signal("song_unloaded")
 
-	Log.i(["buses count:", NAudio.get_buses_count()])
+	Log.i(["buses count:", NSound.get_buses_count()])
 
 
 func stop():
@@ -184,6 +184,8 @@ func play_and_switch(song_name: String = "", section_name: String = "", stop: bo
 		Log.i(["stopping current song/section", current_song, current_section])
 		current_section_player().stop()
 
+	Log.d([section_players])
+
 	if song_name != current_song:
 		emit_signal("song_started", songs[song_name])
 
@@ -206,7 +208,9 @@ func goto_section(section_name: String, when: int = NDef.When.ODD_BAR) -> void:
 	goto_section_call_id += 1
 	var current_id = goto_section_call_id
 
-	yield(current_section_player().wait_until(when), "completed")
+	if current_section_player():
+		current_section_player().stop_at_loop = true
+		yield(current_section_player().wait_until(when), "completed")
 
 	# if id is still the same as when we started the function, proceed
 	# otherwise ignore the call because a new one was made
@@ -354,7 +358,7 @@ func on_section_end(song_name: String, section_name: String) -> void:
 					song_nodes = songs.values()
 					song_nodes.erase(played_songs[-1])
 
-				var song_idx = NAudio.rng.randi_range(0, song_nodes.size() - 1)
+				var song_idx = NSound.rng.randi_range(0, song_nodes.size() - 1)
 				play_and_switch(song_nodes[song_idx].name)
 				played_songs.append(song_nodes[song_idx])
 

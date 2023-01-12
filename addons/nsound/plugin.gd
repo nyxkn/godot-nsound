@@ -3,9 +3,9 @@ extends EditorPlugin
 
 
 func _enter_tree():
-	add_autoload_singleton("NAudio", "res://addons/nsound/audio_framework.gd")
+	add_autoload_singleton("NSound", "res://addons/nsound/core.gd")
 
 
 func _exit_tree():
-	remove_autoload_singleton("NAudio")
+	remove_autoload_singleton("NSound")
 

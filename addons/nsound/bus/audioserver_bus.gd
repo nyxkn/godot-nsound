@@ -70,7 +70,7 @@ func register() -> void:
 	AudioServer.set_bus_name(bus_idx, name)
 	bus_name = AudioServer.get_bus_name(bus_idx)
 
-	NAudio.register_bus(self)
+	NSound.register_bus(self)
 
 	AudioServer.connect("bus_layout_changed", self, "on_bus_layout_changed")
 
@@ -79,7 +79,7 @@ func unregister() -> void:
 	AudioServer.remove_bus(bus_idx)
 	bus_idx = -1
 
-#	NAudio.unregister_bus(self)
+#	NSound.unregister_bus(self)
 
 	AudioServer.disconnect("bus_layout_changed", self, "on_bus_layout_changed")
 

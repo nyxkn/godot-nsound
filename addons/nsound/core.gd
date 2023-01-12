@@ -1,5 +1,7 @@
 extends Node
 
+# nsound core autoload where we keep state
+
 var Log = preload("res://addons/nsound/logger.gd").new().init(self)
 const Utils = preload("res://addons/nsound/utils.gd")
 
@@ -13,7 +15,7 @@ var runtime_tracks := []
 
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
-var music_bus := "Master"
+var music_bus := "Music"
 
 
 func _ready() -> void:

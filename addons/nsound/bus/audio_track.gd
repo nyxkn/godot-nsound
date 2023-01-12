@@ -53,7 +53,7 @@ func init(send_bus_name: String = "Master") -> Bus:
 #	if not stream_player.name:
 #		stream_player.name = name
 	self.send = send_bus_name
-	NAudio.register_track(self)
+	NSound.register_track(self)
 	return self
 
 

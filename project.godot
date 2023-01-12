@@ -110,7 +110,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
-NAudio="*res://addons/nsound/audio_framework.gd"
+NSound="*res://addons/nsound/core.gd"
 
 [display]
 
