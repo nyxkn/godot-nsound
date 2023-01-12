@@ -31,7 +31,6 @@ enum ReferenceMethod { SONG_STREAM, PROCESS, SILENCE }
 var reference_method: int = ReferenceMethod.SILENCE
 
 
-
 #const USE_REFERENCE_STREAM := true
 var process_diffs := []
 
@@ -93,6 +92,8 @@ var wait_id := 0
 
 
 func _ready() -> void:
+	pause_mode = Node.PAUSE_MODE_PROCESS
+
 	reference_stream_player_silence.stream = silence_ogg
 	reference_stream_player_silence.volume_db = -80
 	reference_stream_player_silence.bus = "Null"
@@ -211,6 +212,7 @@ func load_song_section(song_node: Node, section_node: Section):
 
 
 func start():
+	Log.d(["section started", section.name])
 	loop = 0
 	last_beat = -1
 	transition_beat = -1
@@ -219,6 +221,13 @@ func start():
 
 
 func start_loop() -> void:
+	# stopping is probably unneeded?
+#	if stopping:
+#		Log.d(["won't start next loop because stopping", section.name])
+#		# but we still need to have music_player call stop to make sure
+#		return
+
+	Log.d(["loop started", section.name])
 	loop += 1
 	bbt.bar = 1
 	bbt.beat = 1
@@ -626,10 +635,15 @@ func _bar() -> void:
 
 
 func _loop_end() -> void:
+	Log.d(["loop ended", section.name])
 	if section.play_mode == Section.PlayMode.LOOP:
+		Log.d(["restarting loop", section.name])
+#		if not stop_at_loop:
 		start_loop()
 		emit_signal("loop", loop)
+#		stop_at_loop = false
 	else:
+		Log.d(["stopping loop", section.name])
 		# we have to at least set playing=false so that processing stops
 		stop()
 		emit_signal("end", song.name, section.name)
