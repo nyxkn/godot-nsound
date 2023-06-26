@@ -45,6 +45,7 @@ columns = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
+max_value = 0.0
 
 [node name="HookValue" parent="Controls/Sliders" instance=ExtResource("5")]
 unique_name_in_owner = true

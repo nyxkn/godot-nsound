@@ -79,6 +79,7 @@ var level: int:
 
 #var active_levels_tracks := []
 var levels_tracks := []
+var max_level := 0
 
 var tracks_queue := []
 
@@ -206,10 +207,14 @@ func load_song_section(song_node: Node, section_node: Section):
 	NSound.setup_buses(section_node)
 
 	# initialize nodes
+	max_level = 0
 	levels_tracks.clear()
 	for node in Utils.get_all_children(section_node):
 		if node is LevelsTrack:
 			levels_tracks.append(node)
+			for l in node.levels.values():
+				if l > max_level:
+					max_level = l
 #			for child in node.get_children():
 #				if child is Bus:
 #					child.volume_db = NDef.MIN_DB

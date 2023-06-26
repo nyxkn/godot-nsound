@@ -38,6 +38,8 @@ func attach_to_player(music_player):
 		_current_section_player.loop_signal.connect(_on_Music_loop)
 		_current_section_player.level_signal.connect(_on_Music_level)
 
+	%Level.max_value = _current_section_player.max_level
+
 	%BPB.value = _current_section_player.beats_per_bar
 	%BPM.value = _current_section_player.bpm
 	%Bars.value = _current_section_player.bars
