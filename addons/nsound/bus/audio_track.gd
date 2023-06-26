@@ -17,24 +17,16 @@ var stream_player: AudioStreamPlayer
 #var seamless_fading := false
 
 
+#const enable_legacy_loading = true
+
 func _ready() -> void:
-#	stream_player = get_node_or_null("Stream")
-	# pick the first audiostreamplayer
-	for child in get_children():
-		if child is AudioStreamPlayer:
-			stream_player = child
-			break
-
-# create the stream player child loaded with the audio file
-	if not stream_player:
-		if audio_file:
-			stream_player = AudioStreamPlayer.new()
-			stream_player.stream = audio_file
-
-			add_child(stream_player)
-		else:
-			Log.w(["bus", name, "has no audiostream"])
-			return
+	if audio_file:
+		stream_player = AudioStreamPlayer.new()
+		stream_player.stream = audio_file
+		add_child(stream_player)
+	else:
+		Log.w(["bus", name, "has no audiostream"])
+		return
 
 #	print(Utils.get_scene_file_path(stream_player.stream.resource_path))
 	stream_player.name = stream_player.stream.resource_path.get_file().replace(".", "_")

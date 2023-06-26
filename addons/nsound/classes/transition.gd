@@ -1,5 +1,5 @@
-extends Resource
 class_name Transition
+extends Resource
 
 #export var name: String
 

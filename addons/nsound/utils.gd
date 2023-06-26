@@ -49,12 +49,9 @@ static func compile_regex(regex_string: String) -> RegEx:
 	return re
 
 
-#static func get_scene_file_path(file_path: String, with_ext = true) -> String:
-#	var split = file_path.split("/")
-#	var file_name = split[-1]
-#	if not with_ext:
-#		file_name = file_name.split(".")[0]
-#	return file_name
+static func get_file_name_no_ext(path: String) -> String:
+	var file_name = path.get_file().split(".")[0]
+	return file_name
 
 
 static func indent_print(tabs, str):

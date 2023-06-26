@@ -1,5 +1,5 @@
-extends Node
 class_name Bus
+extends Node
 
 var Log = preload("res://addons/nsound/logger.gd").new(self)
 
@@ -33,10 +33,12 @@ signal user_volume_changed(value)
 # we'd use MIN_DB but export doesn't seem to accept that
 # this is the true volume. users are not supposed to interact with this
 #export var _volume_db : get = get_volume_db, set = set_volume_db # (float, -80, 24)
-var _volume_db : get = get_volume_db, set = set_volume_db
+var _volume_db: float :
+	get = get_volume_db, set = set_volume_db
 
 # this is the bus to which we send our output
-@export var send: String : get = get_send, set = set_send
+@export var send: String :
+	get = get_send, set = set_send
 
 
 # automation volume. meant to be used mostly through fade

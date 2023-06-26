@@ -1,5 +1,5 @@
-extends Node
 class_name BBT
+extends Node
 
 var Log = preload("res://addons/nsound/logger.gd").new(self)
 const Utils = preload("res://addons/nsound/utils.gd")

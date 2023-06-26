@@ -1,5 +1,5 @@
-extends AudioServerBus
 class_name Song
+extends AudioServerBus
 
 # required parameters
 @export var bpm: int

@@ -1,5 +1,5 @@
-extends Node
 class_name Region
+extends Node
 
 # region is necessarily section-local
 # barbeat numbers are always section-local

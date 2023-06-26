@@ -1,6 +1,7 @@
 @tool
-extends AudioServerBus
+
 class_name SegmentsTrack
+extends AudioServerBus
 
 # or maybe should we add this as properties on an audiostreamplayer custom class?
 #export var timeline setget set_timeline # (Array, float)

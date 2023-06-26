@@ -1,5 +1,5 @@
-extends Bus
 class_name AudioServerBus
+extends Bus
 
 # identifies which audioserver bus we're encapsulating. same as the audioserver bus idx
 # note: this is not a reliable index. if a previous index bus is removed, all will be shifted down

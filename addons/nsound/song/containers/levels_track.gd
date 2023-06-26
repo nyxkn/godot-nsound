@@ -1,6 +1,7 @@
 @tool
-extends AudioServerBus
+
 class_name LevelsTrack
+extends AudioServerBus
 
 const Utils = preload("res://addons/nsound/utils.gd")
 

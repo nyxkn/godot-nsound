@@ -1,5 +1,5 @@
-extends AudioServerBus
 class_name Section
+extends AudioServerBus
 
 # this is mandatory
 @export var bars: int
