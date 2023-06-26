@@ -1,5 +1,7 @@
 # NSound
 
+> WARNING: ***Currently being ported to Godot 4 and it's somewhat broken***
+
 Sound system for adaptive music and game audio in Godot.
 
 The goal is to implement an adaptive music system which provides most of the features expected out of typical game audio middleware.
@@ -11,7 +13,7 @@ offering the possibility of combining horizontal sequencing and vertical layerin
 
 Custom logic can also be provided through scripting.
 
-> *** Project is still work in progress, but it's nearing a stable api ***
+> ***Project is still work in progress, but it's nearing a stable api***
 >
 > Documentation will be improved soon and examples will be added.
 
