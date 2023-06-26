@@ -92,3 +92,8 @@ func set_editable(value) -> void:
 		await ready
 
 	$LineEdit.visible = value
+
+
+func _on_line_edit_text_submitted(new_text: String) -> void:
+	value = new_text
+	emit_signal("value_changed", value)

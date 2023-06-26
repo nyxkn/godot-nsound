@@ -74,6 +74,13 @@ func set_exponential(v) -> void:
 
 
 func set_value(new_value: float):
+	set_value_no_signal(new_value)
+
+	# it's safer to call this when ready. but is there any need for it to happen before ready?
+	value_changed.emit(new_value)
+
+
+func set_value_no_signal(new_value: float):
 	_value = new_value
 
 	if not is_node_ready():
@@ -82,9 +89,6 @@ func set_value(new_value: float):
 	$Value.text = str(new_value)
 	$SpinBox.set_value_no_signal(new_value)
 	$HSlider.set_value_no_signal(new_value)
-
-	# it's safer to call this when ready. but is there any need for it to happen before ready?
-	value_changed.emit(new_value)
 
 
 func _on_h_slider_value_changed(new_value: float) -> void:

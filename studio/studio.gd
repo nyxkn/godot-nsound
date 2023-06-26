@@ -43,7 +43,7 @@ func attach_to_player(music_player):
 	$"%Bars".value = _current_section_player.bars
 
 	$"%Timeline".max_value = _current_section_player.loop_length
-	$"%Timeline".value = _current_section_player.loop_time
+	$"%Timeline".set_value_no_signal(_current_section_player.loop_time)
 	$"%Timeline/TotalTime".text = str("%0.1f" % _current_section_player.loop_length, 's')
 	$"%Time".text = str("%0.1f" % _current_section_player.loop_time, 's')
 
@@ -71,7 +71,7 @@ func update_status():
 
 func _process(delta: float) -> void:
 	if music_system.current_section_player():
-		$"%Timeline".value = _current_section_player.loop_time
+		$"%Timeline".set_value_no_signal(_current_section_player.loop_time)
 		$"%Time".text = str("%0.1f" % _current_section_player.loop_time, 's')
 		$"%BBT".value = _current_section_player.bbt.to_float()
 
@@ -130,9 +130,6 @@ func _on_Music_song_started(song_node) -> void:
 
 func _on_Music_level(n) -> void:
 	$"%Level/SpinBox".value = n
-
-
-
 
 
 func _on_Level_value_changed(value) -> void:

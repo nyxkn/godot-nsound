@@ -1,5 +1,7 @@
 extends Node
 
+# load instead of preload to avoid cyclic reference
+var Utils = load("res://addons/nsound/utils.gd")
 
 enum Level { DEBUG, INFO, WARN, ERROR }
 
@@ -70,5 +72,12 @@ func w(objects, context = "") -> void:
 
 func e(objects, context = "", error_code = 0) -> void:
 	print_log(objects, context, Level.ERROR)
+
+
+func trace():
+	var stack = Utils.tail(get_stack())
+	Utils.pretty_print(stack)
+#	Utils.pretty_print(Utils.tail(get_stack()))
+
 
 

@@ -1,10 +1,15 @@
-
 # it's useless to load the Log class since static functions cannot use it
 # workaround is to make use of the Log instance of NSound autoload
 
 # ================
 # utils
 # ================
+
+static func tail(array: Array):
+	return array.slice(1)
+
+static func heads(array: Array):
+	return array.slice(0, -1)
 
 
 static func get_all_children(node: Node, type: String = "") -> Array:
@@ -67,6 +72,36 @@ static func compile_regex(regex_string: String) -> RegEx:
 #	if not with_ext:
 #		file_name = file_name.split(".")[0]
 #	return file_name
+
+
+static func indent_print(tabs, str):
+	print("\t".repeat(tabs), str)
+
+
+static func pretty_print(data, indent = 0):
+	if data is Array:
+		indent_print(indent, "[")
+	else:
+		indent_print(indent, "{")
+
+	for e in data:
+		var key
+		var value
+		if data is Array:
+			value = e
+		else:
+			key = e
+			value = data[e]
+
+		if value is Dictionary:
+			if key != null:
+				indent_print(indent+1, str(key, ":"))
+			pretty_print(value, indent + 1)
+		elif value is Array:
+			pretty_print(value, indent + 1)
+		else:
+			indent_print(indent+1, str(key, ": ", value))
+	indent_print(indent, "]" if data is Array else "}")
 
 
 # ================
