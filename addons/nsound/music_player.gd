@@ -19,10 +19,10 @@ signal song_unloaded()
 # sequence. at the end of a song we move on to the next one
 # shuffle. at the end of a song we randomly choose another one
 enum PlayMode { ONCE_EACH, LOOP_EACH, SEQUENCE, SHUFFLE }
-export(PlayMode) var play_mode = PlayMode.SEQUENCE
+@export var play_mode: PlayMode = PlayMode.SEQUENCE
 
-export(bool) var stop_on_pause := false
-export(float) var pause_duck_volume := -12.0
+@export var stop_on_pause: bool = false
+@export var pause_duck_volume: float = -12.0
 
 var songs := {}
 # we instance one music player for each section of a song
@@ -51,10 +51,10 @@ var goto_section_call_id := 0
 
 func _ready() -> void:
 	if stop_on_pause:
-		pause_mode = Node.PAUSE_MODE_STOP
+		process_mode = Node.PROCESS_MODE_PAUSABLE
 	else:
 		# section players inherit the mode because they're our child
-		pause_mode = Node.PAUSE_MODE_PROCESS
+		process_mode = Node.PROCESS_MODE_ALWAYS
 
 	for song in get_children():
 		songs[song.name] = song
@@ -109,7 +109,7 @@ func load_song(song_name: String):
 				stingers[song_name][track.name] = track
 			Utils.setup_buses(node)
 
-#	yield(get_tree(), "idle_frame")
+#	await get_tree().idle_frame
 
 	transitions[song_name] = song_node.transitions
 
@@ -122,18 +122,18 @@ func load_song(song_name: String):
 		_section_players_node.add_child(section_player)
 		section_players[song_name][section_name] = section_player
 
-		section_player.connect("end", self, "on_section_end", [section_node])
+		section_player.end.connect(on_section_end.bind(section_node))
 
 		section_player.load_song_section(song_node, section_node)
 
 	song_node.music_system = self
 	song_node._setup()
-#	song_node.connect("hook_value_changed", self, "on_hook_value_changed")
+#	song_node.connect("hook_value_changed",Callable(self,"on_hook_value_changed"))
 
 
 	loaded_songs.append(song_name)
 
-	emit_signal("song_loaded", song_node)
+	song_loaded.emit(song_node)
 
 	Log.i(["buses count:", NSound.get_buses_count()])
 
@@ -168,7 +168,7 @@ func unload_song(song_name: String):
 #	current_section = ""
 #	current_song = ""
 
-	emit_signal("song_unloaded")
+	song_unloaded.emit()
 
 	Log.i(["buses count:", NSound.get_buses_count()])
 
@@ -214,9 +214,9 @@ func play_and_switch(song_name: String = "", section_name: String = "", stop: bo
 	if song_name != current_song:
 		current_song = song_name
 		current_section = section_name
-		emit_signal("song_started", songs[current_song])
+		song_started.emit(songs[current_song])
 
-	emit_signal("section_started", sections[current_song][current_section])
+	section_started.emit(sections[current_song][current_section])
 
 
 func goto_section(section_name: String, when: int = NDef.When.ODD_BAR) -> void:
@@ -225,7 +225,7 @@ func goto_section(section_name: String, when: int = NDef.When.ODD_BAR) -> void:
 
 	if current_section_player():
 #		current_section_player().stopping = true
-		yield(current_section_player().wait_until(when), "completed")
+		await current_section_player().wait_until(when)
 
 	# if id is still the same as when we started the function, proceed
 	# otherwise ignore the call because a new one was made
@@ -282,13 +282,13 @@ func run_transition(transition_name: String) -> void:
 
 	from_section_player.determine_transition_beat(transition.when, transition.bars)
 
-	yield(from_section_player.wait_until(transition.when), "completed")
+	await from_section_player.wait_until(transition.when)
 
 	if transition.stinger:
 		queue_stinger(transition.stinger, NDef.When.NOW)
 
 	for i in transition.bars:
-		yield(from_section_player, "bar")
+		await from_section_player.bar
 
 	to_section_player.set_level(transition.level, NDef.When.NOW)
 	play_and_switch(current_song, to_section, false)
@@ -303,7 +303,7 @@ func run_transition(transition_name: String) -> void:
 		sections[current_song][to_section].auto_volume_db = NDef.MIN_DB
 		from_section_player.fade_out(from_section_player.section, NDef.When.NOW, from_section_player.beat_length * 4)
 		to_section_player.fade_in(to_section_player.section, NDef.When.NOW, from_section_player.beat_length * 4)
-		yield(from_section_player, "faded_out")
+		await from_section_player.faded_out
 		from_section_player.stop()
 	else:
 		# always duplicate?
@@ -312,7 +312,7 @@ func run_transition(transition_name: String) -> void:
 
 
 func queue_stinger(stinger: String, when: int = NDef.When.BAR) -> void:
-	yield(current_section_player().wait_until(when), "completed")
+	await current_section_player().wait_until(when)
 
 	Log.d(["playing stinger", stinger])
 	current_section_player().play_track(stingers[current_song][stinger])
@@ -348,7 +348,7 @@ func on_section_end(song_name: String, section_name: String) -> void:
 		match play_mode:
 			PlayMode.ONCE_EACH:
 				Log.i("song finished. stopping")
-				emit_signal("song_finished", songs[song_name])
+				song_finished.emit(songs[song_name])
 
 			PlayMode.LOOP_EACH:
 				Log.i("looping song")

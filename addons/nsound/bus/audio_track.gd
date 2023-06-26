@@ -1,14 +1,15 @@
+@icon("res://addons/nsound/assets/icons/godot/AudioStreamPlayer.svg")
+
+class_name AudioTrack
 extends Bus
-class_name AudioTrack, "res://addons/nsound/assets/icons/godot/AudioStreamPlayer.svg"
 
 # this is a bus that does not make use of a godot audioserver
 # it interacts with audiostream directly
 
-
 const Utils = preload("res://addons/nsound/utils.gd")
 
-export(bool) var loop := false
-export(AudioStream) var audio_file: AudioStream
+@export var loop: bool = false
+@export var audio_file: AudioStream
 
 var stream_player: AudioStreamPlayer
 
@@ -35,10 +36,10 @@ func _ready() -> void:
 			Log.w(["bus", name, "has no audiostream"])
 			return
 
-#	print(Utils.get_filename(stream_player.stream.resource_path))
-	stream_player.name = Utils.get_filename(stream_player.stream.resource_path).replace(".", "_")
+#	print(Utils.get_scene_file_path(stream_player.stream.resource_path))
+	stream_player.name = stream_player.stream.resource_path.get_file().replace(".", "_")
 
-	stream_player.connect("finished", self, "_stream_player_finished")
+	stream_player.finished.connect(_stream_player_finished)
 
 
 #func _process(delta: float) -> void:
@@ -74,14 +75,14 @@ func set_volume_db(value: float) -> void:
 	if not stream_player: return
 
 	stream_player.volume_db = value
-	.set_volume_db(value)
+	super.set_volume_db(value)
 
 
 func set_send(value: String) -> void:
 	if not stream_player: return
 
 	stream_player.bus = value
-	.set_send(value)
+	super.set_send(value)
 
 
 func set_mute(value: bool) -> void:
@@ -93,7 +94,7 @@ func set_mute(value: bool) -> void:
 	else:
 #		stream_player.volume_db = _volume_db
 		self.auto_volume_db = 0.0
-	.set_mute(value)
+	super.set_mute(value)
 
 
 #func set_solo(value: bool) -> void:

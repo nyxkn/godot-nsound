@@ -1,5 +1,7 @@
+@icon("res://addons/nsound/assets/icons/godot/Play.svg")
+
+class_name MultiTrack
 extends AudioServerBus
-class_name MultiTrack, "res://addons/nsound/assets/icons/godot/Play.svg"
 
 # you could have a progression type switch here
 # but then you'd have to conform all types to the same variables
@@ -10,7 +12,7 @@ class_name MultiTrack, "res://addons/nsound/assets/icons/godot/Play.svg"
 # shuffle means that you want each track to play with equal frequency
 # and that we don't play the same track twice in a row
 enum Progression { RANDOM, SEQUENCE, SHUFFLE }
-export(Progression) var progression := Progression.SHUFFLE
+@export var progression: Progression = Progression.SHUFFLE
 
 var last_played: int = -1
 var tracks: Array

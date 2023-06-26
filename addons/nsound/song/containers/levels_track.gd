@@ -1,4 +1,4 @@
-tool
+@tool
 extends AudioServerBus
 class_name LevelsTrack
 
@@ -9,23 +9,23 @@ const Utils = preload("res://addons/nsound/utils.gd")
 # for some very strange reason, this dictionary doesn't preserve order across reloads
 # so you end up with a default ordering with 11 before 1
 # not sure there's anything we can do here
-export(Dictionary) var levels: Dictionary
+@export var levels: Dictionary
 
-export(bool) var regex_match := false
+@export var regex_match: bool = false
 
 # single only activates the highest level (elias)
 # additive activates everything up to level
 # padding activates level and adjacent levels. is this useful?
 enum LayerMode { SINGLE, ADDITIVE }
-export(LayerMode) var layer_mode := LayerMode.SINGLE
+@export var layer_mode: LayerMode = LayerMode.SINGLE
 
 
 func _ready() -> void:
 	# to clear ALL data in EVERY instance
 #	levels.clear()
 
-	if Engine.editor_hint:
-		if levels.empty():
+	if Engine.is_editor_hint():
+		if levels.is_empty():
 			for node in get_children():
 				add_levels_entry(node)
 

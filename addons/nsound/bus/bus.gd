@@ -18,30 +18,37 @@ signal auto_volume_changed(value)
 signal user_volume_changed(value)
 
 
-export(bool) var mute := false setget set_mute
+@export var mute: bool = false :
+	set = set_mute
 # solo is not very useful on chained buses
 # all buses of the chain need to be soloed for them to play
 # it's only useful for top-level buses really
-#export(bool) var solo := false setget set_solo
+#export var solo: bool := false : set = set_solo
 # a disabled track won't be played by play_track() and _process won't run
 # it's a simple true/false value
-export(bool) var disabled := false setget set_disabled
+@export var disabled: bool = false :
+	set = set_disabled
 
 
 # we'd use MIN_DB but export doesn't seem to accept that
 # this is the true volume. users are not supposed to interact with this
-#export(float, -80, 24) var _volume_db setget set_volume_db, get_volume_db
-var _volume_db setget set_volume_db, get_volume_db
+#export var _volume_db : get = get_volume_db, set = set_volume_db # (float, -80, 24)
+var _volume_db : get = get_volume_db, set = set_volume_db
 
 # this is the bus to which we send our output
-export(String) var send setget set_send, get_send
+@export var send: String : get = get_send, set = set_send
 
 
 # automation volume. meant to be used mostly through fade
-var auto_volume_db := 0.0 setget set_auto_volume_db
+var _auto_volume_db: float = 0.0
+var auto_volume_db: float :
+	get: return _auto_volume_db
+	set(v): set_auto_volume_db(v)
+
 # volume set through the mixer or manually through code
 # this is so that fades can happen independently of the real volume
-export(float, -80, 24) var user_volume_db := 0.0 setget set_user_volume_db
+@export var user_volume_db := 0.0 :
+	set = set_user_volume_db
 
 
 # fade variables
@@ -53,18 +60,18 @@ enum FadeType { IN, OUT }
 var fade_type: int
 var fade_blend: float
 
-var fading: bool setget set_fading
+var fading: bool : set = set_fading
 
 # last volume before fade
 # useful for restoring the previous volume level we had before fading out
 #var prefade_volume: float = 0
 
 
-onready var debug = get_tree().root.find_node("Debug", true, false)
+@onready var debug = get_tree().root.find_child("Debug", true, false)
 
 
 func init(send_bus_name: String = "Master") -> Bus:
-#	assert(0 == 1, "you should not be instancing the Bus class. consider this to be abstract")
+#	assert(0 == 1) #,"you should not be instancing the Bus class. consider this to be abstract")
 	Log.w(["you have initialized the class Bus as", name, ". Bus should probably just be abstract"])
 	self.send = send_bus_name
 	return self
@@ -84,14 +91,14 @@ func set_fading(value):
 
 func _process(delta: float) -> void:
 	if fading:
-		var t = inverse_lerp(fade_start_time, fade_start_time + fade_duration, OS.get_ticks_msec())
+		var t = inverse_lerp(fade_start_time, fade_start_time + fade_duration, Time.get_ticks_msec())
 
 		if t >= 1.0:
 #			Log.d(["final", _volume_db])
 			self.fading = false
 
-#			self._volume_db = linear2db(fade_final)
-			self.auto_volume_db = linear2db(fade_final)
+#			self._volume_db = linear_to_db(fade_final)
+			self.auto_volume_db = linear_to_db(fade_final)
 #			self.auto_volume_db = fade_final
 
 		else:
@@ -115,15 +122,15 @@ func _process(delta: float) -> void:
 				# we can choose the blend between linear and square
 				# often signals aren't perfectly correlated or uncorrelated
 				var t_final = lerp(linear_t, square_t, fade_blend)
-#				self.auto_volume_db = linear2db( lerp(fade_initial, fade_final, t_final) )
-				set_auto_volume_db(linear2db( lerp(fade_initial, fade_final, t_final) ), true)
+#				self.auto_volume_db = linear_to_db( lerp(fade_initial, fade_final, t_final) )
+				set_auto_volume_db(linear_to_db( lerp(fade_initial, fade_final, t_final) ), true)
 			elif fade_type == FadeType.OUT:
 				var linear_t = 1.0 - t
 				var square_t = sqrt(1.0 - t)
 				var t_final = lerp(linear_t, square_t, fade_blend)
 				# note that we need to swap initial and final
-#				self.auto_volume_db = linear2db( lerp(fade_final, fade_initial, t_final) )
-				set_auto_volume_db(linear2db( lerp(fade_final, fade_initial, t_final) ), true)
+#				self.auto_volume_db = linear_to_db( lerp(fade_final, fade_initial, t_final) )
+				set_auto_volume_db(linear_to_db( lerp(fade_final, fade_initial, t_final) ), true)
 
 #			debug.print(self.auto_volume_db, "db_" + name)
 
@@ -145,9 +152,9 @@ func fade(initial, final, duration = 2.0, blend = 1.0):
 #		Log.d(["fading to prefade_volume:", prefade_volume])
 
 
-	fade_start_time = OS.get_ticks_msec()
-	fade_initial = db2linear(initial)
-	fade_final = db2linear(final)
+	fade_start_time = Time.get_ticks_msec()
+	fade_initial = db_to_linear(initial)
+	fade_final = db_to_linear(final)
 	# using msec
 	fade_duration = duration * 1000
 	fade_blend = blend
@@ -164,8 +171,8 @@ func fade(initial, final, duration = 2.0, blend = 1.0):
 
 
 func get_true_volume() -> float:
-	var true_volume = db2linear(user_volume_db) * db2linear(auto_volume_db)
-	return linear2db(true_volume)
+	var true_volume = db_to_linear(user_volume_db) * db_to_linear(auto_volume_db)
+	return linear_to_db(true_volume)
 
 
 func set_auto_volume_db(value: float, from_fade = false) -> void:
@@ -176,15 +183,15 @@ func set_auto_volume_db(value: float, from_fade = false) -> void:
 			Log.w("cancelling fade")
 			self.fading = false
 
-	auto_volume_db = value
+	_auto_volume_db = value
 	self._volume_db = get_true_volume()
-	emit_signal("auto_volume_changed", auto_volume_db)
+	auto_volume_changed.emit(auto_volume_db)
 
 
 func set_user_volume_db(value: float) -> void:
 	user_volume_db = value
 	self._volume_db = get_true_volume()
-	emit_signal("user_volume_changed", user_volume_db)
+	user_volume_changed.emit(user_volume_db)
 
 
 func set_volume_db(value: float) -> void:

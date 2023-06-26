@@ -13,7 +13,7 @@ var end: float
 var loop: bool
 # the section this region belongs to
 # this gets initialized by music_player
-var _section: Section setget ,section
+var _section: Section : get = section
 
 func init(start: float, end: float = -1) -> Region:
 	self.start = start

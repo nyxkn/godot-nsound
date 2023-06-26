@@ -1,22 +1,23 @@
-tool
+@tool
 extends MarginContainer
 
-var Log = preload("res://addons/nsound/logger.gd").new(self)
+## to use, unpack as editable children, then add your content under the Content node
+## or use add_item
 
-
-# to use, unpack as editable children, then add your content under the Content node
-
-onready var content := $VBoxContainer/Content
+# we cannot use % for content because that doesn't work if the scene gets made local
+@onready var content: MarginContainer = $VBoxContainer/Content
 
 
 func _ready() -> void:
-	if content.get_child_count() == 0:
-		Log.w("you need to add your own content under the Content node")
-
-	get_node("%ShowFold").connect("pressed", self, "_on_ShowFold_pressed")
-	# ensure content is hidden
 	content.visible = false
 
 
-func _on_ShowFold_pressed() -> void:
+func _on_show_fold_pressed() -> void:
+	if content.get_child_count() == 0:
+		NSound.Log.w("you need to add your own content under the Content node")
+
 	content.visible = !content.visible
+
+
+func add_item(control: Control):
+	content.add_child(control)

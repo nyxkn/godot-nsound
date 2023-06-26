@@ -2,10 +2,10 @@ extends AudioServerBus
 class_name Song
 
 # required parameters
-export(int) var bpm
-export(int) var beats_per_bar
+@export var bpm: int
+@export var beats_per_bar: int
 # bars is defined per section
-#export(int) var bars := 0
+#export var bars: int := 0
 
 # 3 levels of transitions
 # 1. basic go to section. use default settings
@@ -17,16 +17,16 @@ export(int) var beats_per_bar
 # and you can run these at any time
 # you could even set which actions to run from a transition definition
 
-#export(Array, Resource) var transitions
-export(Dictionary) var transitions
+#export var transitions # (Array, Resource)
+@export var transitions: Dictionary
 
 var music_system
 
 
 func _ready() -> void:
 	pass
-#	assert(bpm, "bpm value must be set in song: " + name)
-#	assert(beats_per_bar, "beats_per_bar value must be set in song: " + name)
+#	assert(bpm) #,"bpm value must be set in song: " + name)
+#	assert(beats_per_bar) #,"beats_per_bar value must be set in song: " + name)
 
 
 # simply define the transition functions in your Song-derived script

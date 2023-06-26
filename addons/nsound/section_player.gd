@@ -4,13 +4,13 @@ var Log = preload("res://addons/nsound/logger.gd").new(self)
 const Utils = preload("res://addons/nsound/utils.gd")
 #const BBT = preload("res://addons/nsound/classes/bbt.gd")
 
-signal loop_beat(n)
+signal loop_beat_signal(n)
 signal beat(n)
 signal bar(n)
-signal barbeat(n)
+signal barbeat_signal(n)
 signal odd_bar(n)
-signal loop(n)
-signal level(n)
+signal loop_signal(n)
+signal level_signal(n)
 
 signal end(song, section)
 
@@ -70,7 +70,13 @@ var loop_length: float
 var beat_length: float
 var section_beats: int
 
-var level: int = 1 setget set_level
+# https://github.com/godotengine/godot/issues/74144#issuecomment-1607602901
+# workaround. setters cannot take extra arguments. might be fixed in the future
+var _level: int = 1
+var level: int:
+	get: return _level
+	set(v): set_level(v)
+
 #var active_levels_tracks := []
 var levels_tracks := []
 
@@ -311,7 +317,7 @@ func seek(to_position: float) -> void:
 	Log.d(["seeking to time:", to_position, "s"])
 	loop_time = to_position
 
-	if OS.get_ticks_msec() < last_seek_time + 10:
+	if Time.get_ticks_msec() < last_seek_time + 10:
 		Log.w(["seeking too quickly. ignoring seek."])
 		return
 
@@ -320,7 +326,7 @@ func seek(to_position: float) -> void:
 	for stream_player in active_stream_players:
 		stream_player.seek(to_position)
 
-	last_seek_time = OS.get_ticks_msec()
+	last_seek_time = Time.get_ticks_msec()
 
 
 func seek_to_bbt(bbt: BBT) -> void:
@@ -346,7 +352,7 @@ func stop_all_streams() -> void:
 	# nonetheless, it's somewhat hard to check whether the stream has truly stopped
 	active_stream_players.clear()
 
-#	yield(get_tree(), "idle_frame")
+#	await get_tree().idle_frame
 
 #	var streams_still_playing = []
 #	for stream_player in active_stream_players:
@@ -383,7 +389,7 @@ func ________LEVELS(): pass
 
 
 func set_level(value: int, when: int = NDef.When.ODD_BAR) -> void:
-	level = value
+	_level = value
 #	Log.d(["set level", value])
 
 	for levels_track in levels_tracks:
@@ -431,7 +437,7 @@ func set_level(value: int, when: int = NDef.When.ODD_BAR) -> void:
 
 
 
-	emit_signal("level", value)
+	level_signal.emit(value)
 
 
 
@@ -468,16 +474,16 @@ func wait_until(when: int) -> void:
 	match when:
 		NDef.When.NOW:
 			# hack. we need to wait at least one frame for yield to register
-			yield(get_tree(), "idle_frame")
+			await get_tree().idle_frame
 		NDef.When.BEAT:
-			yield(self, "beat")
+			await self.beat
 		NDef.When.BAR:
-			yield(self, "bar")
+			await self.bar
 		NDef.When.ODD_BAR:
-			yield(self, "odd_bar")
+			await self.odd_bar
 		NDef.When.LOOP:
-			yield(self, "loop")
-
+			await self.loop
+#	return true
 
 func determine_transition_beat(when: int, transition_bars):
 	match when:
@@ -511,12 +517,12 @@ func fade_in(track: Bus, when: int = NDef.When.ODD_BAR, duration: float = -1) ->
 		track.auto_volume_db = 0
 		return
 	else:
-		yield(wait_until(when), "completed")
+		await wait_until(when)
 		track.fade(null, 0.0, dur)
 #		Log.d(["fading in track", track, "duration", dur])
 
-	yield(get_tree().create_timer(dur), "timeout")
-	emit_signal("faded_in", track)
+	await get_tree().create_timer(dur).timeout
+	faded_in.emit(track)
 
 
 func fade_out(track: Bus, when: int = NDef.When.ODD_BAR, duration: float = -1) -> void:
@@ -528,12 +534,12 @@ func fade_out(track: Bus, when: int = NDef.When.ODD_BAR, duration: float = -1) -
 		track.auto_volume_db = NDef.MIN_DB
 		return
 	else:
-		yield(wait_until(when), "completed")
+		await wait_until(when)
 		track.fade(null, NDef.MIN_DB, dur)
 #		Log.d(["fading out track", track])
 
-	yield(get_tree().create_timer(dur), "timeout")
-	emit_signal("faded_out", track)
+	await get_tree().create_timer(dur).timeout
+	faded_out.emit(track)
 
 
 
@@ -619,17 +625,17 @@ func _beat() -> void:
 	if bbt.beat == 1:
 		_bar()
 
-	emit_signal("loop_beat", loop_beat)
-	emit_signal("beat", bbt.beat)
-	emit_signal("barbeat", barbeat)
+	loop_beat_signal.emit(loop_beat)
+	beat.emit(bbt.beat)
+	barbeat_signal.emit(barbeat)
 
 
 
 func _bar() -> void:
 #	bar = (loop_beat - 1) / beats_per_bar + 1
-	emit_signal("bar", bbt.bar)
+	bar.emit(bbt.bar)
 	if bbt.bar % 2 == 1:
-		emit_signal("odd_bar", bbt.bar)
+		odd_bar.emit(bbt.bar)
 
 
 func _loop_end() -> void:
@@ -638,11 +644,11 @@ func _loop_end() -> void:
 		Log.d(["restarting loop", section.name])
 #		if not stop_at_loop:
 		start_loop()
-		emit_signal("loop", loop)
+		loop_signal.emit(loop)
 #		stop_at_loop = false
 	else:
 		Log.d(["stopping loop", section.name])
 		# we have to at least set playing=false so that processing stops
 		stop()
-		emit_signal("end", song.name, section.name)
+		end.emit(song.name, section.name)
 

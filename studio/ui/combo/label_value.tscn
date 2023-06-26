@@ -1,112 +1,42 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=2 format=3 uid="uid://8tyumwgxsf1c"]
 
-[sub_resource type="GDScript" id=1]
-script/source = "tool
-extends HBoxContainer
-
-
-signal value_changed(value)
-
-# these setters get called on scene reload as long as a custom value was provided
-# they won't get called on reload if the value is the default value defined here
-# note, these get called BEFORE _ready. so anything you do in _ready will override these
-export(String) var label: String = \"\" setget set_label
-export(String) var value: String = \"\" setget set_value
-export(String) var separator: String = \"\" setget set_separator
-export(String) var total: String = \"\" setget set_total
-export(bool) var editable: bool = false setget set_editable
-
-# this setup seems to be the best possible. this has been reviewed a few times.
-# it's better than manually setting label text in _ready
-# because this way we get to make use of the export setget fully
-func _ready() -> void:
-	$Separator.visible = false
-	# calling set_label so we update the label to \"name\" if no label was provided
-	# we cannot set text here otherwise the setget will be overridden
-	if not label: set_label(label)
-
-
-func set_label(value) -> void:
-	label = str(value)
-	if label:
-		$Label.text = value
-	else:
-		$Label.text = name
-
-
-func set_value(v) -> void:
-	value = str(v)
-	$Value.text = value
-
-
-func set_separator(value) -> void:
-	separator = str(value)
-	if separator:
-		$Separator.text = separator
-		$Separator.show()
-	else:
-		$Separator.hide()
-
-
-func set_total(value) -> void:
-	total = str(value)
-	if total:
-		$TotalSeparator.show()
-		$Total.show()
-		$Total.text = value
-	else:
-		$Total.hide()
-		$TotalSeparator.hide()
-
-
-func set_editable(value) -> void:
-	editable = value
-	$LineEdit.visible = value
-
-
-func _on_LineEdit_text_entered(new_text: String) -> void:
-	self.value = new_text
-	emit_signal(\"value_changed\", value)
-"
+[ext_resource type="Script" path="res://studio/ui/combo/label_value.gd" id="1"]
 
 [node name="LabelValue" type="HBoxContainer"]
-margin_right = 75.0
-margin_bottom = 14.0
-script = SubResource( 1 )
+offset_right = 75.0
+offset_bottom = 14.0
+script = ExtResource("1")
 
 [node name="Label" type="Label" parent="."]
-margin_right = 69.0
-margin_bottom = 14.0
+layout_mode = 2
 text = "LabelValue"
 
 [node name="Separator" type="Label" parent="."]
 visible = false
-margin_left = 73.0
-margin_right = 73.0
-margin_bottom = 14.0
+layout_mode = 2
 
 [node name="Value" type="Label" parent="."]
-margin_left = 73.0
-margin_right = 73.0
-margin_bottom = 14.0
+layout_mode = 2
+
+[node name="Suffix" type="Label" parent="."]
+visible = false
+layout_mode = 2
 
 [node name="TotalSeparator" type="Label" parent="."]
 visible = false
-margin_left = 77.0
-margin_right = 82.0
-margin_bottom = 14.0
+layout_mode = 2
 text = "/"
 
 [node name="Total" type="Label" parent="."]
 visible = false
-margin_left = 77.0
-margin_right = 125.0
-margin_bottom = 14.0
+layout_mode = 2
 
 [node name="LineEdit" type="LineEdit" parent="."]
 visible = false
-margin_left = 77.0
-margin_right = 135.0
-margin_bottom = 24.0
+layout_mode = 2
 
-[connection signal="text_entered" from="LineEdit" to="." method="_on_LineEdit_text_entered"]
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+visible = false
+layout_mode = 2
+
+[connection signal="text_submitted" from="LineEdit" to="." method="_on_LineEdit_text_entered"]

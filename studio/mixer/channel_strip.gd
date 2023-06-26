@@ -5,14 +5,14 @@ var Log = preload("res://addons/nsound/logger.gd").new(self)
 var bus: Bus
 var channel: Dictionary = { "peak_l": -100, "peak_r": -100 }
 
-onready var user_volume_slider: VSlider = get_node("%UserVolumeSlider")
-onready var auto_volume_slider: VSlider = get_node("%AutoVolumeSlider")
-onready var spinbox: SpinBox = get_node("%SpinBox")
-onready var vu_l: TextureProgress = get_node("%VuL")
-onready var vu_r: TextureProgress = get_node("%VuR")
-onready var effects: Tree = $"%Effects"
+@onready var user_volume_slider: VSlider = get_node("%UserVolumeSlider")
+@onready var auto_volume_slider: VSlider = get_node("%AutoVolumeSlider")
+@onready var spinbox: SpinBox = get_node("%SpinBox")
+@onready var vu_l: TextureProgressBar = get_node("%VuL")
+@onready var vu_r: TextureProgressBar = get_node("%VuR")
+@onready var effects: Tree = $"%Effects"
 #onready var substrips = $"%Substrips"
-onready var substrips = get_node("%Substrips")
+@onready var substrips = get_node("%Substrips")
 
 
 func init(bus: Bus) -> Node:
@@ -44,8 +44,8 @@ func _ready() -> void:
 		Log.e(["bus", name, "wasn't initialized"])
 		return
 
-	bus.connect("user_volume_changed", self, "on_user_volume_changed")
-	bus.connect("auto_volume_changed", self, "on_auto_volume_changed")
+	bus.user_volume_changed.connect(on_user_volume_changed)
+	bus.auto_volume_changed.connect(on_auto_volume_changed)
 
 #	set_process(false)
 #	if bus is AudioServerBus:
@@ -183,8 +183,8 @@ func _scaled_db_to_normalized_volume(db: float) -> float:
 	else:
 		if db < 0.0:
 			var positive_x: float = pow(abs(db) / 45.0, 1.0 / 3.0) + 1.0
-			var translation: Vector2 = Vector2(1.0, 0.0) - Vector2(positive_x, abs(db))
-			var reflected_position: Vector2 = Vector2(1.0, 0.0) + translation
+			var position: Vector2 = Vector2(1.0, 0.0) - Vector2(positive_x, abs(db))
+			var reflected_position: Vector2 = Vector2(1.0, 0.0) + position
 			return reflected_position.x
 		else:
 			return pow(db / 45.0, 1.0 / 3.0) + 1.0

@@ -1,15 +1,19 @@
 [remap]
 
-importer="ogg_vorbis"
-type="AudioStreamOGGVorbis"
-path="res://.import/silence-80m.ogg-ad52b6441a079bbbcfd126836e9f8560.oggstr"
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://ds4bvlr1ud1jr"
+path="res://.godot/imported/silence-80m.ogg-ad52b6441a079bbbcfd126836e9f8560.oggvorbisstr"
 
 [deps]
 
 source_file="res://addons/nsound/assets/audio/silence-80m.ogg"
-dest_files=[ "res://.import/silence-80m.ogg-ad52b6441a079bbbcfd126836e9f8560.oggstr" ]
+dest_files=["res://.godot/imported/silence-80m.ogg-ad52b6441a079bbbcfd126836e9f8560.oggvorbisstr"]
 
 [params]
 
-loop=true
+loop=false
 loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

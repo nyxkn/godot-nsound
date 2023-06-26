@@ -16,7 +16,7 @@ var bus_name: String
 # existing audioserver bus
 # use init instead to create a new audioserver bus
 func wrap(audio_server_bus_name: String = "Master") -> void:
-	assert(bus_idx == -1, "bus " + str(self) + " is already initialized")
+	assert(bus_idx == -1) #,"bus " + str(self) + " is already initialized")
 
 	var idx = AudioServer.get_bus_index(audio_server_bus_name)
 	if idx >= 0:
@@ -34,7 +34,7 @@ func wrap(audio_server_bus_name: String = "Master") -> void:
 # so in bottom to top initialization, the deepest children end up on the left of the audio mixer
 # and that way they cannot send properly to their parents who will spawn on their right
 func init(send_bus_name: String = "Master") -> Bus:
-	assert(bus_idx == -1, "bus " + str(self) + " is already initialized")
+	assert(bus_idx == -1) #,"bus " + str(self) + " is already initialized")
 
 	register()
 
@@ -58,7 +58,7 @@ func idx() -> int:
 
 
 func register() -> void:
-	assert(bus_idx == -1, "trying to register an already initialized bus")
+	assert(bus_idx == -1) #,"trying to register an already initialized bus")
 
 	AudioServer.add_bus()
 	bus_idx = AudioServer.bus_count - 1
@@ -72,7 +72,7 @@ func register() -> void:
 
 	NSound.register_bus(self)
 
-	AudioServer.connect("bus_layout_changed", self, "on_bus_layout_changed")
+	AudioServer.bus_layout_changed.connect(on_bus_layout_changed)
 
 
 func unregister() -> void:
@@ -81,7 +81,7 @@ func unregister() -> void:
 
 #	NSound.unregister_bus(self)
 
-	AudioServer.disconnect("bus_layout_changed", self, "on_bus_layout_changed")
+	AudioServer.bus_layout_changed.connect(on_bus_layout_changed)
 
 
 func set_volume_db(value: float) -> void:
@@ -90,22 +90,22 @@ func set_volume_db(value: float) -> void:
 		return
 
 	AudioServer.set_bus_volume_db(bus_idx, value)
-	.set_volume_db(value)
+	super.set_volume_db(value)
 
 
 func set_send(value: String) -> void:
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
+	assert(bus_idx != -1) #,"bus " + str(self) + " isn't initialized")
 #	if bus_idx == -1:
 #		Log.e(["bus", name, "isn't initialized"])
 #		return
 
 	AudioServer.set_bus_send(bus_idx, value)
-	.set_send(value)
+	super.set_send(value)
 
 
 #func get_bus_send() -> String:
 #	# we had some issues with the program stopping here and giving very vague error messages
-##	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
+##	assert(bus_idx != -1) #,"bus " + str(self) + " isn't initialized")
 ##	if bus_idx == -1:
 ##		print("bus is uninitialized")
 ##		return ""
@@ -116,9 +116,9 @@ func set_send(value: String) -> void:
 
 
 func set_mute(value: bool) -> void:
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
+	assert(bus_idx != -1) #,"bus " + str(self) + " isn't initialized")
 	AudioServer.set_bus_mute(bus_idx, value)
-	.set_mute(value)
+	super.set_mute(value)
 
 
 #func set_solo(value: bool) -> void:
@@ -131,18 +131,18 @@ func set_mute(value: bool) -> void:
 
 
 func add_effect(effect: AudioEffect):
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
+	assert(bus_idx != -1) #,"bus " + str(self) + " isn't initialized")
 	AudioServer.add_bus_effect(bus_idx, effect)
 #	var effect_idx = AudioServer.get_bus_effect_count(bus_idx) - 1
 
 
 func get_effect(effect_idx: int) -> AudioEffect:
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
+	assert(bus_idx != -1) #,"bus " + str(self) + " isn't initialized")
 	return AudioServer.get_bus_effect(bus_idx, effect_idx)
 
 
 func get_effects() -> Array:
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
+	assert(bus_idx != -1) #,"bus " + str(self) + " isn't initialized")
 
 	var effects := []
 	var effect_count = AudioServer.get_bus_effect_count(bus_idx)
@@ -154,5 +154,5 @@ func get_effects() -> Array:
 
 
 func is_effect_enabled(effect_idx: int) -> bool:
-	assert(bus_idx != -1, "bus " + str(self) + " isn't initialized")
+	assert(bus_idx != -1) #,"bus " + str(self) + " isn't initialized")
 	return AudioServer.is_bus_effect_enabled(bus_idx, effect_idx)

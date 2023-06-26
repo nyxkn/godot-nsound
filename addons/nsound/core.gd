@@ -19,7 +19,7 @@ var music_bus := "Music"
 
 
 func _ready() -> void:
-#	AudioServer.connect("bus_layout_changed", self, "on_bus_layout_changed")
+#	AudioServer.connect("bus_layout_changed",Callable(self,"on_bus_layout_changed"))
 
 	for i in AudioServer.bus_count:
 		var bus_name = AudioServer.get_bus_name(i)

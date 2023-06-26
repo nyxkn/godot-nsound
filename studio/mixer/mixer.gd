@@ -3,10 +3,9 @@ extends Control
 var Log = preload("res://addons/nsound/logger.gd").new(self)
 const Utils = preload("res://addons/nsound/utils.gd")
 
-const Fold = preload("res://studio/ui/fold.tscn")
 const ChannelStrip = preload("res://studio/mixer/channel_strip.tscn")
-onready var core_strips: HBoxContainer = $Strips/CoreStrips
-onready var runtime_strips: HBoxContainer = $Strips/RuntimeStrips
+@onready var core_strips: HBoxContainer = $Strips/CoreStrips
+@onready var runtime_strips: HBoxContainer = $Strips/RuntimeStrips
 
 
 func _ready() -> void:
@@ -20,7 +19,7 @@ func show_section(section):
 
 func init_core_buses():
 	for bus in NSound.core_buses.values():
-		var abc = ChannelStrip.instance().init(bus)
+		var abc = ChannelStrip.instantiate().init(bus)
 		core_strips.add_child(abc)
 
 
@@ -43,7 +42,7 @@ func init_song(root_node: Node) -> void:
 	for node in all_nodes:
 		if node is Bus:
 			var bus: Bus = node
-			var strip = ChannelStrip.instance().init(bus)
+			var strip = ChannelStrip.instantiate().init(bus)
 			strip.name = bus.name
 			if not bus.send:
 				Log.e(["bus", bus, "is missing a send"])
@@ -62,7 +61,7 @@ func init_song(root_node: Node) -> void:
 			runtime_strips.add_child(strips[k])
 
 	# waiting for the top-level strips to be readied
-	yield(get_tree(), "idle_frame")
+	await get_tree().process_frame
 
 	for k in strips:
 		var strip = strips[k]

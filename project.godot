@@ -6,106 +6,13 @@
 ;   [section] ; section goes between []
 ;   param=value ; assign values to parameters
 
-config_version=4
-
-_global_script_classes=[ {
-"base": "Bus",
-"class": "AudioServerBus",
-"language": "GDScript",
-"path": "res://addons/nsound/bus/audioserver_bus.gd"
-}, {
-"base": "Bus",
-"class": "AudioTrack",
-"language": "GDScript",
-"path": "res://addons/nsound/bus/audio_track.gd"
-}, {
-"base": "Node",
-"class": "BBT",
-"language": "GDScript",
-"path": "res://addons/nsound/classes/bbt.gd"
-}, {
-"base": "Node",
-"class": "Bus",
-"language": "GDScript",
-"path": "res://addons/nsound/bus/bus.gd"
-}, {
-"base": "AudioServerBus",
-"class": "LevelsTrack",
-"language": "GDScript",
-"path": "res://addons/nsound/song/containers/levels_track.gd"
-}, {
-"base": "AudioServerBus",
-"class": "MultiTrack",
-"language": "GDScript",
-"path": "res://addons/nsound/song/containers/multi_track.gd"
-}, {
-"base": "Node",
-"class": "MusicPlayer",
-"language": "GDScript",
-"path": "res://addons/nsound/music_player.gd"
-}, {
-"base": "Node",
-"class": "NDef",
-"language": "GDScript",
-"path": "res://addons/nsound/definitions.gd"
-}, {
-"base": "Button",
-"class": "QuickButton",
-"language": "GDScript",
-"path": "res://studio/ui/quick_button.gd"
-}, {
-"base": "Node",
-"class": "Region",
-"language": "GDScript",
-"path": "res://addons/nsound/classes/region.gd"
-}, {
-"base": "AudioServerBus",
-"class": "Section",
-"language": "GDScript",
-"path": "res://addons/nsound/song/section.gd"
-}, {
-"base": "AudioServerBus",
-"class": "SegmentsTrack",
-"language": "GDScript",
-"path": "res://addons/nsound/song/containers/segments.gd"
-}, {
-"base": "AudioServerBus",
-"class": "Song",
-"language": "GDScript",
-"path": "res://addons/nsound/song/song.gd"
-}, {
-"base": "AudioServerBus",
-"class": "StingersContainer",
-"language": "GDScript",
-"path": "res://addons/nsound/song/containers/stingers_container.gd"
-}, {
-"base": "Resource",
-"class": "Transition",
-"language": "GDScript",
-"path": "res://addons/nsound/classes/transition.gd"
-} ]
-_global_script_class_icons={
-"AudioServerBus": "",
-"AudioTrack": "res://addons/nsound/assets/icons/godot/AudioStreamPlayer.svg",
-"BBT": "",
-"Bus": "",
-"LevelsTrack": "",
-"MultiTrack": "res://addons/nsound/assets/icons/godot/Play.svg",
-"MusicPlayer": "",
-"NDef": "",
-"QuickButton": "",
-"Region": "",
-"Section": "",
-"SegmentsTrack": "",
-"Song": "",
-"StingersContainer": "",
-"Transition": ""
-}
+config_version=5
 
 [application]
 
 config/name="nsound"
 run/main_scene="res://test/test.tscn"
+config/features=PackedStringArray("4.1")
 config/icon="res://icon.png"
 
 [autoload]
@@ -114,12 +21,12 @@ NSound="*res://addons/nsound/core.gd"
 
 [display]
 
-window/size/width=1366
-window/size/height=768
+window/size/viewport_width=1366
+window/size/viewport_height=768
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/nsound/plugin.cfg" )
+enabled=PackedStringArray("res://addons/nsound/plugin.cfg")
 
 [gui]
 
@@ -127,10 +34,10 @@ common/drop_mouse_on_gui_input_disabled=true
 
 [network]
 
-limits/debugger_stdout/max_chars_per_second=20480
-limits/debugger_stdout/max_messages_per_frame=10000
-limits/debugger_stdout/max_errors_per_second=10000
-limits/debugger_stdout/max_warnings_per_second=10000
+limits/debugger/max_chars_per_second=20480
+limits/debugger/max_queued_messages=10000
+limits/debugger/max_errors_per_second=10000
+limits/debugger/max_warnings_per_second=10000
 
 [physics]
 

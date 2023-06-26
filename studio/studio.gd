@@ -12,10 +12,10 @@ var _current_song
 func init(music_system: MusicPlayer) -> void:
 	self.music_system = music_system
 
-	music_system.connect("section_started", self, "_on_Music_section_started")
-	music_system.connect("song_started", self, "_on_Music_song_started")
-	music_system.connect("song_loaded", self, "_on_Music_song_loaded")
-	music_system.connect("song_unloaded", self, "_on_Music_song_unloaded")
+	music_system.section_started.connect(_on_Music_section_started)
+	music_system.song_started.connect(_on_Music_song_started)
+	music_system.song_loaded.connect(_on_Music_song_loaded)
+	music_system.song_unloaded.connect(_on_Music_song_unloaded)
 
 	get_node("%Songs").clear()
 	for name in music_system.songs:
@@ -31,12 +31,12 @@ func attach_to_player(music_player):
 #	_current_section_player.disconnect("loop", self, "_on_Music_loop")
 #	_current_section_player.disconnect("level", self, "_on_Music_level")
 
-	if not _current_section_player.is_connected("beat", self, "_on_Music_beat"):
-		_current_section_player.connect("beat", self, "_on_Music_beat")
-		_current_section_player.connect("loop_beat", self, "_on_Music_loop_beat")
-		_current_section_player.connect("bar", self, "_on_Music_bar")
-		_current_section_player.connect("loop", self, "_on_Music_loop")
-		_current_section_player.connect("level", self, "_on_Music_level")
+	if not _current_section_player.beat.is_connected(_on_Music_beat):
+		_current_section_player.beat.connect(_on_Music_beat)
+		_current_section_player.loop_beat_signal.connect(_on_Music_loop_beat)
+		_current_section_player.bar.connect(_on_Music_bar)
+		_current_section_player.loop_signal.connect(_on_Music_loop)
+		_current_section_player.level_signal.connect(_on_Music_level)
 
 	$"%BPB".value = _current_section_player.beats_per_bar
 	$"%BPM".value = _current_section_player.bpm
@@ -181,12 +181,12 @@ func _on_Unload_pressed() -> void:
 
 func _on_Timeline_value_changed(value) -> void:
 	_current_section_player.seek(value)
-	yield(get_tree().create_timer(0.1), "timeout")
+	await get_tree().create_timer(0.1).timeout
 	update_status()
 
 
 func _on_HookValue_value_changed(value) -> void:
-	emit_signal("hook_value_changed", value)
+	hook_value_changed.emit(value)
 
 
 func _on_BBT_value_changed(value) -> void:
