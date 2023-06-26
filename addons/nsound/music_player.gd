@@ -211,10 +211,10 @@ func play_and_switch(song_name: String = "", section_name: String = "", stop: bo
 
 	section_players[song_name][section_name].start()
 
+	current_section = section_name
 	# changing to a new song rather than just a different section
 	if song_name != current_song:
 		current_song = song_name
-		current_section = section_name
 		song_started.emit(songs[current_song])
 
 	section_started.emit(sections[current_song][current_section])
