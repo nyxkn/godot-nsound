@@ -5,14 +5,14 @@ var Log = preload("res://addons/nsound/logger.gd").new(self)
 var bus: Bus
 var channel: Dictionary = { "peak_l": -100, "peak_r": -100 }
 
-@onready var user_volume_slider: VSlider = get_node("%UserVolumeSlider")
-@onready var auto_volume_slider: VSlider = get_node("%AutoVolumeSlider")
-@onready var spinbox: SpinBox = get_node("%SpinBox")
-@onready var vu_l: TextureProgressBar = get_node("%VuL")
-@onready var vu_r: TextureProgressBar = get_node("%VuR")
-@onready var effects: Tree = $"%Effects"
-#onready var substrips = $"%Substrips"
-@onready var substrips = get_node("%Substrips")
+@onready var user_volume_slider: VSlider = %UserVolumeSlider
+@onready var auto_volume_slider: VSlider = %AutoVolumeSlider
+@onready var spinbox: SpinBox = %SpinBox
+@onready var vu_l: TextureProgressBar = %VuL
+@onready var vu_r: TextureProgressBar = %VuR
+@onready var effects: Tree = %Effects
+#onready var substrips = %Substrips"
+@onready var substrips = %Substrips
 
 
 func init(bus: Bus) -> Node:
@@ -20,20 +20,20 @@ func init(bus: Bus) -> Node:
 
 	self.bus = bus
 
-	get_node("%ShowFold").visible = false
+	%ShowFold.visible = false
 
-	get_node("%BusName").text = bus.name
-	get_node("%SendName").text = bus.send
+	%BusName.text = bus.name
+	%SendName.text = bus.send
 
 	if bus is AudioServerBus:
-		get_node("%AudioServerBusName").text = str(bus.bus_name)
-		get_node("%Progress").hide()
+		%AudioServerBusName.text = str(bus.bus_name)
+		%Progress.hide()
 	elif bus is AudioTrack:
-		get_node("%AudioServerBusName").hide()
-		get_node("%VuMeter").hide()
-		get_node("%Effects").hide()
-		$"%Time".text = "%.1f" % bus.stream_player.get_playback_position()
-		$"%TotalTime".text = "%.1f" % bus.stream_player.stream.get_length() + "s"
+		%AudioServerBusName.hide()
+		%VuMeter.hide()
+		%Effects.hide()
+		%Time.text = "%.1f" % bus.stream_player.get_playback_position()
+		%TotalTime.text = "%.1f" % bus.stream_player.stream.get_length() + "s"
 
 	return self
 
@@ -98,18 +98,18 @@ func _process(delta: float) -> void:
 
 	elif bus is AudioTrack:
 		var is_playing = bus.is_playing()
-		$"%Icons".get_node("Play").visible = is_playing
-		$"%Icons".get_node("Pause").visible = not is_playing
+		%Icons.get_node("Play").visible = is_playing
+		%Icons.get_node("Pause").visible = not is_playing
 
 		if is_playing:
 			var time = bus.stream_player.get_playback_position()
-			$"%Time".text = "%.1f" % time
-			$"%ProgressBar".value = inverse_lerp(0, bus.stream_player.stream.get_length(), time)
+			%Time.text = "%.1f" % time
+			%ProgressBar.value = inverse_lerp(0, bus.stream_player.stream.get_length(), time)
 
 
 func add_substrip(strip: Node):
 	substrips.add_child(strip)
-	get_node("%ShowFold").visible = true
+	%ShowFold.visible = true
 
 
 func on_user_volume_changed(db):
