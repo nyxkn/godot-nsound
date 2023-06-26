@@ -45,7 +45,7 @@ func attach_to_player(music_player):
 	%Timeline.max_value = _current_section_player.loop_length
 	%Timeline.set_value_no_signal(_current_section_player.loop_time)
 	%Timeline/TotalTime.text = str("%0.1f" % _current_section_player.loop_length, 's')
-	%Time.text = str("%0.1f" % _current_section_player.loop_time, 's')
+	%Timeline/Time.text = str("%0.1f" % _current_section_player.loop_time, 's')
 
 #	var total_barbeats = _current_section_player._get_barbeat(
 #		_current_section_player.bars,
@@ -72,7 +72,7 @@ func update_status():
 func _process(delta: float) -> void:
 	if music_system.current_section_player():
 		%Timeline.set_value_no_signal(_current_section_player.loop_time)
-		%Time.text = str("%0.1f" % _current_section_player.loop_time, 's')
+		%Timeline/Time.text = str("%0.1f" % _current_section_player.loop_time, 's')
 		%BBT.value = _current_section_player.bbt.to_float()
 
 
@@ -176,7 +176,8 @@ func _on_Unload_pressed() -> void:
 	var item = options.get_item_text(options.get_selected_id())
 	music_system.unload_song(item)
 
-func _on_Timeline_value_changed(value) -> void:
+
+func _on_timeline_value_changed(value) -> void:
 	_current_section_player.seek(value)
 	await get_tree().create_timer(0.1).timeout
 	update_status()
@@ -187,6 +188,9 @@ func _on_HookValue_value_changed(value) -> void:
 
 
 func _on_BBT_value_changed(value) -> void:
+	print(str("bbt seek to ", float(value)))
 	_current_section_player.seek_to_barbeat(float(value))
+
+
 
 

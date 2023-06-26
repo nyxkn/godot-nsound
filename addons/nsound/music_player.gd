@@ -107,9 +107,9 @@ func load_song(song_name: String):
 		elif node is StingersContainer:
 			for track in node.get_children():
 				stingers[song_name][track.name] = track
-			Utils.setup_buses(node)
+			NSound.setup_buses(node)
 
-#	await get_tree().idle_frame
+#	await get_tree().process_frame
 
 	transitions[song_name] = song_node.transitions
 
@@ -122,7 +122,8 @@ func load_song(song_name: String):
 		_section_players_node.add_child(section_player)
 		section_players[song_name][section_name] = section_player
 
-		section_player.end.connect(on_section_end.bind(section_node))
+#		section_player.end_signal.connect(on_section_end.bind(section_node))
+		section_player.end_signal.connect(on_section_end)
 
 		section_player.load_song_section(song_node, section_node)
 

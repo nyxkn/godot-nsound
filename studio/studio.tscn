@@ -51,34 +51,12 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 
-[node name="Timeline" type="HBoxContainer" parent="Controls/Sliders"]
+[node name="Timeline" parent="Controls/Sliders" instance=ExtResource("5")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-script = ExtResource("1")
 components = 1
 
-[node name="Label" type="Label" parent="Controls/Sliders/Timeline"]
-layout_mode = 2
-text = "Timeline"
-
-[node name="HSlider" type="HSlider" parent="Controls/Sliders/Timeline"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 4
-max_value = 10.0
-
-[node name="Value" type="Label" parent="Controls/Sliders/Timeline"]
-visible = false
-layout_mode = 2
-text = "Timeline"
-
-[node name="SpinBox" type="SpinBox" parent="Controls/Sliders/Timeline"]
-layout_mode = 2
-max_value = 10.0
-
 [node name="Time" type="Label" parent="Controls/Sliders/Timeline"]
-unique_name_in_owner = true
 layout_mode = 2
 text = "0.0s"
 
@@ -89,6 +67,34 @@ text = "/"
 [node name="TotalTime" type="Label" parent="Controls/Sliders/Timeline"]
 layout_mode = 2
 text = "0.0s"
+
+[node name="Timeline0ld" type="HBoxContainer" parent="Controls/Sliders"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("1")
+components = 1
+
+[node name="Label" type="Label" parent="Controls/Sliders/Timeline0ld"]
+layout_mode = 2
+text = "Timeline"
+
+[node name="HSlider" type="HSlider" parent="Controls/Sliders/Timeline0ld"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 10.0
+
+[node name="Value" type="Label" parent="Controls/Sliders/Timeline0ld"]
+visible = false
+layout_mode = 2
+text = "Timeline"
+
+[node name="SpinBox" type="SpinBox" parent="Controls/Sliders/Timeline0ld"]
+visible = false
+layout_mode = 2
+max_value = 10.0
 
 [node name="BBT" parent="Controls/Sliders" instance=ExtResource("6")]
 unique_name_in_owner = true
@@ -277,10 +283,11 @@ layout_mode = 2
 [connection signal="pressed" from="Controls/Unload" to="." method="_on_Unload_pressed"]
 [connection signal="value_changed" from="Controls/Sliders/Level" to="." method="_on_Level_value_changed"]
 [connection signal="value_changed" from="Controls/Sliders/HookValue" to="." method="_on_HookValue_value_changed"]
-[connection signal="value_changed" from="Controls/Sliders/Timeline" to="." method="_on_Timeline_value_changed"]
-[connection signal="drag_ended" from="Controls/Sliders/Timeline/HSlider" to="Controls/Sliders/Timeline" method="_on_HSlider_drag_ended"]
-[connection signal="drag_started" from="Controls/Sliders/Timeline/HSlider" to="Controls/Sliders/Timeline" method="_on_HSlider_drag_started"]
-[connection signal="value_changed" from="Controls/Sliders/Timeline/HSlider" to="Controls/Sliders/Timeline" method="_on_HSlider_value_changed"]
+[connection signal="value_changed" from="Controls/Sliders/Timeline" to="." method="_on_timeline_value_changed"]
+[connection signal="value_changed" from="Controls/Sliders/Timeline0ld" to="." method="_on_Timeline_value_changed"]
+[connection signal="drag_ended" from="Controls/Sliders/Timeline0ld/HSlider" to="Controls/Sliders/Timeline0ld" method="_on_HSlider_drag_ended"]
+[connection signal="drag_started" from="Controls/Sliders/Timeline0ld/HSlider" to="Controls/Sliders/Timeline0ld" method="_on_HSlider_drag_started"]
+[connection signal="value_changed" from="Controls/Sliders/Timeline0ld/HSlider" to="Controls/Sliders/Timeline0ld" method="_on_HSlider_value_changed"]
 [connection signal="value_changed" from="Controls/Sliders/BBT" to="." method="_on_BBT_value_changed"]
 [connection signal="pressed" from="Controls/Run/Transitions/RunTransition" to="." method="_on_RunTransition_pressed"]
 [connection signal="pressed" from="Controls/Run/Section/GotoSection" to="." method="_on_GotoSection_pressed"]

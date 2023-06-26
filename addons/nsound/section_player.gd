@@ -12,7 +12,7 @@ signal odd_bar(n)
 signal loop_signal(n)
 signal level_signal(n)
 
-signal end(song, section)
+signal end_signal(song, section)
 
 signal faded_in(track)
 signal faded_out(track)
@@ -203,7 +203,7 @@ func load_song_section(song_node: Node, section_node: Section):
 		if section.regions[r].loop == true:
 			looping_regions[r] = section.regions[r]
 
-	Utils.setup_buses(section_node)
+	NSound.setup_buses(section_node)
 
 	# initialize nodes
 	levels_tracks.clear()
@@ -330,7 +330,7 @@ func seek(to_position: float) -> void:
 
 
 func seek_to_bbt(bbt: BBT) -> void:
-	var to_position = _bbt_to_loop_beat(bbt) * beat_length
+	var to_position = _loop_beat_to_position(_bbt_to_loop_beat(bbt))
 	seek(to_position)
 
 
@@ -352,7 +352,7 @@ func stop_all_streams() -> void:
 	# nonetheless, it's somewhat hard to check whether the stream has truly stopped
 	active_stream_players.clear()
 
-#	await get_tree().idle_frame
+#	await get_tree().process_frame
 
 #	var streams_still_playing = []
 #	for stream_player in active_stream_players:
@@ -474,7 +474,7 @@ func wait_until(when: int) -> void:
 	match when:
 		NDef.When.NOW:
 			# hack. we need to wait at least one frame for yield to register
-			await get_tree().idle_frame
+			await get_tree().process_frame
 		NDef.When.BEAT:
 			await self.beat
 		NDef.When.BAR:
@@ -572,7 +572,11 @@ func ________PRIVATE_UTIL(): pass
 
 
 func _bbt_to_loop_beat(bbt: BBT):
-	return (bbt.bar-1) * beats_per_bar + (bbt.beat)
+	return (bbt.bar-1) * beats_per_bar + bbt.beat
+
+
+func _loop_beat_to_position(loop_beat):
+	return (loop_beat - 1) * beat_length
 
 
 func _is_stream_stinger(node: Node) -> bool:
@@ -650,5 +654,5 @@ func _loop_end() -> void:
 		Log.d(["stopping loop", section.name])
 		# we have to at least set playing=false so that processing stops
 		stop()
-		end.emit(song.name, section.name)
+		end_signal.emit(song.name, section.name)
 
