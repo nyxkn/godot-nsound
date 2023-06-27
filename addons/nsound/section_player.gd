@@ -158,10 +158,7 @@ func _process(delta: float) -> void:
 func ________LOAD_START_SONG(): pass
 
 
-func load_song_section(song_node: Node, section_node: Section):
-	song = song_node
-	section = section_node
-
+func load_song_section(song: Song, section: Section):
 	# from song
 #	_copy_props_from(song)
 	bpm = song.bpm
@@ -204,12 +201,12 @@ func load_song_section(song_node: Node, section_node: Section):
 		if section.regions[r].loop == true:
 			looping_regions[r] = section.regions[r]
 
-	NSound.setup_buses(section_node)
+	NSound.setup_buses(section)
 
 	# initialize nodes
 	max_level = 0
 	levels_tracks.clear()
-	for node in Utils.get_all_children(section_node):
+	for node in Utils.get_all_children(section):
 		if node is LevelsTrack:
 			levels_tracks.append(node)
 			for l in node.levels.values():
