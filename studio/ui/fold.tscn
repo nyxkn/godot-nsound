@@ -21,3 +21,5 @@ text = "show"
 [node name="Content" type="MarginContainer" parent="VBoxContainer"]
 visible = false
 layout_mode = 2
+
+[connection signal="pressed" from="VBoxContainer/ShowFold" to="." method="_on_show_fold_pressed"]

@@ -116,6 +116,7 @@ max_value = 1.0
 step = 0.001
 value = 0.729
 editable = false
+scrollable = false
 
 [node name="UserVolumeSlider" type="VSlider" parent="HBoxContainer/VBoxContainer/Fader"]
 unique_name_in_owner = true
@@ -176,17 +177,18 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="Play" type="TextureRect" parent="HBoxContainer/VBoxContainer/Progress/Icons"]
-visible = false
 layout_mode = 2
 texture = ExtResource("4")
+stretch_mode = 3
 
 [node name="Pause" type="TextureRect" parent="HBoxContainer/VBoxContainer/Progress/Icons"]
+visible = false
 layout_mode = 2
 texture = ExtResource("8")
+stretch_mode = 3
 
 [node name="ProgressBar" type="ProgressBar" parent="HBoxContainer/VBoxContainer/Progress/Icons"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 5
@@ -240,10 +242,8 @@ editable = false
 [node name="FoldingContent" type="MarginContainer" parent="HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_constants/margin_top = 2
 script = ExtResource("1")
-
-[node name="Panel" type="Panel" parent="HBoxContainer/FoldingContent"]
-layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/FoldingContent"]
 layout_mode = 2
@@ -263,3 +263,4 @@ layout_mode = 2
 [connection signal="value_changed" from="HBoxContainer/VBoxContainer/Fader/AutoVolumeSlider" to="." method="_on_AutoVolumeSlider_value_changed"]
 [connection signal="drag_ended" from="HBoxContainer/VBoxContainer/Fader/UserVolumeSlider" to="." method="_on_UserVolumeSlider_drag_ended"]
 [connection signal="value_changed" from="HBoxContainer/VBoxContainer/Fader/UserVolumeSlider" to="." method="_on_UserVolumeSlider_value_changed"]
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/ShowFold" to="HBoxContainer/FoldingContent" method="_on_show_fold_pressed"]
