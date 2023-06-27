@@ -14,8 +14,8 @@ var Log = preload("res://addons/nsound/logger.gd").new(self)
 
 #signal bus_initialized
 #signal volume_changed(value)
-signal auto_volume_changed(value)
-signal user_volume_changed(value)
+signal auto_volume_changed(value: float)
+signal user_volume_changed(value: float)
 
 
 @export var mute: bool = false :
@@ -49,7 +49,7 @@ var auto_volume_db: float :
 
 # volume set through the mixer or manually through code
 # this is so that fades can happen independently of the real volume
-@export var user_volume_db := 0.0 :
+@export var user_volume_db: float = 0.0 :
 	set = set_user_volume_db
 
 

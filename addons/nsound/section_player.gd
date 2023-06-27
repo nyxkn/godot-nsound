@@ -4,18 +4,18 @@ var Log = preload("res://addons/nsound/logger.gd").new(self)
 const Utils = preload("res://addons/nsound/utils.gd")
 #const BBT = preload("res://addons/nsound/classes/bbt.gd")
 
-signal loop_beat_signal(n)
-signal beat(n)
-signal bar(n)
-signal barbeat_signal(n)
-signal odd_bar(n)
-signal loop_signal(n)
-signal level_signal(n)
+signal loop_beat_signal(n: int)
+signal beat(n: int)
+signal bar(n: int)
+signal barbeat_signal(n: float)
+signal odd_bar(n: int)
+signal loop_signal(n: int)
+signal level_signal(n: int)
 
 signal end_signal(song: Song, section: Section)
 
-signal faded_in(track)
-signal faded_out(track)
+signal faded_in(track: Bus)
+signal faded_out(track: Bus)
 
 
 const silence_ogg = preload("res://addons/nsound/assets/audio/silence-10m.ogg")

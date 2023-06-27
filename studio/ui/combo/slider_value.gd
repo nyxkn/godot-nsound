@@ -2,7 +2,7 @@
 extends HBoxContainer
 
 
-signal value_changed(value)
+signal value_changed(value: float)
 
 @export var min_value: float = 0 : set = set_min_value
 @export var max_value: float = 10 : set = set_max_value
