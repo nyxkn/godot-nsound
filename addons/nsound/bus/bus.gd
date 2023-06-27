@@ -73,7 +73,6 @@ var fading: bool : set = set_fading
 
 
 func init(send_bus_name: String = "Master") -> Bus:
-#	assert(0 == 1) #,"you should not be instancing the Bus class. consider this to be abstract")
 	Log.w(["you have initialized the class Bus as", name, ". Bus should probably just be abstract"])
 	self.send = send_bus_name
 	return self

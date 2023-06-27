@@ -115,41 +115,40 @@ func add_substrip(strip: Node):
 func on_user_volume_changed(db):
 	spinbox.value = db
 	var norm = _scaled_db_to_normalized_volume(db)
-	user_volume_slider.value = norm
+	user_volume_slider.set_value_no_signal(norm)
 
 
 func on_auto_volume_changed(db):
 	var norm = _scaled_db_to_normalized_volume(db)
-	auto_volume_slider.value = norm
+	auto_volume_slider.set_value_no_signal(norm)
 
 
-# using drag ended instead of value changed because this one gets called from code as well
-func _on_UserVolumeSlider_value_changed(value: float) -> void:
+func _on_user_volume_slider_value_changed(value: float) -> void:
 	pass
-#	var db = _normalized_volume_to_scaled_db(value)
-#	spinbox.value = db
-#	bus.user_volume_db = db
+	var db = _normalized_volume_to_scaled_db(value)
+	spinbox.value = db
+	bus.user_volume_db = db
 
 
-func _on_AutoVolumeSlider_value_changed(value: float) -> void:
+func _on_auto_volume_slider_value_changed(value: float) -> void:
 	pass
-#	var db = _normalized_volume_to_scaled_db(value)
-#	bus.auto_volume_db = db
+	var db = _normalized_volume_to_scaled_db(value)
+	bus.auto_volume_db = db
 
 
-func _on_UserVolumeSlider_drag_ended(value_changed: bool) -> void:
-	if value_changed:
-		var value = user_volume_slider.value
-		var db = _normalized_volume_to_scaled_db(value)
-		spinbox.value = db
-		bus.user_volume_db = db
-
-
-func _on_AutoVolumeSlider_drag_ended(value_changed: bool) -> void:
-	if value_changed:
-		var value = user_volume_slider.value
-		var db = _normalized_volume_to_scaled_db(value)
-		bus.auto_volume_db = db
+#func _on_UserVolumeSlider_drag_ended(value_changed: bool) -> void:
+#	if value_changed:
+#		var value = user_volume_slider.value
+#		var db = _normalized_volume_to_scaled_db(value)
+#		spinbox.value = db
+#		bus.user_volume_db = db
+#
+#
+#func _on_AutoVolumeSlider_drag_ended(value_changed: bool) -> void:
+#	if value_changed:
+#		var value = user_volume_slider.value
+#		var db = _normalized_volume_to_scaled_db(value)
+#		bus.auto_volume_db = db
 
 
 func _on_Solo_toggled(button_pressed: bool) -> void:
@@ -188,6 +187,3 @@ func _scaled_db_to_normalized_volume(db: float) -> float:
 			return reflected_position.x
 		else:
 			return pow(db / 45.0, 1.0 / 3.0) + 1.0
-
-
-

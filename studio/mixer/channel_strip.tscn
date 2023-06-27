@@ -106,6 +106,8 @@ layout_mode = 2
 theme_override_icons/updown = SubResource("16")
 min_value = -80.0
 step = 0.1
+alignment = 1
+editable = false
 
 [node name="Fader" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
 layout_mode = 2
@@ -270,8 +272,6 @@ layout_mode = 2
 [connection signal="toggled" from="HBoxContainer/VBoxContainer/Controls/Solo" to="." method="_on_Solo_toggled"]
 [connection signal="toggled" from="HBoxContainer/VBoxContainer/Controls/Mute" to="." method="_on_Mute_toggled"]
 [connection signal="toggled" from="HBoxContainer/VBoxContainer/Controls/Bypass" to="." method="_on_Bypass_toggled"]
-[connection signal="drag_ended" from="HBoxContainer/VBoxContainer/Fader/AutoVolumeSlider" to="." method="_on_AutoVolumeSlider_drag_ended"]
-[connection signal="value_changed" from="HBoxContainer/VBoxContainer/Fader/AutoVolumeSlider" to="." method="_on_AutoVolumeSlider_value_changed"]
-[connection signal="drag_ended" from="HBoxContainer/VBoxContainer/Fader/UserVolumeSlider" to="." method="_on_UserVolumeSlider_drag_ended"]
-[connection signal="value_changed" from="HBoxContainer/VBoxContainer/Fader/UserVolumeSlider" to="." method="_on_UserVolumeSlider_value_changed"]
+[connection signal="value_changed" from="HBoxContainer/VBoxContainer/Fader/AutoVolumeSlider" to="." method="_on_auto_volume_slider_value_changed"]
+[connection signal="value_changed" from="HBoxContainer/VBoxContainer/Fader/UserVolumeSlider" to="." method="_on_user_volume_slider_value_changed"]
 [connection signal="pressed" from="HBoxContainer/VBoxContainer/ShowFold" to="HBoxContainer/FoldingContent" method="_on_show_fold_pressed"]
