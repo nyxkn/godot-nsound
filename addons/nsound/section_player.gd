@@ -173,22 +173,21 @@ func load_song_section(song: Song, section: Section):
 	if section.bpm: bpm = section.bpm
 	if section.beats_per_bar: beats_per_bar = section.beats_per_bar
 
-	if bpm == 0:
-		Log.e(["missing bpm value for song/section", section])
-		assert(1 == 2)
-	if beats_per_bar == 0:
-		Log.e(["missing beats_per_bar value for song/section", section])
-		assert(1 == 2)
+	assert(bpm != 0, str("missing bpm value for song/section: ", section))
+	assert(beats_per_bar != 0, str("missing beats_per_bar value for song/section: ", section))
+
 	if bars == 0:
 		Log.w(["missing bars value for song/section, attempting to autocalculate", section])
 		# attempting to autocalculate bars
 		var first_audiotrack = section.get_child(0)
 		if not first_audiotrack is AudioTrack:
-			Log.e(["failed to calculate bars value. input manually"])
-			assert(1 == 2)
-		var beats_in_track = (bpm / 60.0) * first_audiotrack.stream_player.stream.get_length()
-		bars = round(beats_in_track / beats_per_bar)
-		Log.i(["autocalculated bars for section", section.name, "to", bars])
+			Log.e(["couldn't find a track to calculate bars from"])
+		else:
+			var beats_in_track = (bpm / 60.0) * first_audiotrack.stream_player.stream.get_length()
+			bars = round(beats_in_track / beats_per_bar)
+			Log.i(["autocalculated bars for section", section.name, "to", bars])
+
+	assert(bars != 0, str("missing bars value for song/section: ", section))
 
 	beat_length = 60.0 / bpm
 
