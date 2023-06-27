@@ -8,6 +8,9 @@ var music_system
 var _current_section_player
 var _current_song
 
+@onready var mixer: ScrollContainer = %Mixer
+
+
 
 func init(music_system: MusicPlayer) -> void:
 	self.music_system = music_system
@@ -101,7 +104,7 @@ func _on_Music_loop(n) -> void:
 
 
 func _on_Music_song_unloaded() -> void:
-	%Mixer.clear()
+	mixer.clear()
 
 
 func _on_Music_song_loaded(song_node) -> void:
@@ -129,7 +132,7 @@ func _on_Music_song_started(song_node) -> void:
 	for name in music_system.sections[_current_song]:
 		%Sections.add_item(name)
 
-	%Mixer.init_song(song_node)
+	mixer.init_song(song_node)
 
 
 func _on_Music_level(n) -> void:

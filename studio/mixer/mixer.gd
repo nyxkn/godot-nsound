@@ -1,4 +1,4 @@
-extends MarginContainer
+extends ScrollContainer
 
 var Log = preload("res://addons/nsound/logger.gd").new(self)
 const Utils = preload("res://addons/nsound/utils.gd")
