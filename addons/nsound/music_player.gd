@@ -6,10 +6,10 @@ const Utils = preload("res://addons/nsound/utils.gd")
 const SectionPlayer = preload("res://addons/nsound/section_player.gd")
 #const BBT = preload("res://addons/nsound/classes/bbt.gd")
 
-signal section_started(node)
-signal song_started(node)
-signal song_finished(node)
-signal song_loaded(node)
+signal section_started(section: Section)
+signal song_started(song: Song)
+signal song_finished(song: Song)
+signal song_loaded(song: Song)
 signal song_unloaded()
 
 
@@ -18,7 +18,7 @@ signal song_unloaded()
 # loop. at the end of a song we restart it (does this belong here or in song?)
 # sequence. at the end of a song we move on to the next one
 # shuffle. at the end of a song we randomly choose another one
-enum PlayMode { ONCE_EACH, LOOP_EACH, SEQUENCE, SHUFFLE }
+enum PlayMode { STOP_EACH, LOOP_EACH, SEQUENCE, SEQUENCE_LOOP, SHUFFLE }
 @export var play_mode: PlayMode = PlayMode.SEQUENCE
 
 @export var stop_on_pause: bool = false
@@ -124,8 +124,7 @@ func load_song(song_name: String):
 		_section_players_node.add_child(section_player)
 		section_players[song_name][section_name] = section_player
 
-#		section_player.end_signal.connect(on_section_end.bind(section_node))
-		section_player.end_signal.connect(on_section_end)
+		section_player.end_signal.connect(_on_section_end)
 
 		section_player.load_song_section(song_node, section_node)
 
@@ -322,61 +321,65 @@ func queue_stinger(stinger: String, when: int = NDef.When.BAR) -> void:
 
 
 # determine what to do at the end of a section
-func on_section_end(song_name: String, section_name: String) -> void:
-	var section_nodes = sections[song_name].values()
+func _on_section_end(song: Song, section: Section) -> void:
+	var section_nodes = sections[song.name].values()
 	var song_nodes = songs.values()
 
-	Log.d(["section ended:", section_name])
+	Log.d(["section ended:", section.name])
 
 	Log.d(["section_nodes:", section_nodes])
 	Log.d(["song_nodes:", song_nodes])
 
 	var section_idx = -1
 	for i in section_nodes.size():
-		if section_nodes[i].name == section_name:
+		if section_nodes[i].name == section.name:
 			section_idx = i
 			break
-
 
 	if section_idx < section_nodes.size() - 1:
 		Log.d(["switching to next section"])
 		# there's more sections in the song. play next section
 		# switching to the next section should happen exactly in time
 		# so ensure everything is already loaded
-		play_and_switch(song_name, section_nodes[section_idx + 1].name)
+		play_and_switch(song.name, section_nodes[section_idx + 1].name)
 
 	elif section_idx == section_nodes.size() - 1:
 		Log.d(["switching to next song"])
 		# this was the last section. play next song
 		match play_mode:
-			PlayMode.ONCE_EACH:
+			PlayMode.STOP_EACH:
+				# you can manually decide what to do after
 				Log.i("song finished. stopping")
-				song_finished.emit(songs[song_name])
+				song_finished.emit(song)
 
 			PlayMode.LOOP_EACH:
+				# you can manually decide when to stop/change
 				Log.i("looping song")
-				play_and_switch(song_name, section_nodes[0].name)
+				play_and_switch(song.name, section_nodes[0].name)
 
-			PlayMode.SEQUENCE:
+			PlayMode.SEQUENCE, PlayMode.SEQUENCE_LOOP:
 				Log.i("moving on to next song in sequence")
 
-				var song_idx = -1
-				for i in song_nodes.size():
-					if song_nodes[i].name == song_name:
-						song_idx = i
-						break
+				var song_idx = song_nodes.find(song)
 
 				if song_idx == song_nodes.size() - 1:
-					# stop?
-					Log.i("end of sequence. stopping")
+					if play_mode == PlayMode.SEQUENCE_LOOP:
+						Log.i("end of sequence. looping")
+						play_and_switch(song_nodes[0].name)
+					else:
+						# call stop manually? needed?
+						Log.i("end of sequence. stopping")
 				else:
 					play_and_switch(song_nodes[song_idx + 1].name)
 
 			PlayMode.SHUFFLE:
+				# shuffle ensures all songs are played, in random order
+				# you can implement a RANDOM mode where they are truly random
 				Log.i("shuffling for the next song")
 
 				if _shuffle_remaining_songs.is_empty():
 					_shuffle_remaining_songs = song_nodes.duplicate()
+					_shuffle_remaining_songs.erase(song) # remove song just played
 					_shuffle_remaining_songs.shuffle()
 
 				var next_song = _shuffle_remaining_songs.pop_front()

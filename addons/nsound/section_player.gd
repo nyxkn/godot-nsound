@@ -12,7 +12,7 @@ signal odd_bar(n)
 signal loop_signal(n)
 signal level_signal(n)
 
-signal end_signal(song, section)
+signal end_signal(song: Song, section: Section)
 
 signal faded_in(track)
 signal faded_out(track)
@@ -659,5 +659,5 @@ func _loop_end() -> void:
 		Log.d(["stopping loop", section.name])
 		# we have to at least set playing=false so that processing stops
 		stop()
-		end_signal.emit(song.name, section.name)
+		end_signal.emit(song, section)
 

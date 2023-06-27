@@ -44,8 +44,10 @@ func attach_to_player(music_player):
 	%BPM.value = _current_section_player.bpm
 	%Bars.value = _current_section_player.bars
 
-	%Timeline.max_value = _current_section_player.loop_length
+	# set needs to be first, so max_value doesn't trigger a value set if it
+	# becomes smaller than the last value
 	%Timeline.set_value_no_signal(_current_section_player.loop_time)
+	%Timeline.max_value = _current_section_player.loop_length
 	%Timeline/TotalTime.text = str("%0.1f" % _current_section_player.loop_length, 's')
 	%Timeline/Time.text = str("%0.1f" % _current_section_player.loop_time, 's')
 
