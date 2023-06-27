@@ -48,8 +48,8 @@ var last_beat: int
 # except that start section starts it the first time, and play loop reruns every loop
 
 #var sections: Dictionary
-var song: Song
-var section: Section
+var current_song: Song
+var current_section: Section
 
 # section-specific variables
 var bpm: int
@@ -159,6 +159,9 @@ func ________LOAD_START_SONG(): pass
 
 
 func load_song_section(song: Song, section: Section):
+	current_song = song
+	current_section = section
+
 	# from song
 #	_copy_props_from(song)
 	bpm = song.bpm
@@ -218,7 +221,7 @@ func load_song_section(song: Song, section: Section):
 
 
 func start():
-	Log.d(["section started", section.name])
+	Log.d(["section started", current_section.name])
 	loop = 0
 	last_beat = -1
 	transition_beat = -1
@@ -233,7 +236,7 @@ func start_loop() -> void:
 #		# but we still need to have music_player call stop to make sure
 #		return
 
-	Log.d(["loop started", section.name])
+	Log.d(["loop started", current_section.name])
 	loop += 1
 	bbt.bar = 1
 	bbt.beat = 1
@@ -259,7 +262,7 @@ func start_loop() -> void:
 
 #	for node in section.get_children():
 #		play_track(node)
-	play_track(section)
+	play_track(current_section)
 
 	# we only get song's reference stream after calling play_track
 	if reference_method == ReferenceMethod.SONG_STREAM:
@@ -645,16 +648,16 @@ func _bar() -> void:
 
 
 func _loop_end() -> void:
-	Log.d(["loop ended", section.name])
-	if section.play_mode == Section.PlayMode.LOOP:
-		Log.d(["restarting loop", section.name])
+	Log.d(["loop ended", current_section.name])
+	if current_section.play_mode == Section.PlayMode.LOOP:
+		Log.d(["restarting loop", current_section.name])
 #		if not stop_at_loop:
 		start_loop()
 		loop_signal.emit(loop)
 #		stop_at_loop = false
 	else:
-		Log.d(["stopping loop", section.name])
+		Log.d(["stopping loop", current_section.name])
 		# we have to at least set playing=false so that processing stops
 		stop()
-		end_signal.emit(song, section)
+		end_signal.emit(current_song, current_section)
 
