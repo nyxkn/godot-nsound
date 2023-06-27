@@ -23,6 +23,7 @@ enum PlayMode { ONCE_EACH, LOOP_EACH, SEQUENCE, SHUFFLE }
 
 @export var stop_on_pause: bool = false
 @export var pause_duck_volume: float = -12.0
+@export var preload_all_songs: bool = false
 
 var songs := {}
 # we instance one music player for each section of a song
@@ -40,7 +41,7 @@ var loaded_songs := []
 var current_song: String
 var current_section: String
 
-var played_songs := []
+var _shuffle_remaining_songs := []
 
 #var song_loaded: bool = false
 
@@ -70,8 +71,9 @@ func _ready() -> void:
 	_section_players_node.name = "MusicPlayers"
 	add_child(_section_players_node)
 
-	for song_name in songs:
-		load_song(song_name)
+	if preload_all_songs:
+		for song_name in songs:
+			load_song(song_name)
 
 
 func _process(delta: float) -> void:
@@ -373,15 +375,11 @@ func on_section_end(song_name: String, section_name: String) -> void:
 			PlayMode.SHUFFLE:
 				Log.i("shuffling for the next song")
 
-				for song in played_songs:
-					song_nodes.erase(song)
+				if _shuffle_remaining_songs.is_empty():
+					_shuffle_remaining_songs = song_nodes.duplicate()
+					_shuffle_remaining_songs.shuffle()
 
-				if song_nodes.size() == 0:
-					song_nodes = songs.values()
-					song_nodes.erase(played_songs[-1])
-
-				var song_idx = NSound.rng.randi_range(0, song_nodes.size() - 1)
-				play_and_switch(song_nodes[song_idx].name)
-				played_songs.append(song_nodes[song_idx])
+				var next_song = _shuffle_remaining_songs.pop_front()
+				play_and_switch(next_song.name)
 
 
