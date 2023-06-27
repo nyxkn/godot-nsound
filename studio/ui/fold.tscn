@@ -18,7 +18,7 @@ layout_mode = 2
 size_flags_horizontal = 0
 text = "show"
 
-[node name="Content" type="MarginContainer" parent="VBoxContainer"]
+[node name="FoldContent" type="MarginContainer" parent="VBoxContainer"]
 visible = false
 layout_mode = 2
 

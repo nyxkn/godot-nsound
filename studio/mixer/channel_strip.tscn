@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://btwqpb5a5n2h2"]
+[gd_scene load_steps=22 format=3 uid="uid://btwqpb5a5n2h2"]
 
 [ext_resource type="Script" path="res://studio/ui/fold.gd" id="1"]
 [ext_resource type="Script" path="res://studio/mixer/channel_strip.gd" id="2"]
@@ -9,6 +9,9 @@
 [ext_resource type="Texture2D" uid="uid://bheop36yudvnh" path="res://addons/nsound/assets/icons/godot/BusVuFull.svg" id="7"]
 [ext_resource type="Texture2D" uid="uid://lyets6dg00ei" path="res://addons/nsound/assets/icons/godot/Pause.svg" id="8"]
 [ext_resource type="Texture2D" uid="uid://dj2eotvtxkgse" path="res://addons/nsound/assets/icons/godot/BusVuEmpty.svg" id="9"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ch5op"]
+bg_color = Color(0.2, 0.2, 0.2, 1)
 
 [sub_resource type="Theme" id="9"]
 
@@ -35,6 +38,7 @@
 [node name="Strip" type="PanelContainer"]
 offset_right = 88.0
 offset_bottom = 401.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ch5op")
 script = ExtResource("2")
 
 [node name="PreviewTimer" type="Timer" parent="."]
@@ -192,6 +196,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 5
+theme_override_font_sizes/font_size = 8
 max_value = 1.0
 
 [node name="Hb" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Progress"]
@@ -248,11 +253,17 @@ script = ExtResource("1")
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/FoldingContent"]
 layout_mode = 2
 
-[node name="Content" type="MarginContainer" parent="HBoxContainer/FoldingContent/VBoxContainer"]
+[node name="FoldContent" type="MarginContainer" parent="HBoxContainer/FoldingContent/VBoxContainer"]
 visible = false
 layout_mode = 2
 
-[node name="Substrips" type="HBoxContainer" parent="HBoxContainer/FoldingContent/VBoxContainer/Content"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/FoldingContent/VBoxContainer/FoldContent"]
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="HBoxContainer/FoldingContent/VBoxContainer/FoldContent/VBoxContainer"]
+layout_mode = 2
+
+[node name="Substrips" type="HBoxContainer" parent="HBoxContainer/FoldingContent/VBoxContainer/FoldContent/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 

@@ -5,7 +5,7 @@ extends MarginContainer
 ## or use add_item
 
 # we cannot use % for content because that doesn't work if the scene gets made local
-@onready var content: MarginContainer = $VBoxContainer/Content
+@onready var content: MarginContainer = find_child("FoldContent")
 
 
 func _ready() -> void:
