@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3 uid="uid://bns3onjethi8v"]
+
+[ext_resource type="Script" path="res://studio/mixer/mixer.gd" id="1_erlx1"]
+
+[node name="Mixer" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -553.0
+offset_bottom = -272.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_erlx1")
+
+[node name="Strips" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 1366.0
+offset_bottom = 768.0
+
+[node name="CoreStrips" type="HBoxContainer" parent="Strips"]
+layout_mode = 2
+
+[node name="VSeparator" type="VSeparator" parent="Strips"]
+layout_mode = 2
+
+[node name="RuntimeStrips" type="HBoxContainer" parent="Strips"]
+layout_mode = 2

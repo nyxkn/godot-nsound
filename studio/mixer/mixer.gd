@@ -1,4 +1,4 @@
-extends Control
+extends MarginContainer
 
 var Log = preload("res://addons/nsound/logger.gd").new(self)
 const Utils = preload("res://addons/nsound/utils.gd")
@@ -13,8 +13,8 @@ func _ready() -> void:
 	init_core_buses()
 
 
-func show_section(section):
-	pass
+#func show_section(section):
+#	pass
 
 
 func init_core_buses():

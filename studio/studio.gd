@@ -74,7 +74,7 @@ func update_status():
 
 
 func _process(delta: float) -> void:
-	if music_system.current_section_player():
+	if music_system != null and music_system.current_section_player():
 		%Timeline.set_value_no_signal(_current_section_player.loop_time)
 		%Timeline/Time.text = str("%0.1f" % _current_section_player.loop_time, 's')
 		%BBT.value = _current_section_player.bbt.to_float()
@@ -136,49 +136,9 @@ func _on_Music_level(n) -> void:
 	%Level/SpinBox.value = n
 
 
-func _on_Level_value_changed(value) -> void:
+
+func _on_level_value_changed(value) -> void:
 	_current_section_player.level = value
-
-
-func _on_NextLoop_pressed() -> void:
-	_current_section_player._loop_end()
-
-
-func _on_RunTransition_pressed() -> void:
-	var t = %Transitions
-	music_system.run_transition(t.get_item_text(t.get_selected_id()))
-
-
-func _on_RunStinger_pressed() -> void:
-	var options = %Stingers
-	music_system.queue_stinger(options.get_item_text(options.get_selected_id()))
-
-
-func _on_GotoSection_pressed() -> void:
-	var options = %Sections
-	var item = options.get_item_text(options.get_selected_id())
-	music_system.goto_section(item)
-#	attach_to_player(music_system._current_section_player)
-
-
-func _on_GotoSong_pressed() -> void:
-	var options = %Songs
-	var item = options.get_item_text(options.get_selected_id())
-	music_system.goto_song(item)
-
-func _on_Play_pressed() -> void:
-	var options = %Songs
-	var item = options.get_item_text(options.get_selected_id())
-	music_system.play_and_switch(item)
-
-func _on_Stop_pressed() -> void:
-	music_system.stop()
-
-
-func _on_Unload_pressed() -> void:
-	var options = %Songs
-	var item = options.get_item_text(options.get_selected_id())
-	music_system.unload_song(item)
 
 
 func _on_timeline_value_changed(value) -> void:
@@ -187,14 +147,53 @@ func _on_timeline_value_changed(value) -> void:
 	update_status()
 
 
-func _on_HookValue_value_changed(value) -> void:
+func _on_hook_value_value_changed(value) -> void:
 	hook_value_changed.emit(value)
 
 
-func _on_BBT_value_changed(value) -> void:
+func _on_bbt_value_changed(value) -> void:
 	print(str("bbt seek to ", float(value)))
 	_current_section_player.seek_to_barbeat(float(value))
 
 
+func _on_play_pressed() -> void:
+	var options = %Songs
+	var item = options.get_item_text(options.get_selected_id())
+	music_system.play_and_switch(item)
 
 
+func _on_stop_pressed() -> void:
+	music_system.stop()
+
+
+func _on_next_loop_pressed() -> void:
+	_current_section_player._loop_end()
+
+
+func _on_unload_pressed() -> void:
+	var options = %Songs
+	var item = options.get_item_text(options.get_selected_id())
+	music_system.unload_song(item)
+
+
+func _on_goto_song_pressed() -> void:
+	var options = %Songs
+	var item = options.get_item_text(options.get_selected_id())
+	music_system.goto_song(item)
+
+
+func _on_goto_section_pressed() -> void:
+	var options = %Sections
+	var item = options.get_item_text(options.get_selected_id())
+	music_system.goto_section(item)
+#	attach_to_player(music_system._current_section_player)
+
+
+func _on_run_transition_pressed() -> void:
+	var t = %Transitions
+	music_system.run_transition(t.get_item_text(t.get_selected_id()))
+
+
+func _on_run_stinger_pressed() -> void:
+	var options = %Stingers
+	music_system.queue_stinger(options.get_item_text(options.get_selected_id()))

@@ -33,7 +33,7 @@
 [sub_resource type="CompressedTexture2D" id="16"]
 
 [node name="Strip" type="PanelContainer"]
-offset_right = 72.0
+offset_right = 88.0
 offset_bottom = 401.0
 script = ExtResource("2")
 
