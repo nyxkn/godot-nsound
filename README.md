@@ -1,6 +1,8 @@
 # NSound
 
-> WARNING: ***Currently being ported to Godot 4 and it's somewhat broken***
+> **Note**: ***project is still work in progress, but nearing usability***.
+>
+> Documentation needs improvement and examples will be added.
 
 Sound system for adaptive music and game audio in Godot.
 
@@ -12,10 +14,6 @@ The system is designed to be very flexible. Songs can be composed in many differ
 offering the possibility of combining horizontal sequencing and vertical layering as desired.
 
 Custom logic can also be provided through scripting.
-
-> ***Project is still work in progress, but it's nearing a stable api***
->
-> Documentation will be improved soon and examples will be added.
 
 ## Installation
 
